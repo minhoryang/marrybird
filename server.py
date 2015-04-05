@@ -43,7 +43,7 @@ class RegisterApi(Resource):
         gender = False
         if args['gender'] == 'female':
             gender = True
-        u = User(args['name'], args['pwd'], True)
+        u = User(args['name'], args['pwd'], gender)
         SESSION.add(u)
         try:
             SESSION.commit()
