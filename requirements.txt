@@ -2,3 +2,4 @@ SQLAlchemy
 flask
 flask-admin
 flask-restful
+newrelic

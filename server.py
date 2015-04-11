@@ -1,4 +1,4 @@
-from flask import Flask, request #, jsonify
+from flask import Flask, request, jsonify
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.restful import Api, Resource, reqparse
@@ -14,6 +14,10 @@ admin.add_view(ModelView(User, SESSION))
 @app.route('/')
 def index():
     return 'Helloworld'
+
+@app.route('/json')
+def test_json():
+    return jsonify({'text':'helloworld'})
 
 @app.teardown_request
 def shutdown_session(exception=None):
