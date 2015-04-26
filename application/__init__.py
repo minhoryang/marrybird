@@ -7,11 +7,10 @@ def create_app():
 	app.config['PROJECT_PATH'] = abspath(join(dirname(__file__), '..'))
 	app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/db/app.db' % (app.config['PROJECT_PATH'], )
 	
-	from .models import db
+	from .models import db, user
 	db.init_app(app)
 
 	api = Api(app, version='1.0', title='MarryBird API', description='serve JSON')
-	from . import users
-	users.init(api)
+	user.init(api)
 
 	return app
