@@ -47,13 +47,13 @@ def init(api):
     class AvailableKeywords(Resource):
         def get(self):
             """Available Keyword List."""
-            return {"keywords": keywords}
+            return {'status':200, 'message': keywords}
 
     @namespace.route('/<string:username>')
     class GetUsersKeywordsStatus(Resource):
         def get(self, username):
             """Get User's Keywords Status (Inputted or not, then which)."""
-            return {'status': 'User Not Found'}, 404
+            return {'status': 404, 'message': 'User Not Found'}, 404
 
     @namespace.route('/<string:username>/<string:keyword>')
     class UsersKeywords(Resource):
@@ -63,7 +63,7 @@ def init(api):
             if rec:
                 return rec.__dict__[keyword]
             else:
-                return {'status': 'Not Found'}, 404
+                return {'status': 404, 'message': 'Not Found'}, 404
 
         wanted = api.parser()
         wanted.add_argument('value', type=str, required=True, help='{"value": ""}', location='json')
@@ -80,6 +80,6 @@ def init(api):
                 rec.__dict__[keyword] = args['value']
                 db.session.add(rec)
                 db.session.commit()
-                return {'status': 'done'}
+                return {'status': 200, 'message': 'done'}
             else:
-                return {'status': 'Not Found'}, 404
+                return {'status': 404, 'message': 'Not Found'}, 404

@@ -42,11 +42,11 @@ def init(api):
             args = self.wanted.parse_args()
             user = User.query.filter(User.username == username).first()
             if not user:
-                return {'status': 'User Not Found'}, 404
+                return {'status': 404, 'message': 'User Not Found'}, 404
             if user.check_password(args['password']):
-                return {'status': 'Done'}  # TODO : SESSION!
+                return {'status': 200, 'message': 'Done'}  # TODO : SESSION!
             else:
-                return {'status': 'User Not Found'}, 404
+                return {'status': 404, 'message': 'User Not Found'}, 404
 
     @namespace.route('/register')
     class Register(Resource):
@@ -71,5 +71,5 @@ def init(api):
                 db.session.add(new_user)
                 db.session.commit()
             except IntegrityError as e:
-                return {'status': 'existed username', 'reason': str(e)}, 400
-            return {'status': 'okay'}
+                return {'status': 400, 'message': 'Existed Account\n'+str(e)}, 400
+            return {'status': 200, 'message':'okay'}
