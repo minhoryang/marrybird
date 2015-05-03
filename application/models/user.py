@@ -3,6 +3,7 @@ from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.restplus import Resource, fields
+from flask_jwt import generate_token
 from sqlalchemy.exc import IntegrityError
 from ._base import db
 
@@ -27,11 +28,11 @@ class MaleUser(User):
 class FemaleUser(User):
     pass
 
-def init(api):
+def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/<string:username>')
-    @api.doc(responses={200:'Successfully Login', 400:'Bad Format/Request', 404: 'User Not Found'})
+    @api.doc(responses={200:'Successfully Login', 400:'Bad Request', 404:'Not Found'})
     class Login(Resource):
         wanted = api.parser()
         wanted.add_argument('password', type=str, required=True, help='{"password": ""}', location='json')  # pull out.
@@ -41,19 +42,17 @@ def init(api):
             """Hello Users."""
             args = self.wanted.parse_args()
             user = User.query.filter(User.username == username).first()
-            if not user:
-                return {'status': 404, 'message': 'User Not Found'}, 404
-            if user.check_password(args['password']):
-                return {'status': 200, 'message': 'Done'}  # TODO : SESSION!
-            else:
-                return {'status': 404, 'message': 'User Not Found'}, 404
+            if user and user.check_password(args['password']):
+                return {'status': 200, 'message': generate_token(user)}
+            return {'status': 404, 'message': 'Not Found'}, 404
 
     @namespace.route('/register')
+    @api.doc(responses={200:'Successfully Login', 400:'Bad Request', 404: 'Not Found'})
     class Register(Resource):
         register_rules = api.model('Register', {
-        'username' : fields.String(required=True, description='username'),
-        'password' : fields.String(required=True, description='password'),
-        'isMale' : fields.Boolean(required=True)
+            'username' : fields.String(required=True, description='username'),
+            'password' : fields.String(required=True, description='password'),
+            'isMale' : fields.Boolean(required=True)
         })
         wanted = api.parser()
         wanted.add_argument('register', type=register_rules, required=True, help='{"register": {"username": "", "password": "", "isMale": true}}', location='json')
@@ -73,3 +72,11 @@ def init(api):
             except IntegrityError as e:
                 return {'status': 400, 'message': 'Existed Account\n'+str(e)}, 400
             return {'status': 200, 'message':'okay'}
+
+    #@namespace.route('/checkid')
+    #class CheckID(Resource):
+    #    def
+
+    @jwt.user_handler
+    def load_user(payload):
+        return User.query.filter(User.id == payload['user_id']).first()

@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from flask.ext.restplus import Resource
+from flask_jwt import jwt_required
 from ._base import db
 from .user import User
 
@@ -31,7 +32,7 @@ class Record(db.Model):
         super(Record, self).__setattr__(key, value)
     #super(Record, self).__setattr__('modified_at', datetime.now)
 
-def init(api):
+def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
     keywords = list()
     for i in Record.__dict__.keys():
@@ -45,6 +46,7 @@ def init(api):
 
     @namespace.route('/')
     class AvailableKeywords(Resource):
+        @jwt_required()  # TODO : TEST!!!! and Need to add header info if we want to use it.
         def get(self):
             """Available Keyword List."""
             return {'status':200, 'message': keywords}
