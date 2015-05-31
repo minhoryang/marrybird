@@ -12,7 +12,7 @@ def create_app():
     app.config['PROJECT_PATH'] = abspath(join(dirname(__file__), '..'))
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/db/app.db' % (app.config['PROJECT_PATH'], )
     app.config['SECRET_KEY'] = 'developer'  # TODO: need to change.
-    app.config['JWT_AUTH_HEADER_PREFIX'] = 'bearer'
+    app.config['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
     app.config['JWT_AUTH_URL_RULE'] = None
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=300)  # TODO: need to change.
 

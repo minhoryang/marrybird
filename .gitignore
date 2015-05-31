@@ -3,3 +3,4 @@ __pycache__
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 .idea/
+.DS_Store

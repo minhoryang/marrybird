@@ -10,7 +10,7 @@ from ._base import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(200))  # TODO: flask-bcrypt
+    password = db.Column(db.String(200))
     isMale = db.Column(db.Boolean())
     created_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -73,9 +73,21 @@ def init(api, jwt):
                 return {'status': 400, 'message': 'Existed Account\n'+str(e)}, 400
             return {'status': 200, 'message':'okay'}
 
-    #@namespace.route('/checkid')
-    #class CheckID(Resource):
-    #    def
+    @namespace.route('/checkid/<string:username>')
+    @api.doc(responses={200:'Not Found! Okay to go!', 400:'Bad Request', 404:'Exist ID! Failed to go!'})
+    class CheckID(Resource):
+        def get(self, username):
+            """Check If Wanted ID Was Already Existed."""
+            user = User.query.filter(User.username == username).first()
+            if user:
+                return {'status': 404, 'message': 'Exist ID! Failed to go!'}, 404
+            return {'status': 200, 'message': 'Not Found! Okay to go!'}
+
+    @namespace.route('/phone')
+    @api.doc(responses={})
+    class AddPhone(Resource):
+        def post(self):
+            return ''  # TODO : WHAT TO DO?
 
     @jwt.user_handler
     def load_user(payload):
