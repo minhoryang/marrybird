@@ -49,7 +49,7 @@ def init(api, jwt):
     @api.doc(responses={200:'Successfully Get', 400:'Not You', 401:'Auth Failed', 404:'Not Found'})
     class GetUsersKeywords(Resource):
         wanted = api.parser()
-        wanted.add_argument('authorization', type=str, required=True, help='Bearer JWT', location='headers')
+        wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
 
         @jwt_required()
         @api.doc(parser=wanted)
