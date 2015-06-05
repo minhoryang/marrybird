@@ -1,11 +1,13 @@
 """up/download (currently images only)."""
 
+from base64 import b64encode
 from os import path
 from datetime import datetime
+from urllib.parse import quote
 
 from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
-from flask import current_app
+from flask import current_app, make_response, request
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user  # TODO: Refactor JWT.
 
@@ -20,6 +22,7 @@ class File(db.Model):
     orig_filename = db.Column(db.String(100))  # TODO: is it enough?! :(
     dest_filename = db.Column(db.String(100))
     extension = db.Column(db.String(5))
+    mimetype = db.Column(db.String(20))
     # md5 = db.Column(db.String(32))  # TODO: add MD5
     # TODO: add Descriptions of file (is this face included?)
     # TODO: add GraphicHash
@@ -46,7 +49,7 @@ def init(api, jwt):
         return '.' in filename and filename.rsplit('.', 1)[1] in ['jpg', 'png']
 
     @namespace.route('/<string:username>')  # TODO: REGEX .jpg, .png
-    @api.doc(responses={200:'Successfully Login', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
+    @api.doc(responses={200:'Successfully Uploaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
     class FileUploadByMultipart(Resource):
         wanted = api.parser()
         wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
@@ -74,7 +77,8 @@ def init(api, jwt):
                                 username=username,
                                 orig_filename=args[arg_name].filename,
                                 dest_filename=dest_filename,
-                                extension=dest_filename.rsplit('.', 1)[1]
+                                extension=dest_filename.rsplit('.', 1)[1],
+                                mimetype=args[arg_name].mimetype
                             )
                             db.session.add(f)
                             db.session.commit()  # XXX: is it okay to go here?
@@ -88,3 +92,56 @@ def init(api, jwt):
                     return {'status': 400, 'message': 'Not allowed file(s): ' + ', '.join(failed)}, 400
 
         # GET?!
+        @namespace.route('/<int:idx>')
+        @api.doc(response={200:'Successfully Downloaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
+        class FileDownload(Resource):
+            wanted = api.parser()
+            wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+            @jwt_required()
+            @api.doc(parser=wanted, description="Checkout the chrome debug browser - Network sections.\n"
+                                                "(Below image can't loaded because they reload without an authorizaion header.\n"
+                                                "But you can download it directly.)")
+            def get(self, idx):
+                """Download file. (without approval check) (but checked the user)"""  # TODO: APPROVAL CHECK!
+                f = File.query.get(idx)
+                if not f:
+                    return {'status': 404, 'message': 'Not Found'}, 404
+                else:
+                    response = make_response(open(path.join(current_app.config['UPLOAD_FOLDER'], f.dest_filename), 'rb').read())
+                    response.content_type = f.mimetype
+                    return response
+
+        @namespace.route('/<int:idx>/base64')
+        @api.doc(response={200:'Successfully Downloaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
+        class FileDownloadBase64(Resource):
+            wanted = api.parser()
+            wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+            @jwt_required()
+            @api.doc(parser=wanted, description="1. Copy below base64 strings at 'message'\n"
+                                                "2. Launch new blank page (about:blank)\n"
+                                                "3. \<img src='PASTE_IT_HERE'/\>")
+            def get(self, idx):
+                """Download file. (without approval check) (but checked the user)"""  # TODO: APPROVAL CHECK!
+                f = File.query.get(idx)
+                if not f:
+                    return {'status': 404, 'message': 'Not Found'}, 404
+                else:
+                    base64 = b64encode(open(path.join(current_app.config['UPLOAD_FOLDER'], f.dest_filename), 'rb').read())
+                    return {'status': 200, 'message': 'data:%s;base64,%s' % (f.mimetype, quote(base64))}
+
+        @namespace.route('/<int:idx>/base64_tester')
+        @api.representation('text/html')
+        class FileDownloadBase64_Tester(Resource):
+            wanted = api.parser()
+            wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+            @api.doc(parser=wanted)
+            def get(self, idx):
+                args = self.wanted.parse_args()
+                # TODO
+                return """<html><body><script src="//code.jquery.com/jquery-2.1.4.min.js"/><img><script></script>"""
+
+        class FileDownloadBase64_QueryString(Resource):
+            pass  # TODO
