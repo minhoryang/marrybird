@@ -4,3 +4,4 @@ flask-restplus
 flask-migrate
 newrelic
 -e git+https://github.com/mattupstate/flask-jwt.git#egg=flask-jwt
+requests

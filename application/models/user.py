@@ -83,12 +83,6 @@ def init(api, jwt):
                 return {'status': 404, 'message': 'Exist ID! Failed to go!'}, 404
             return {'status': 200, 'message': 'Not Found! Okay to go!'}
 
-    @namespace.route('/phone')
-    @api.doc(responses={})
-    class AddPhone(Resource):
-        def post(self):
-            return ''  # TODO : WHAT TO DO?
-
     @jwt.user_handler
     def load_user(payload):
         return User.query.filter(User.id == payload['user_id']).first()

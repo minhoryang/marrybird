@@ -18,13 +18,14 @@ def create_app():
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(minutes=10)  # TODO: need to change.
     app.config['UPLOAD_FOLDER'] = '/tmp/'
 
-    from .models import db, user, record, file
+    from .models import db, user, record, file, phone
     db.init_app(app)
 
     admin = Admin(app)
     admin.add_view(ModelView(user.User, db.session))
     admin.add_view(ModelView(record.Record, db.session))
     admin.add_view(ModelView(file.File, db.session))
+    admin.add_view(ModelView(phone.Phone, db.session))
 
     class MyJWT(JWT):
         def _error_callback(self, e):
@@ -36,5 +37,6 @@ def create_app():
     user.init(api, jwt)
     record.init(api, jwt)
     file.init(api, jwt)
+    phone.init(api, jwt)
 
     return app
