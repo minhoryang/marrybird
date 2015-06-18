@@ -113,12 +113,14 @@ def init(api, jwt):
                     return response
 
             # XXX : Not Worked at Web UI.
+            """
             wanted2 = api.parser()
             wanted2.add_argument('bearer', type=str, required=True, help='"$JsonWebToken"', location='form')
             @api.doc(parser=wanted2)
             def post(self, idx):
                 args = self.wanted2.parse_args()
                 return BearerDownloader(idx, args['bearer'])
+            """
 
         @namespace.route('/<int:idx>/base64')
         @api.doc(response={200:'Successfully Downloaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
