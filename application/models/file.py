@@ -9,7 +9,7 @@ from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 from flask import current_app, make_response, request
 from flask.ext.restplus import Resource, fields
-from flask_jwt import jwt_required, current_user  # TODO: Refactor JWT.
+from flask_jwt import jwt_required, current_user, JWTError  # TODO: Refactor JWT.
 
 from ._base import db
 
@@ -112,6 +112,14 @@ def init(api, jwt):
                     response.content_type = f.mimetype
                     return response
 
+            # XXX : Not Worked at Web UI.
+            wanted2 = api.parser()
+            wanted2.add_argument('bearer', type=str, required=True, help='"$JsonWebToken"', location='form')
+            @api.doc(parser=wanted2)
+            def post(self, idx):
+                args = self.wanted2.parse_args()
+                return BearerDownloader(idx, args['bearer'])
+
         @namespace.route('/<int:idx>/base64')
         @api.doc(response={200:'Successfully Downloaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
         class FileDownloadBase64(Resource):
@@ -121,7 +129,7 @@ def init(api, jwt):
             @jwt_required()
             @api.doc(parser=wanted, description="1. Copy below base64 strings at 'message'\n"
                                                 "2. Launch new blank page (about:blank)\n"
-                                                "3. \<img src='PASTE_IT_HERE'/\>")
+                                                "3. \<img src=\'PASTE_IT_HERE\'/\>")
             def get(self, idx):
                 """Download file. (without approval check) (but checked the user)"""  # TODO: APPROVAL CHECK!
                 f = File.query.get(idx)
@@ -147,5 +155,23 @@ def init(api, jwt):
                 return response  # redirect?!
         """
 
+        @namespace.route('/<int:idx>/<string:bearer>')
+        @api.doc(response={200:'Successfully Downloaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
         class FileDownloadBase64_QueryString(Resource):
-            pass  # TODO
+            def get(self, idx, bearer):
+                return BearerDownloader(idx, bearer)
+
+    def BearerDownloader(idx, bearer):
+        try:
+            payload = jwt.decode_callback(bearer)
+            user = jwt.user_callback(payload)
+        except JWTError:
+            return {'status': 401, 'message': 'Auth Failed'}, 401
+        else:
+            f = File.query.get(idx)
+            if not f:
+                return {'status': 404, 'message': 'Not Found'}, 404
+            else:
+                response = make_response(open(path.join(current_app.config['UPLOAD_FOLDER'], f.dest_filename), 'rb').read())
+                response.content_type = f.mimetype
+                return response
