@@ -131,6 +131,7 @@ def init(api, jwt):
                     base64 = b64encode(open(path.join(current_app.config['UPLOAD_FOLDER'], f.dest_filename), 'rb').read())
                     return {'status': 200, 'message': 'data:%s;base64,%s' % (f.mimetype, quote(base64))}
 
+        """
         @namespace.route('/<int:idx>/base64_tester')
         @api.representation('text/html')
         class FileDownloadBase64_Tester(Resource):
@@ -141,7 +142,10 @@ def init(api, jwt):
             def get(self, idx):
                 args = self.wanted.parse_args()
                 # TODO
-                return """<html><body><script src="//code.jquery.com/jquery-2.1.4.min.js"/><img><script></script>"""
+                response = make_response("<html><body><script src='//code.jquery.com/jquery-2.1.4.min.js'/><img><script></script></body></html>")
+                response.content_type = "text/html"
+                return response  # redirect?!
+        """
 
         class FileDownloadBase64_QueryString(Resource):
             pass  # TODO
