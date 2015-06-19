@@ -10,7 +10,7 @@ from .user import User
 class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
-    modified_at = db.Column(db.DateTime, default=datetime.now)
+    modified_at = db.Column(db.DateTime)
     username = db.Column(db.String(50), unique=True)
 
     nickname = db.Column(db.String(50), unique=True)
@@ -81,8 +81,7 @@ def init(api, jwt):
                 if not rec:
                     rec = Record(username=username)
                 for key, value in got:
-                    rec.__dict__[key] = value
-                db.session.add(rec)
+                    rec.__setattr__(key, value)
                 db.session.commit()
                 return {'status': 200, 'message': 'done'}
             else:

@@ -1,3 +1,4 @@
+#sqlalchemy<1.0
 flask
 flask-admin
 flask-restplus
