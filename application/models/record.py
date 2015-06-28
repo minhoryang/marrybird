@@ -76,15 +76,17 @@ def init(api, jwt):
             args = self.wanted.parse_args()['records']
             got = []
             for key in args:
-                if key in keywords:
-                    got.append((key, args[key]))
+                if args[key]:
+                    if key in keywords:
+                        got.append((key, args[key]))
             if current_user.username == username:
                 rec = Record.query.filter(Record.username == username).first()
                 if not rec:
                     rec = Record(username=username)
                 for key, value in got:
                     rec.__setattr__(key, value)
+                db.session.add(rec)
                 db.session.commit()
-                return {'status': 200, 'message': 'done'}
+                return {'status': 200, 'message': 'Updated!'}
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
