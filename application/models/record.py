@@ -2,7 +2,7 @@
 from copy import copy
 from datetime import datetime
 
-from flask.ext.restplus import Resource
+from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
 from ._base import db
 from .user import User
@@ -65,16 +65,19 @@ def init(api, jwt):
                 return {'status': 400, 'message': 'Not You'}, 400
 
         wanted2 = copy(wanted)
-        for key in keywords: wanted2.add_argument(key, type=str, location='form')
+        record_rules = api.model('records', {key: fields.String() for key in keywords})
+        print(record_rules)
+
+        wanted2.add_argument('records', type=record_rules, required=True, help='{"records": {"nickname": "", ...}}', location='json')
 
         @jwt_required()
         @api.doc(parser=wanted2)
         def post(self, username):
             """Set User's Keyword Contents."""
-            args = self.wanted.parse_args()
+            args = self.wanted.parse_args()['records']
             got = []
-            for key in keywords:
-                if args[key]:
+            for key in args:
+                if key in keywords:
                     got.append((key, args[key]))
             if current_user.username == username:
                 rec = Record.query.filter(Record.username == username).first()
