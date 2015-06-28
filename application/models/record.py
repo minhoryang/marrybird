@@ -42,6 +42,7 @@ def init(api, jwt):
 
     @namespace.route('/')
     class GetKeywordsList(Resource):
+        """All Available Keywords List."""
         def get(self):
             return {'status': 200, 'message': keywords}
 
@@ -66,8 +67,6 @@ def init(api, jwt):
 
         wanted2 = copy(wanted)
         record_rules = api.model('records', {key: fields.String() for key in keywords})
-        print(record_rules)
-
         wanted2.add_argument('records', type=record_rules, required=True, help='{"records": {"nickname": "", ...}}', location='json')
 
         @jwt_required()

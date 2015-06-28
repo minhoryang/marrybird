@@ -33,7 +33,7 @@ def create_app():
 
     jwt = MyJWT(app)
 
-    api = Api(app, version='1.0', title='MarryBird API', description='Hi There!')
+    api = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
     user.init(api, jwt)
     record.init(api, jwt)
     file.init(api, jwt)
