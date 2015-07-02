@@ -23,7 +23,7 @@ class Record(db.Model):
     birthday = db.Column(db.String(50))  # TODO: format string
     height = db.Column(db.String(50))
     religion = db.Column(db.String(50))
-    chararistic = db.Column(db.String(50))
+    characteristic = db.Column(db.String(50))
     photo_url = db.Column(db.String(50))
 
     def __setattr__(self, key, value):
