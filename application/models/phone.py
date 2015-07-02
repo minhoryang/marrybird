@@ -75,3 +75,21 @@ def init(api, jwt):
 
     def check_phone_number(phonenum):
         return True  # TODO
+
+    @namespace.route('/<string:target_username>')
+    class Get(Resource):
+        wanted = api.parser()
+        wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+        @jwt_required()
+        @api.doc(parser=wanted)
+        def get(self, target_username):
+            got = Phone.query.filter(Phone.username == target_username).first()
+            if not got:
+                return {'status': 400, 'message': 'Not Authorized'}, 400
+            if not is_okay_to_get_your_phone_number(current_user, got):
+                return {'status': 400, 'message': 'Not Authorized'}, 400
+            return {'status': 200, 'message': got.phone}
+
+    def is_okay_to_get_your_phone_number(me, you):
+        return True  # TODO
