@@ -13,7 +13,6 @@ from ..externals.slack import push
 
 class Phone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #username = db.Column(db.String(50), unique=True)
     phone = db.Column(db.String(10), unique=True)
     status = db.Column(db.String(10))
     modified_at = db.Column(db.DateTime, default=datetime.now)
@@ -25,23 +24,18 @@ class Phone(db.Model):
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
-    @namespace.route('/request/')  #<string:username>')
+    @namespace.route('/request/')
     class Request(Resource):
         wanted = api.parser()
-        wanted.add_argument('phonenum', type=str, required=True, help='{"phonenum": "010-6247-3590"}', location='json')
-        #wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+        wanted.add_argument('phonenum', type=str, required=True, help='{"phonenum": "01062473590"}', location='json')
 
-        #@jwt_required()
         @api.doc(parser=wanted)
-        def post(self):  #, username):
+        def post(self):
             """Request Token and Sending Push to Slack."""
             args = self.wanted.parse_args()
             if not check_phone_number(args['phonenum']):
                 return {'status': 400, 'message': 'Wrong Phone Number'}, 400
-            #if not current_user.username == username:
-            #    return {'status': 400, 'message': 'Not You'}, 400
             add = Phone()
-            #add.username = username
             add.phone = args['phonenum']
             add.status = str(randrange(1000, 9999))
             try:
@@ -49,21 +43,13 @@ def init(api, jwt):
                 db.session.commit()
             except IntegrityError as e:
                 return {'status': 400, 'message': 'Already Requested\n'+str(e)}, 400
-            #push(add.username + '의 ' + add.phone + ' 로 ' + add.status + ' 를 보내주세요.')
             push('휴대폰인증)' + add.phone + ' 로 ' + add.status + ' 를 보내주세요.')
             return {'status': 200, 'message': 'requested'}
 
-    @namespace.route('/validate/<string:phonenum>/<int:token>')  #<string:username>/<int:token>')
+    @namespace.route('/validate/<string:phonenum>/<int:token>')
     class Validate(Resource):
-        #wanted = api.parser()
-        #wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
-
-        #@jwt_required()
-        #@api.doc(parser=wanted)
-        def get(self, phonenum, token):  # username, token):
+        def get(self, phonenum, token):
             """Validate Token."""
-            #if not current_user.username == username:
-            #    return {'status': 400, 'message': 'Not You'}, 400
             got = Phone.query.filter(Phone.phone == phonenum).first()
             if not got:
                 return {'status': 400, 'message': 'Not Found'}, 400
@@ -77,6 +63,7 @@ def init(api, jwt):
     def check_phone_number(phonenum):
         return True  # TODO
 
+    """
     @namespace.route('/<string:target_username>')
     class Get(Resource):
         wanted = api.parser()
@@ -94,3 +81,4 @@ def init(api, jwt):
 
     def is_okay_to_get_your_phone_number(me, you):
         return True  # TODO
+    """
