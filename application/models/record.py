@@ -85,8 +85,21 @@ def init(api, jwt):
                     rec = Record(username=username)
                 for key, value in got:
                     rec.__setattr__(key, value)
-                db.session.add(rec)
-                db.session.commit()
-                return {'status': 200, 'message': 'Updated!'}
+                try:
+                    db.session.add(rec)
+                    db.session.commit()
+                    return {'status': 200, 'message': 'Updated!'}
+                except IntegrityError as e:
+                    return {'status': 400, 'message': 'Existed User&Nick Name\n'}, 400
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
+
+    @namespace.route('/checknickname/<string:nickname>')
+    @api.doc(responses={200:'Not Found! Okay to go!', 400:'Bad Request', 404:'Exist ID! Failed to go!'})
+    class CheckNickname(Resource):
+        def get(self, nickname):
+            """Check If Wanted ID Was Already Existed."""
+            record = Record.query.filter(Record.nickname == nickname).first()
+            if record:
+                return {'status': 404, 'message': 'Exist Nickname! Failed to go!'}, 404
+            return {'status': 200, 'message': 'Not Found! Okay to go!'}
