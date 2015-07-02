@@ -9,12 +9,14 @@ from flask_jwt import jwt_required, current_user
 from sqlalchemy.exc import IntegrityError
 
 from ._base import db
+from .record import Record
 from ..externals.slack import push
 
 class Phone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    phone = db.Column(db.String(10), unique=True)
+    phone = db.Column(db.String(10))
     status = db.Column(db.String(10))
+    created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime, default=datetime.now)
 
     def __setattr__(self, key, value):
@@ -35,14 +37,20 @@ def init(api, jwt):
             args = self.wanted.parse_args()
             if not check_phone_number(args['phonenum']):
                 return {'status': 400, 'message': 'Wrong Phone Number'}, 400
+            # Check Existed User.
+            if Record.query.filter(Record.phonenum == args['phonenum']).first():
+                return {'status': 400, 'message': 'Already Registered'}
+            # Expired Same Numbers
+            for i in Phone.query.filter(Phone.phone == args['phonenum']).filter(Phone.status != "expired"):
+                i.status = "expired"
+                db.session.add(i)
+            db.session.commit()
+            # Register
             add = Phone()
             add.phone = args['phonenum']
             add.status = str(randrange(1000, 9999))
-            try:
-                db.session.add(add)
-                db.session.commit()
-            except IntegrityError as e:
-                return {'status': 400, 'message': 'Already Requested\n'+str(e)}, 400
+            db.session.add(add)
+            db.session.commit()
             push('휴대폰인증)' + add.phone + ' 로 ' + add.status + ' 를 보내주세요.')
             return {'status': 200, 'message': 'requested'}
 
@@ -50,7 +58,7 @@ def init(api, jwt):
     class Validate(Resource):
         def get(self, phonenum, token):
             """Validate Token."""
-            got = Phone.query.filter(Phone.phone == phonenum).first()
+            got = Phone.query.filter(Phone.phone == phonenum).order_by(Phone.created_at.desc()).first()
             if not got:
                 return {'status': 400, 'message': 'Not Found'}, 400
             if got.status != str(token):

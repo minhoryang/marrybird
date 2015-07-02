@@ -25,6 +25,7 @@ class Record(db.Model):
     religion = db.Column(db.String(50))
     characteristic = db.Column(db.String(50))
     photo_url = db.Column(db.String(50))
+    phonenum = db.Column(db.String(20), unique=True)
 
     def __setattr__(self, key, value):
         super(Record, self).__setattr__(key, value)
@@ -90,7 +91,7 @@ def init(api, jwt):
                     db.session.commit()
                     return {'status': 200, 'message': 'Updated!'}
                 except IntegrityError as e:
-                    return {'status': 400, 'message': 'Existed User&Nick Name\n'}, 400
+                    return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
 
