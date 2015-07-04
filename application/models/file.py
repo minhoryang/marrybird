@@ -52,15 +52,15 @@ def init(api, jwt):
     @api.doc(responses={200:'Successfully Uploaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
     class FileUploadByMultipart(Resource):
         wanted = api.parser()
-        wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+        #wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
         wanted.add_argument('file1', type=FileStorage, required=True, help='.jpg .png', location='files')
         #wanted.add_argument('file2', type=FileStorage, required=True, help='', location='files')  # TODO: Multiple
 
-        @jwt_required()
+        #@jwt_required()
         @api.doc(parser=wanted)  # TODO: Content Types
         def post(self, username):
             """Upload your file(s) by multipart format."""
-            if current_user.username != username:
+            if False:  #current_user.username != username:
                 return {'status': 400, 'message': 'Not You'}, 400  # TODO: refactor others like this.
             else:
                 args = self.wanted.parse_args()
@@ -69,7 +69,7 @@ def init(api, jwt):
                 for arg_name in args:
                     if 'file' in arg_name:
                         if _allowed_file(args[arg_name].filename):
-                            dest_filename = secure_filename(str(datetime.now()) + '.' + str(current_user.id) + '.' + args[arg_name].filename)
+                            dest_filename = secure_filename(str(datetime.now()) + '.' + args[arg_name].filename)
                             # TODO: badly above %s.%s.%s % (a,b,c)
                             # TODO: check magic(file_header)
                             args[arg_name].save(path.join(current_app.config['UPLOAD_FOLDER'], dest_filename))
