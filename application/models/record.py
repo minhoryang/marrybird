@@ -8,11 +8,16 @@ from ._base import db
 from .user import User
 
 class Record(db.Model):
+    # XXX : Can't Read & Write.
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
     username = db.Column(db.String(50), unique=True)
 
+    # XXX : Can't Write
+    is_regular_member = db.Column(db.Boolean, default=False)
+
+    # XXX : Readable & Writable
     nickname = db.Column(db.String(50), unique=True)
     graduated_school = db.Column(db.String(50))
     graduated_school_major = db.Column(db.String(50))
@@ -27,80 +32,101 @@ class Record(db.Model):
     photo_url = db.Column(db.String(50))
     phonenum = db.Column(db.String(20), unique=True)
 
+    regular_company_email = db.Column(db.String(50))
+    regular_company_id_photo_url = db.Column(db.String(50))
+    regular_company_paper_card_photo_url = db.Column(db.String(50))
+    regular_graduated_school_email = db.Column(db.String(50))
+    regular_graduated_school_id_photo_url = db.Column(db.String(50))
+
     def __setattr__(self, key, value):
         super(Record, self).__setattr__(key, value)
         super(Record, self).__setattr__('modified_at', datetime.now())
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
-    keywords = list()
+
+    CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username']
+    CANT_WRITE_AT_CLIENT = ['is_regular_member']
+    AVAILABLE = list()
+
     for i in Record.__dict__.keys():
-        if i[0] == '_' or i in ['id', 'created_at', 'modified_at', 'username']:
-            pass
+        if i[0] == '_' or i in CANT_READ_AND_WRITE_AT_CLIENT:
+            pass  # XXX : Can't Read at Client.
         else:
-            keywords.append(i)
-    keywords.sort()
+            AVAILABLE.append(i)
+    AVAILABLE.sort()
 
     @namespace.route('/')
     class GetKeywordsList(Resource):
         """All Available Keywords List."""
         def get(self):
-            return {'status': 200, 'message': keywords}
+            return {'status': 200, 'message': AVAILABLE}
 
     @namespace.route('/<string:username>')
     @api.doc(responses={200:'Successfully Get', 400:'Not You', 401:'Auth Failed', 404:'Not Found'})
     class GetUsersKeywords(Resource):
-        wanted = api.parser()
-        wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+        # TODO : PULL THIS OUT.
+        authorization = api.parser()
+        authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
 
         @jwt_required()
-        @api.doc(parser=wanted)
+        @api.doc(parser=authorization)
         def get(self, username):
             """Get User's Keyword Contents."""
-            if current_user.username == username:
-                rec = Record.query.filter(Record.username == username).first()
-                if rec:
-                    return {'status': 200, 'message': [{key : rec.__dict__[key]} for key in keywords]}
-                else:
-                    return {'status': 404, 'message': 'Not Found'}, 404
-            else:
+            if current_user.username != username:
                 return {'status': 400, 'message': 'Not You'}, 400
 
-        wanted2 = copy(wanted)
-        record_rules = api.model('records', {key: fields.String() for key in keywords})
-        wanted2.add_argument('records', type=record_rules, required=True, help='{"records": {"nickname": "", ...}}', location='json')
-
-        @jwt_required()
-        @api.doc(parser=wanted2)
-        def post(self, username):
-            """Set User's Keyword Contents."""
-            args = self.wanted.parse_args()['records']
-            got = []
-            for key in args:
-                if args[key]:
-                    if key in keywords:
-                        got.append((key, args[key]))
-            if current_user.username == username:
-                rec = Record.query.filter(Record.username == username).first()
-                if not rec:
-                    rec = Record(username=username)
-                for key, value in got:
-                    rec.__setattr__(key, value)
-                try:
-                    db.session.add(rec)
-                    db.session.commit()
-                    return {'status': 200, 'message': 'Updated!'}
-                except IntegrityError as e:
-                    return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400
+            existed_record = Record.query.filter(Record.username == username).first()
+            if existed_record:
+                return {'status': 200, 'message': [{key : existed_record.__dict__[key]} for key in AVAILABLE]}
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
+
+        wanted_changes = copy(authorization)
+        wanted_changes.add_argument(
+            'records',
+            type=api.model('records', {key: fields.String() for key in AVAILABLE}),
+            required=True,
+            help='{"records": {"nickname": "", ...}}',
+            location='json')
+
+        @jwt_required()
+        @api.doc(parser=wanted_changes)
+        def post(self, username):
+            """Set User's Keyword Contents."""
+            received_changes = self.wanted_changes.parse_args()['records']
+
+            acceptable_changes = []
+            for key in received_changes:
+                if received_changes[key]:
+                    if key in CANT_WRITE_AT_CLIENT:
+                        pass  # XXX : Can't write at Client. (Ignore first)
+                    elif key in AVAILABLE:
+                        acceptable_changes.append((key, received_changes[key]))
+
+            if current_user.username != username:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
+            existed_record = Record.query.filter(Record.username == username).first()
+            if not existed_record:
+                existed_record = Record(username=username)
+
+            for key, value in acceptable_changes:
+                existed_record.__setattr__(key, value)
+
+            try:
+                db.session.add(existed_record)
+                db.session.commit()
+                return {'status': 200, 'message': 'Updated!'}
+            except IntegrityError as e:
+                return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400
 
     @namespace.route('/checknickname/<string:nickname>')
     @api.doc(responses={200:'Not Found! Okay to go!', 400:'Bad Request', 404:'Exist ID! Failed to go!'})
     class CheckNickname(Resource):
         def get(self, nickname):
             """Check If Wanted ID Was Already Existed."""
-            record = Record.query.filter(Record.nickname == nickname).first()
-            if record:
+            if Record.query.filter(Record.nickname == nickname).first():
                 return {'status': 404, 'message': 'Exist Nickname! Failed to go!'}, 404
             return {'status': 200, 'message': 'Not Found! Okay to go!'}
+    # TODO : NEED TO PULL THIS RESPONSES and RETURN FORMAT OUT TO utils.restful.returns or responses.

@@ -17,7 +17,7 @@ def debug():
 def run():
 	from newrelic.agent import initialize
 	initialize('config/newrelic.ini')
-	app.run("0.0.0.0", debug=True, port=5000)
+	app.run("0.0.0.0", debug=True, use_reloader=True, port=5000)
 
 @manager.command
 def createdb():
