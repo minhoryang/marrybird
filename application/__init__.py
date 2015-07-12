@@ -16,7 +16,7 @@ def create_app():
     app.config['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
     app.config['JWT_AUTH_URL_RULE'] = None
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(minutes=10)  # TODO: need to change.
-    app.config['UPLOAD_FOLDER'] = '/tmp/'
+    app.config['UPLOAD_FOLDER'] = 'images/'
 
     from .models import db, user, record, file, phone
     db.init_app(app)
