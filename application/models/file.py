@@ -87,7 +87,7 @@ def init(api, jwt):
                             failed.append(args[arg_name].filename)
                     # Others such as authorization(included at parser), file2(not included (yet)) ignored automatically.
                 if not failed:
-                    return {'status': 200, 'message': [f.id for f in handled]}
+                    return {'status': 200, 'message': [str(f.id) for f in handled]}
                 else:
                     return {'status': 400, 'message': 'Not allowed file(s): ' + ', '.join(failed)}, 400
 
