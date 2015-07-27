@@ -30,6 +30,7 @@ class Record(db.Model):
     religion = db.Column(db.String(50))
     characteristic = db.Column(db.String(50))
     photo_url = db.Column(db.String(50))
+    photo_thumbnail_url = db.Column(db.String(50))
     phonenum = db.Column(db.String(20), unique=True)
 
     regular_company_email = db.Column(db.String(50))
