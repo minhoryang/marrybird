@@ -27,7 +27,7 @@ def init():
         mkdir(app.config['UPLOAD_FOLDER'])
     except FileExistsError:
         pass
-    db.create_all()
+    db.create_all()  # TODO: NEED TO KNOW HOW IT WORKS WITHOUT DEFINING WHICH DB WE WANT TO USE.
 
 if __name__ == "__main__":
     manager.run()
