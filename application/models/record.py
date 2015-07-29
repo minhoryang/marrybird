@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
-from ._base import db
+from . import db
 from .user import User
 
 class Record(db.Model):

@@ -23,7 +23,10 @@ def run():
 
 @manager.command
 def init():
-    mkdir(app.config['UPLOAD_FOLDER'])
+    try:
+        mkdir(app.config['UPLOAD_FOLDER'])
+    except FileExistsError:
+        pass
     db.create_all()
 
 if __name__ == "__main__":

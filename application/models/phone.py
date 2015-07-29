@@ -8,7 +8,7 @@ from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy.exc import IntegrityError
 
-from ._base import db
+from . import db
 from .record import Record
 from ..externals.slack import push
 

@@ -11,7 +11,7 @@ from flask import current_app, make_response, request
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user, JWTError  # TODO: Refactor JWT.
 
-from ._base import db
+from . import db
 
 
 class File(db.Model):
