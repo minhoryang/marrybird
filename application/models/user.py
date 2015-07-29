@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from . import db
 
 class User(db.Model):
+    #__tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(200))
@@ -23,11 +24,23 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    """__mapper_args__ = {
+        'polymorphic_on':isMale,
+        'polymorphic_identity':'user',
+        'with_polymorphic':'*'
+    }"""
+
 class MaleUser(User):
     pass
+    """__tablename__ = "maleuser"
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    __mapper_args__ = {'polymorphic_identity':'maleuser'}"""
 
 class FemaleUser(User):
     pass
+    """__tablename__ = "femaleuser"
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    __mapper_args__ = {'polymorphic_identity':'femaleuser'}"""
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
