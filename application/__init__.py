@@ -19,13 +19,19 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = 'images/'
 
     from .models import db, user, record, file, phone
+    from .models.dating import score, request, response, selected, rejected, review
     db.init_app(app)
 
     admin = Admin(app)
     admin.add_view(ModelView(user.User, db.session))
+    admin.add_view(ModelView(user.MaleUser, db.session))
+    admin.add_view(ModelView(user.FemaleUser, db.session))
+
     admin.add_view(ModelView(record.Record, db.session))
     admin.add_view(ModelView(file.File, db.session))
     admin.add_view(ModelView(phone.Phone, db.session))
+
+    admin.add_view(ModelView(request.Request, db.session))
 
     class MyJWT(JWT):
         def _error_callback(self, e):
@@ -38,5 +44,7 @@ def create_app():
     record.init(api, jwt)
     file.init(api, jwt)
     phone.init(api, jwt)
+
+    request.init(api, jwt)
 
     return app

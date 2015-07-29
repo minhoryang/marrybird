@@ -31,16 +31,14 @@ class User(db.Model):
     }"""
 
 class MaleUser(User):
-    pass
-    """__tablename__ = "maleuser"
+    __tablename__ = "maleuser"
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    __mapper_args__ = {'polymorphic_identity':'maleuser'}"""
+    """__mapper_args__ = {'polymorphic_identity':'maleuser'}"""
 
 class FemaleUser(User):
-    pass
-    """__tablename__ = "femaleuser"
+    __tablename__ = "femaleuser"
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    __mapper_args__ = {'polymorphic_identity':'femaleuser'}"""
+    """__mapper_args__ = {'polymorphic_identity':'femaleuser'}"""
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
