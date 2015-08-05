@@ -17,9 +17,12 @@ def create_app():
     app.config['JWT_AUTH_URL_RULE'] = None
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(minutes=10)  # TODO: need to change.
     app.config['UPLOAD_FOLDER'] = 'images/'
+    app.config['THREADS_PER_PAGE'] = 2
+    app.config['CSRF_ENABLED'] = True
+    app.config['CSRF_SESSION_KEY'] = 'secret'
 
     from .models import db, user, record, file, phone
-    from .models.dating import score, request, response, selected, rejected, review
+    from .models.dating import condition, request, compute, response, progress, met, review
     db.init_app(app)
 
     admin = Admin(app)
@@ -31,7 +34,13 @@ def create_app():
     admin.add_view(ModelView(file.File, db.session))
     admin.add_view(ModelView(phone.Phone, db.session))
 
+    admin.add_view(ModelView(condition.Condition, db.session))
     admin.add_view(ModelView(request.Request, db.session))
+    #admin.add_view(ModelView(compute.Compute, db.session))
+    admin.add_view(ModelView(response.Response, db.session))
+    admin.add_view(ModelView(progress.Progress, db.session))
+    admin.add_view(ModelView(met.Met, db.session))
+    admin.add_view(ModelView(review.Review, db.session))
 
     class MyJWT(JWT):
         def _error_callback(self, e):
@@ -45,6 +54,20 @@ def create_app():
     file.init(api, jwt)
     phone.init(api, jwt)
 
+    # TODO : is it necessary?
+    condition.init(api, jwt)
     request.init(api, jwt)
+    compute.init(api, jwt)
+    response.init(api, jwt)
+    progress.init(api, jwt)
+    met.init(api, jwt)
+    review.init(api, jwt)
+
+
+    # TODO : PULL THIS OUT TO utils.jwt.bridger
+    if not 'user_callback' in jwt.__dict__:
+        @jwt.user_handler
+        def load_user(payload):
+            return dict()
 
     return app
