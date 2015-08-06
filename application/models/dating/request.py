@@ -24,7 +24,9 @@ class Request(db.Model):
 
     # response
     response_id = db.Column(db.Integer, nullable=True)
-    is_response_ready = column_property(response_id != None)
+    is_response_ready = column_property(
+        (response_id != None) and (Response.get(response_id).isDone)
+    )  # TODO
 
 
 def init(api, jwt):
@@ -52,7 +54,7 @@ def init(api, jwt):
             req.condition_id = last_condition.id
             db.session.add(req)
             db.session.commit()
-            ComputeNow(username, last_condition.id)  # TODO : ASYNC, Please!!!!
+            ComputeNow(req.id)  # TODO : ASYNC, Please!!!!
             return {'status': 200, 'message': 'Request Done.'}
 
     """

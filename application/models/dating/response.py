@@ -10,5 +10,8 @@ from .. import db
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
+    #TODO : TEST
+    isDone = db.Column(db.Boolean)
+
 def init(api, jwt):
     pass
