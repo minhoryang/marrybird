@@ -32,7 +32,7 @@ class Request(db.Model):
             Response.id==response_id
         ).correlate_except(Response)
         #(response_id != None) and (Response.get(response_id).isDone)
-    )  # TODO
+    )  # TODO : REPLACE THIS WHEN WE USE CELERY
 
 
 def init(api, jwt):

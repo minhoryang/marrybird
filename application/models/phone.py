@@ -27,7 +27,7 @@ def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/request/')
-    class Request(Resource):
+    class PhoneCheckRequest(Resource):
         wanted = api.parser()
         wanted.add_argument('phonenum', type=str, required=True, help='{"phonenum": "01062473590"}', location='json')
 
@@ -58,7 +58,7 @@ def init(api, jwt):
             return {'status': 200, 'message': 'requested'}
 
     @namespace.route('/validate/<string:phonenum>/<int:token>')
-    class Validate(Resource):
+    class PhoneValidate(Resource):
         def get(self, phonenum, token):
             """Validate Token."""
             got = Phone.query.filter(Phone.phone == phonenum).order_by(Phone.created_at.desc()).first()

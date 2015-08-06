@@ -9,9 +9,17 @@ from .. import db
 
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer)
+    username = db.Column(db.String(50))
 
-    #TODO : TEST
     isDone = db.Column(db.Boolean)
+    result_json = db.Column(db.String(200))
+
 
 def init(api, jwt):
-    pass
+    namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
+
+    @namespace.route('/')
+    class GetResponse(Resource):
+        def get(self):
+            return ''  # TODO : at Progress
