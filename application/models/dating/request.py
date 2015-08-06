@@ -11,6 +11,7 @@ from sqlalchemy.orm import column_property
 from .. import db
 from .compute import ComputeNow
 from .condition import Condition
+from .response import Response
 
 
 class Request(db.Model):
@@ -25,7 +26,12 @@ class Request(db.Model):
     # response
     response_id = db.Column(db.Integer, nullable=True)
     is_response_ready = column_property(
-        (response_id != None) and (Response.get(response_id).isDone)
+        db.select(
+            [Response.isDone]
+        ).where(
+            Response.id==response_id
+        ).correlate_except(Response)
+        #(response_id != None) and (Response.get(response_id).isDone)
     )  # TODO
 
 
@@ -56,6 +62,13 @@ def init(api, jwt):
             db.session.commit()
             ComputeNow(req.id)  # TODO : ASYNC, Please!!!!
             return {'status': 200, 'message': 'Request Done.'}
+
+        def get(self):  # TEST
+            return {'status': 200, 'message':{
+                'None' : Request.query.get(1).is_response_ready,
+                'False' : Request.query.get(2).is_response_ready,
+                'True' : Request.query.get(3).is_response_ready
+            }}
 
     """
     @namespace.route('/<string:username>')
