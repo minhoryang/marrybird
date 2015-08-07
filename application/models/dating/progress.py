@@ -7,6 +7,7 @@ from .. import db
 class Progress(db.Model):
     """ User A loves User B."""
     id = db.Column(db.Integer, primary_key=True)
+    response_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.now)
     A = db.Column(db.String(20))  # TODO: Integer will be faster.
     B = db.Column(db.String(20))
@@ -37,10 +38,11 @@ class Progress(db.Model):
         return HeLovesShe, AOnlyLoveB, BOnlyLoveA
 
     @staticmethod
-    def Love(a_username, b_username):
+    def Love(a_username, b_username, response_id):
         lover = Progress()
         lover.A = a_username
         lover.B = b_username
+        lover.response_id = response_id
         db.session.add(lover)
         db.session.commit()
 
