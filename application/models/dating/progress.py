@@ -14,12 +14,12 @@ class Progress(db.Model):
     @staticmethod
     def SearchWhoLovesMe(b_username):
         found = Progress.query.filter(Progress.B == b_username)
-        return list(found)
+        return [user.A for user in found]
 
     @staticmethod
     def SearchMeLovesWho(a_username):
         found = Progress.query.filter(Progress.A == a_username)
-        return list(found)
+        return [user.B for user in found]
 
     @staticmethod
     def SearchHeLovesSheOrNot(list_a, list_b):

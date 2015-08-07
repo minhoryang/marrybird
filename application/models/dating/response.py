@@ -20,25 +20,27 @@ class Response(db.Model):
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
+    authorization = api.parser()
+    authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
 
     @namespace.route('/')
     class GetResponse(Resource):
 
-        @jwt_required
+        @jwt_required()
+        @api.doc(parser=authorization)
         def get(self):
             username = current_user.username
 
             #Response.query.filter(Response.username == username).
             result_json = None
-
             Success, Someone, Mine = Progress.SearchHeLovesSheOrNot(
                 Progress.SearchWhoLovesMe(username),
                 Progress.SearchMeLovesWho(username)
             )
 
             return {'status': 200, 'message': {
-                success: [user.username for user in Success],
-                someonelovesme: [user.A for user in Someone],
-                notyet: [user.B for user in Mine],
-                result: result_json
+                'success': Success,
+                'someonelovesme': Someone,
+                'notyet': Mine,
+                'result': result_json
             }}
