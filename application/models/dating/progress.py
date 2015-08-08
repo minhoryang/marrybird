@@ -43,8 +43,7 @@ class Progress(db.Model):
         lover.A = a_username
         lover.B = b_username
         lover.response_id = response_id
-        db.session.add(lover)
-        db.session.commit()
+        return lover
 
 
 def init(api, jwt):

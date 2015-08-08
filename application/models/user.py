@@ -5,11 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.restplus import Resource, fields
 from flask_jwt import generate_token
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.declarative import declared_attr
 
 from . import db
 
 class User(db.Model):
-    #__tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(200))
@@ -24,21 +24,15 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    """__mapper_args__ = {
-        'polymorphic_on':isMale,
-        'polymorphic_identity':'user',
-        'with_polymorphic':'*'
-    }"""
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
 
 class MaleUser(User):
-    __tablename__ = "maleuser"
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    """__mapper_args__ = {'polymorphic_identity':'maleuser'}"""
 
 class FemaleUser(User):
-    __tablename__ = "femaleuser"
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    """__mapper_args__ = {'polymorphic_identity':'femaleuser'}"""
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)

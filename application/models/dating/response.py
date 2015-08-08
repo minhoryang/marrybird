@@ -8,6 +8,7 @@ from flask_jwt import jwt_required, current_user
 
 from .. import db
 from .progress import Progress
+from .met import Met_Accepted, Met_Rejected
 
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,16 +34,28 @@ def init(api, jwt):
             username = current_user.username
 
             latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
-            result_json = latest.result_json
+            if latest:
+                result_json = latest.result_json
+            else:
+                result_json = []
 
             Success, Someone, Mine = Progress.SearchHeLovesSheOrNot(
                 Progress.SearchWhoLovesMe(username),
                 Progress.SearchMeLovesWho(username)
             )
 
-            # TODO: Check met.
-            NotYet = Mine
-            Failed = Mine
+            NotYet = []
+            Failed = []
+            for wanted_lover_username in Mine:
+                hater = Met_Rejected.query.filter(
+                    Met_Rejected.A == wanted_lover_username
+                ).filter(
+                    Met_Rejected.B == username
+                ).first()
+                if hater:
+                    Failed.append(wanted_lover_username)
+                else:
+                    NotYet.append(wanted_lover_username)
 
             return {'status': 200, 'message': {
                 'success': Success,
@@ -58,14 +71,15 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self, i, you):
-            if i is not current_user.username:
-                return {'status': 400, 'message': 'Not You'}, 400  # TODO
-            latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
+            #if i != current_user.username:
+            #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
+            latest = Response.query.filter(Response.username == current_user.username).order_by(Response.created_at.desc()).first()
             response_id = 0
-            if you in latest.result_json:  # TODO : It will not work.
+            if latest and you in latest.result_json:  # TODO : It will not work.
                 response_id = latest.id
-            Progress.Love(i, you, response_id)
-            # TODO : MET Not Implemented yet.
+            db.session.add(Progress.Love(i, you, response_id))
+            db.session.add(Met_Accepted.create(response_id, i, you))
+            db.session.commit()
             return {'status': 200, 'meesage': 'done'}
 
     @namespace.route('/<string:i>/hate/<string:you>')
@@ -74,8 +88,8 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self, i, you):
-            if i is not current_user.username:
-                return {'status': 400, 'message': 'Not You'}, 400  # TODO
-            latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
-            # TODO MET
+            #if i != current_user.username:
+            #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
+            db.session.add(Met_Rejected.create(0, i, you))
+            db.session.commit()
             return {'status': 200, 'message': 'done'}
