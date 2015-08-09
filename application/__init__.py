@@ -22,7 +22,7 @@ def create_app():
     app.config['CSRF_SESSION_KEY'] = 'secret'
 
     from .models import db, user, record, file, phone
-    from .models.dating import request, compute, response, progress, met, review
+    from .models.dating import request, compute, response, progress, met, review, score, tier
     db.init_app(app)
 
     admin = Admin(app)
@@ -40,6 +40,8 @@ def create_app():
     admin.add_view(ModelView(progress.Progress, db.session))
     admin.add_view(ModelView(met.Met, db.session))
     admin.add_view(ModelView(review.Review, db.session))
+    admin.add_view(ModelView(score.Score, db.session))
+    admin.add_view(ModelView(tier.Tier, db.session))
 
     class MyJWT(JWT):
         def _error_callback(self, e):
@@ -60,6 +62,7 @@ def create_app():
     progress.init(api, jwt)
     met.init(api, jwt)
     review.init(api, jwt)
+    score.init(api, jwt)
 
 
     # TODO : PULL THIS OUT TO utils.jwt.bridger
