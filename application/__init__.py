@@ -25,23 +25,24 @@ def create_app():
     from .models.dating import request, compute, response, progress, met, review, score, tier
     db.init_app(app)
 
-    admin = Admin(app)
-    admin.add_view(ModelView(user.User, db.session))
-    admin.add_view(ModelView(user.MaleUser, db.session))
-    admin.add_view(ModelView(user.FemaleUser, db.session))
+    admin = Admin(app, name="admin")
 
-    admin.add_view(ModelView(record.Record, db.session))
-    admin.add_view(ModelView(file.File, db.session))
-    admin.add_view(ModelView(phone.Phone, db.session))
+    admin.add_view(ModelView(user.User, db.session, category="User"))
+    admin.add_view(ModelView(user.MaleUser, db.session, category="User"))
+    admin.add_view(ModelView(user.FemaleUser, db.session, category="User"))
 
-    admin.add_view(ModelView(request.Request, db.session))
-    #admin.add_view(ModelView(compute.Compute, db.session))
-    admin.add_view(ModelView(response.Response, db.session))
-    admin.add_view(ModelView(progress.Progress, db.session))
-    admin.add_view(ModelView(met.Met, db.session))
-    admin.add_view(ModelView(review.Review, db.session))
-    admin.add_view(ModelView(score.Score, db.session))
-    admin.add_view(ModelView(tier.Tier, db.session))
+    admin.add_view(ModelView(record.Record, db.session, category="User"))
+    admin.add_view(ModelView(file.File, db.session, category="User"))
+    admin.add_view(ModelView(phone.Phone, db.session, category="User"))
+
+    admin.add_view(ModelView(request.Request, db.session, category="Dating"))
+    #admin.add_view(ModelView(compute.Compute, db.session, category="Dating"))
+    admin.add_view(ModelView(response.Response, db.session, category="Dating"))
+    admin.add_view(ModelView(progress.Progress, db.session, category="Dating"))
+    admin.add_view(ModelView(met.Met, db.session, category="Dating"))
+    admin.add_view(ModelView(review.Review, db.session, category="Dating"))
+    admin.add_view(ModelView(score.Score, db.session, category="Dating"))
+    admin.add_view(ModelView(tier.Tier, db.session, category="Dating"))
 
     class MyJWT(JWT):
         def _error_callback(self, e):
