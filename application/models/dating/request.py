@@ -10,7 +10,6 @@ from sqlalchemy.orm import column_property
 
 from .. import db
 from .compute import ComputeNow
-from .condition import Condition
 from .response import Response
 
 
@@ -21,7 +20,6 @@ class Request(db.Model):
     # request
     requester = db.Column(db.String(50))
     requested_at = db.Column(db.DateTime, default=datetime.now)
-    condition_id = db.Column(db.Integer)
 
     # response
     response_id = db.Column(db.Integer, nullable=True)
@@ -50,14 +48,10 @@ def init(api, jwt):
             # TODO : Notify Unseen Result
             # TODO : Notify Not Reviewed Dating
 
-            latest_condition = Condition.get_latest_condition_by_user(username)
-            if not latest_condition:
-                return {'status': 404, message: 'No Condition Found'}, 404
 
             req = Reqeust()
             req.username = username
             req.requester = username
-            req.condition_id = last_condition.id
             db.session.add(req)
             db.session.commit()
             ComputeNow(req.id)  # TODO : ASYNC, Please!!!!

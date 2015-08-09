@@ -22,7 +22,7 @@ def create_app():
     app.config['CSRF_SESSION_KEY'] = 'secret'
 
     from .models import db, user, record, file, phone
-    from .models.dating import condition, request, compute, response, progress, met, review
+    from .models.dating import request, compute, response, progress, met, review
     db.init_app(app)
 
     admin = Admin(app)
@@ -34,7 +34,6 @@ def create_app():
     admin.add_view(ModelView(file.File, db.session))
     admin.add_view(ModelView(phone.Phone, db.session))
 
-    admin.add_view(ModelView(condition.Condition, db.session))
     admin.add_view(ModelView(request.Request, db.session))
     #admin.add_view(ModelView(compute.Compute, db.session))
     admin.add_view(ModelView(response.Response, db.session))
@@ -55,7 +54,6 @@ def create_app():
     phone.init(api, jwt)
 
     # TODO : is it necessary?
-    condition.init(api, jwt)
     request.init(api, jwt)
     compute.init(api, jwt)
     response.init(api, jwt)
