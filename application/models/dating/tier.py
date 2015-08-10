@@ -2,13 +2,14 @@ __author__ = 'minhoryang'
 
 import enum
 from datetime import datetime
-from sqlalchemy.ext.declarative import declared_attr
+from functools import lru_cache
 
+from sqlalchemy.ext.declarative import declared_attr
 
 from .. import db
 
 class Tier(db.Model):
-    id = db.Column(db.Integer, primary_key=True)  # db.ForeignKey('score.id'), 
+    id = db.Column(db.Integer, primary_key=True)  # db.ForeignKey('score.id'),
 
 
 class TierType(enum.Enum):
@@ -20,8 +21,22 @@ class TierType(enum.Enum):
     cC = "cC"
 
     @staticmethod
-    def getAvailbleTiers(cls):
-        pass  # TODO
+    @lru_cache(maxsize=6)
+    def getDetails(value):
+        return {'external': value[0], 'internal': value[1]}
+
+    @staticmethod
+    @lru_cache(maxsize=6)
+    def getMatchables(cls, grouping_by='internal'):
+        my = __class__.getDetails(cls.value)[grouping_by]
+
+        matchables = list()
+        for _value in __class__.__members__:
+            if __class__.getDetails(_value)[grouping_by] == my:
+                matchables.append(__class__(_value))
+
+        return tuple(matchables)
+
 
 
 def init(api, jwt):
