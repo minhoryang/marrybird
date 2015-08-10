@@ -8,9 +8,6 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from .. import db
 
-class Tier(db.Model):
-    id = db.Column(db.Integer, primary_key=True)  # db.ForeignKey('score.id'),
-
 
 class TierType(enum.Enum):
     aA = "aA"
