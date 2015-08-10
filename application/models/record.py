@@ -78,7 +78,7 @@ def init(api, jwt):
 
             existed_record = Record.query.filter(Record.username == username).first()
             if existed_record:
-                return {'status': 200, 'message': [{key : existed_record.__dict__[key]} for key in AVAILABLE]}
+                return {'status': 200, 'message': {key : existed_record.__dict__[key] for key in AVAILABLE}}
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
 
