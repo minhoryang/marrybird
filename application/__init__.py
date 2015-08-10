@@ -1,4 +1,3 @@
-from datetime import timedelta
 from os.path import abspath, dirname, join
 
 from flask import Flask
@@ -16,9 +15,6 @@ def create_app():
     app.config['PROJECT_PATH'] = abspath(join(dirname(__file__), '..'))
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s/db/app.db' % (app.config['PROJECT_PATH'], )
     app.config['SECRET_KEY'] = 'developer'  # TODO: need to change.
-    app.config['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
-    app.config['JWT_AUTH_URL_RULE'] = None
-    app.config['JWT_EXPIRATION_DELTA'] = timedelta(hours=1)  # TODO: need to change.
     app.config['UPLOAD_FOLDER'] = 'images/'
     app.config['THREADS_PER_PAGE'] = 2
     app.config['CSRF_ENABLED'] = True

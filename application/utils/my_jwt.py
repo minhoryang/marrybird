@@ -1,12 +1,21 @@
 __author__ = 'minhoryang'
 
+from datetime import timedelta
+
 from flask import jsonify
 from flask_jwt import JWT
 
 
 class MyJWT(JWT):
+    def __init__(self, app):
+        super(__class__, self).__init__(app)
+        app.config['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
+        app.config['JWT_AUTH_URL_RULE'] = None
+        app.config['JWT_EXPIRATION_DELTA'] = timedelta(hours=1)  # TODO: need to change.
+
     def _error_callback(self, e):
         return jsonify(dict([('status', e.status_code), ('message', e.error + ' - ' + e.description)])), 401, e.headers  # e.status_code
+
 
 def MyJWT_Bridger(jwt):
     # TODO : Make This Works!
