@@ -6,7 +6,7 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.restplus import Api
 
 from .models import ENABLE_MODELS, db
-from .utils.my_jwt import MyJWT, MyJWT_Bridger
+from .utils.my_jwt import MyJWT
 
 
 def create_app():
@@ -30,6 +30,6 @@ def create_app():
         for model in models:
             admin.add_view(ModelView(model, db.session, category=category))
 
-    MyJWT_Bridger(jwt)
+    MyJWT.Bridger(jwt)
 
     return app
