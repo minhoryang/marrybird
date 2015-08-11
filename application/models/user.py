@@ -10,6 +10,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from . import db
 
 class User(db.Model):
+    __bind_key__ = "user"
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(200))
@@ -29,9 +31,13 @@ class User(db.Model):
         return cls.__name__.lower()
 
 class MaleUser(User):
+    __bind_key__ = "user"
+
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
 class FemaleUser(User):
+    __bind_key__ = "user"
+
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
 def init(api, jwt):

@@ -10,18 +10,14 @@ from . import db
 from .user import User
 
 class Record(db.Model):
+    __bind_key__ = "record"
+
     # XXX : Can't Read & Write.
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
     username = db.Column(db.String(50), unique=True)
-    is_male = column_property(  # TODO : MOVE IT HERE!
-        db.select(
-            [User.isMale]
-        ).where(
-            User.username==username
-        ).correlate_except(User)
-    )
+    is_male = db.Column(db.Boolean)
     # XXX : Can't Write
     is_regular_member = db.Column(db.Boolean, default=False)
     age = db.Column(db.Integer)
@@ -51,6 +47,11 @@ class Record(db.Model):
     def __setattr__(self, key, value):
         if key == "birthday":
             super(Record, self).__setattr__("age", Record.parse_age(value))
+        elif key == "username":
+            super(Record, self).__setattr__(
+                "is_male",
+                User.query.filter(User.username == value).first().isMale
+            )
         super(Record, self).__setattr__(key, value)
         super(Record, self).__setattr__('modified_at', datetime.now())
 
