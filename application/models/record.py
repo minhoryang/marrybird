@@ -47,7 +47,7 @@ class Record(db.Model):
     def __setattr__(self, key, value):
         if key == "birthday":
             super(Record, self).__setattr__("age", Record.parse_age(value))
-        elif key == "username":
+        if key == "username":
             super(Record, self).__setattr__(
                 "is_male",
                 User.query.filter(User.username == value).first().isMale
