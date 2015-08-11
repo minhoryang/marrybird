@@ -19,7 +19,7 @@ def create_app():
     app.config['THREADS_PER_PAGE'] = 2
     app.config['CSRF_ENABLED'] = True
     app.config['CSRF_SESSION_KEY'] = 'secret'
-    app.config['SQLALCHEMY_ECHO'] = True
+    #app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_BINDS'] = {
         'user': 'sqlite:///%s/db/user.db' % (app.config['PROJECT_PATH'], ),
         'record': 'sqlite:///%s/db/record.db' % (app.config['PROJECT_PATH'], ),

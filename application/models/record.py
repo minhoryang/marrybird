@@ -18,6 +18,7 @@ class Record(db.Model):
     modified_at = db.Column(db.DateTime)
     is_male = db.Column(db.Boolean)
     username = db.Column(db.String(50), unique=True)
+    _height = db.Column(db.Integer)
 
     # XXX : Can't Write
     is_regular_member = db.Column(db.Boolean, default=False)
@@ -49,6 +50,11 @@ class Record(db.Model):
         # calc
         if key == "birthday" and value:
             super(Record, self).__setattr__("age", Record.parse_age(value))
+        if key == "height" and value:
+            super(Record, self).__setattr__(
+                "_height",
+                int(value)
+            )
         # delegated from DB
         if key == "username" and value:
             super(Record, self).__setattr__(

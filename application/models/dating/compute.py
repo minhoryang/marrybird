@@ -11,18 +11,28 @@ def ComputeNow(request_id):
     req = Request.query.get(request_id)
     rec = Record.query.filter(Record.username == req.username).first()
     meetable = Record.parse_comma(rec.district_meetable)
+    heightcond = None
+    if rec.is_male:
+        heightcond = rec._height + 2 >= Record._height
+    else:
+        heightcond = Record._height + 2 >= rec._height
+    religioncond = True
+    if rec.religion != "무교":
+        religioncond = Record.religion == rec.religion
+    result = []
     for i in meetable:
         out = Record.query.filter(
             Record.is_male != rec.is_male,
             Record.district_meetable.contains(i),
-#            Record.parse_age(Record.birthday) + 4 >= Record.parse_age(rec.birthday),
-#            Record.parse_age(Record.birthday) - 4 <= Record.parse_age(rec.birthday),
+            Record.age + 4 >= rec.age,
+            Record.age - 4 <= rec.age,
+            heightcond,
+            religioncond,
         )
         for j in out:
-            print(j.username)
-    #Record.query.filter()
-    # district_meetable join
-    # age +-4
+            result.append(j.username)
+    for username in set(result):
+        print(username)
     # height (m+2<f)
     # religion
     pass  # TODO
