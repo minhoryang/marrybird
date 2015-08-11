@@ -13,9 +13,10 @@ from .. import db
 from .tier import TierType
 
 
+# XXX : Need to be close with Record.DB
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
 
     school_score = db.Column(db.Float, nullable=False)
     work_score = db.Column(db.Float, nullable=False)
@@ -25,7 +26,7 @@ class Score(db.Model):
     tierr = db.Column(EnumType(TierType))
 
     def __setattr__(self, key, value):
-        #old = self.tierr
+        old = self.tierr
         super(Score, self).__setattr__(key, value)
         if key is 'tier':
             self.tierr = TierType(value)

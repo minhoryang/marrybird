@@ -64,6 +64,10 @@ def init(api, jwt):
                 'True' : Request.query.get(3).is_response_ready
             }}
 
+    @namespace.route('/test/<int:id>')
+    class TestThis(Resource):
+        def get(self, id):
+            ComputeNow(id)
     """
     @namespace.route('/<string:username>')
     class ComputeRequestBySystem(Resource):

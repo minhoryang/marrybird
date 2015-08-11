@@ -4,7 +4,10 @@ from datetime import datetime
 
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
+from sqlalchemy.orm import column_property
+
 from . import db
+from .user import User
 
 class Record(db.Model):
     # XXX : Can't Read & Write.
@@ -12,9 +15,16 @@ class Record(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
     username = db.Column(db.String(50), unique=True)
-
+    is_male = column_property(  # TODO : MOVE IT HERE!
+        db.select(
+            [User.isMale]
+        ).where(
+            User.username==username
+        ).correlate_except(User)
+    )
     # XXX : Can't Write
     is_regular_member = db.Column(db.Boolean, default=False)
+    age = db.Column(db.Integer)
 
     # XXX : Readable & Writable
     nickname = db.Column(db.String(50), unique=True)
@@ -24,7 +34,7 @@ class Record(db.Model):
     job = db.Column(db.String(50))
     district = db.Column(db.String(50))
     district_meetable = db.Column(db.String(50))
-    birthday = db.Column(db.String(50))  # TODO: format string
+    birthday = db.Column(db.String(50))  # TODO: format string "2015-08-10"
     height = db.Column(db.String(50))
     religion = db.Column(db.String(50))
     characteristic = db.Column(db.String(50))
@@ -39,14 +49,26 @@ class Record(db.Model):
     regular_graduated_school_id_photo_url = db.Column(db.String(50))
 
     def __setattr__(self, key, value):
+        if key == "birthday":
+            super(Record, self).__setattr__("age", Record.parse_age(value))
         super(Record, self).__setattr__(key, value)
         super(Record, self).__setattr__('modified_at', datetime.now())
+
+    @staticmethod
+    def parse_comma(input):
+        for i in input.split(','):
+            if i:
+                yield i
+
+    @staticmethod
+    def parse_age(birthday):
+        return 2015 - int(birthday[:4]) + 1
 
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
-    CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username']
-    CANT_WRITE_AT_CLIENT = ['is_regular_member']
+    CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username', 'is_male']
+    CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age']
     AVAILABLE = list()
 
     for i in Record.__dict__.keys():
