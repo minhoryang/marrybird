@@ -16,8 +16,9 @@ class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
-    username = db.Column(db.String(50), unique=True)
     is_male = db.Column(db.Boolean)
+    username = db.Column(db.String(50), unique=True)
+
     # XXX : Can't Write
     is_regular_member = db.Column(db.Boolean, default=False)
     age = db.Column(db.Integer)
@@ -45,9 +46,11 @@ class Record(db.Model):
     regular_graduated_school_id_photo_url = db.Column(db.String(50))
 
     def __setattr__(self, key, value):
-        if key == "birthday":
+        # calc
+        if key == "birthday" and value:
             super(Record, self).__setattr__("age", Record.parse_age(value))
-        if key == "username":
+        # delegated from DB
+        if key == "username" and value:
             super(Record, self).__setattr__(
                 "is_male",
                 User.query.filter(User.username == value).first().isMale
