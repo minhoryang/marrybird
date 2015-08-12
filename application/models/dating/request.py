@@ -29,8 +29,8 @@ class Request(db.Model):
         ).where(
             Response.id==response_id
         ).correlate_except(Response)
-        #(response_id != None) and (Response.get(response_id).isDone)
-    )  # TODO : REPLACE THIS WHEN WE USE CELERY
+    )
+    # TODO : REPLACE THIS WHEN WE USE CELERY
 
 
 def init(api, jwt):
@@ -40,34 +40,23 @@ def init(api, jwt):
 
     @namespace.route('/')
     class ComputeRequest(Resource):
+        # TODO : Countdown
+        # TODO : Notify Unseen Result
+        # TODO : Notify Not Reviewed Dating
+
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self):
             username = current_user.username
-            # TODO : Countdown
-            # TODO : Notify Unseen Result
-            # TODO : Notify Not Reviewed Dating
 
-
-            req = Reqeust()
+            req = Request()
             req.username = username
             req.requester = username
             db.session.add(req)
             db.session.commit()
-            ComputeNow(req.id)  # TODO : ASYNC, Please!!!!
-            return {'status': 200, 'message': 'Request Done.'}
+            output = ComputeNow(req.id)
+            return {'status': 200, 'message': 'Done.' + str(output)}
 
-        def get(self):  # TEST
-            return {'status': 200, 'message':{
-                'None' : Request.query.get(1).is_response_ready,
-                'False' : Request.query.get(2).is_response_ready,
-                'True' : Request.query.get(3).is_response_ready
-            }}
-
-    @namespace.route('/test/<int:id>')
-    class TestThis(Resource):
-        def get(self, id):
-            ComputeNow(id)
     """
     @namespace.route('/<string:username>')
     class ComputeRequestBySystem(Resource):

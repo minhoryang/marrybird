@@ -16,13 +16,13 @@ class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
-    is_male = db.Column(db.Boolean)
+    is_male = db.Column(db.Boolean)  # copied
     username = db.Column(db.String(50), unique=True)
-    _height = db.Column(db.Integer)
+    _height = db.Column(db.Integer)  # converted
 
     # XXX : Can't Write
     is_regular_member = db.Column(db.Boolean, default=False)
-    age = db.Column(db.Integer)
+    age = db.Column(db.Integer)  # calc-ed
 
     # XXX : Readable & Writable
     nickname = db.Column(db.String(50), unique=True)
