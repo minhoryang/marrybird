@@ -35,7 +35,8 @@ def init(api, jwt):
 
             latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
             if latest:
-                result_json = latest.result_json
+                from json import loads
+                result_json = loads(latest.result_json.replace("'", '"'))
             else:
                 result_json = []
 
