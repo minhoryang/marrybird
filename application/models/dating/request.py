@@ -1,4 +1,11 @@
-"""."""
+"""Handle User's Matching Process <Request>.
+
+1. <Request> will fire at 12:00am by me(in person) manually
+2. Then It register the request log at <Request> DB
+3. Then It <Compute.ComputeNow> will make a result.
+
+GOTO: Compute
+"""
 __author__ = 'minhoryang'
 
 from copy import copy

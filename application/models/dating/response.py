@@ -1,7 +1,15 @@
-"""."""
+"""All Love-Line starts and ends at here.
+
+1. User comes here for seeing new love-mate. (which was prepared by <Request>-<Compute>)
+2. <Response> get the result of latest <Request>.
+3. According to <Progress> (which stores the current on-going love-lines), Search 'I love You' and 'You love I'.
+4. Using above 'I love You' and 'You love I',
+
+"""
 __author__ = 'minhoryang'
 
 from datetime import datetime
+from json import loads
 
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
@@ -34,8 +42,8 @@ def init(api, jwt):
             username = current_user.username
 
             latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
+            result_json = None
             if latest:
-                from json import loads
                 result_json = loads(latest.result_json.replace("'", '"'))
             else:
                 result_json = []
@@ -57,6 +65,11 @@ def init(api, jwt):
                     Failed.append(wanted_lover_username)
                 else:
                     NotYet.append(wanted_lover_username)
+
+            for i in NotYet:
+                if i in result_json:
+                    result_json.remove(i)
+
 
             return {'status': 200, 'message': {
                 'success': Success,

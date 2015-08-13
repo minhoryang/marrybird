@@ -105,8 +105,6 @@ def init(api, jwt):
         @api.doc(parser=authorization)
         def get(self, username):
             """Get User's Keyword Contents."""
-            if current_user.username != username:
-                return {'status': 400, 'message': 'Not You'}, 400
 
             existed_record = Record.query.filter(Record.username == username).first()
             if existed_record:
@@ -126,6 +124,9 @@ def init(api, jwt):
         @api.doc(parser=wanted_changes)
         def post(self, username):
             """Set User's Keyword Contents."""
+            if current_user.username != username:
+                return {'status': 400, 'message': 'Not You'}, 400
+
             received_changes = self.wanted_changes.parse_args()['records']
 
             acceptable_changes = []

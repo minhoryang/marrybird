@@ -1,3 +1,5 @@
+"""Stores the met (by Accepts/Rejects/NoResponse)."""
+
 __author__ = 'minhoryang'
 
 from enum import Enum

@@ -1,3 +1,21 @@
+"""<Compute>: Suggest new user by <Request>.
+
+1. Get the <request>
+2. Get the requester's information(<record>)
+3. Check the following conditions per meet-able districts of the requester.
+  - Gender
+    + can be tweakable
+  - join (Meet-able district)
+  - Age +- 4
+  - Man's Height +2 >= Woman's Height
+  - Same religion (if hasn't, ignore it.)
+4. Check already <met>?
+5. Then deliver it to <Response>.
+
+READ: Record, Met
+GOTO: Response
+"""
+
 __author__ = 'minhoryang'
 
 from .. import db
