@@ -1,5 +1,5 @@
 __author__ = 'minhoryang'
-import requests
+import erequests
 import json
 
 WEB_HOOK_URL = "https://hooks.slack.com/services/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"
@@ -12,4 +12,4 @@ def push(message="", channel="#progress"):
         #"channel": channel,
         "text": message
     }
-    r = requests.post(WEB_HOOK_URL, data=json.dumps(payload))
+    r = erequests.async.post(WEB_HOOK_URL, data=json.dumps(payload)).send()
