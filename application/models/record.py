@@ -74,25 +74,40 @@ class Record(db.Model):
     def _parse_age(birthday):
         return 2015 - int(birthday[:4]) + 1
 
+    @staticmethod
+    def _cant_write_at_client_keywords():
+        CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age']
+        return CANT_WRITE_AT_CLIENT
+
+    @staticmethod
+    def _available_keywords():
+        CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username', 'is_male']
+        CANT_WRITE_AT_CLIENT = __class__._cant_write_at_client_keywords()
+        AVAILABLE = list()
+
+        for i in __class__.__dict__.keys():
+            if i[0] == '_' or i in CANT_READ_AND_WRITE_AT_CLIENT:
+                pass  # XXX : Can't Read at Client.
+            else:
+                AVAILABLE.append(i)
+        AVAILABLE.sort()
+        return AVAILABLE
+
+    @staticmethod
+    def _get(username):
+        existed_record = __class__.query.filter(Record.username == username).first()
+        if existed_record:
+            return {key : existed_record.__dict__[key] for key in __class__._available_keywords()}
+        return {}
+
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
-
-    CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username', 'is_male']
-    CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age']
-    AVAILABLE = list()
-
-    for i in Record.__dict__.keys():
-        if i[0] == '_' or i in CANT_READ_AND_WRITE_AT_CLIENT:
-            pass  # XXX : Can't Read at Client.
-        else:
-            AVAILABLE.append(i)
-    AVAILABLE.sort()
 
     @namespace.route('/')
     class GetKeywordsList(Resource):
         """All Available Keywords List."""
         def get(self):
-            return {'status': 200, 'message': AVAILABLE}
+            return {'status': 200, 'message': Record._available_keywords()}
 
     @namespace.route('/<string:username>')
     @api.doc(responses={200:'Successfully Get', 400:'Not You', 401:'Auth Failed', 404:'Not Found'})
@@ -106,16 +121,16 @@ def init(api, jwt):
         def get(self, username):
             """Get User's Keyword Contents."""
 
-            existed_record = Record.query.filter(Record.username == username).first()
+            existed_record = Record._get(username)
             if existed_record:
-                return {'status': 200, 'message': {key : existed_record.__dict__[key] for key in AVAILABLE}}
+                return {'status': 200, 'message': existed_record}
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
 
         wanted_changes = copy(authorization)
         wanted_changes.add_argument(
             'records',
-            type=api.model('records', {key: fields.String() for key in AVAILABLE}),
+            type=api.model('records', {key: fields.String() for key in Record._available_keywords()}),
             required=True,
             help='{"records": {"nickname": "", ...}}',
             location='json')
@@ -132,9 +147,9 @@ def init(api, jwt):
             acceptable_changes = []
             for key in received_changes:
                 if received_changes[key]:
-                    if key in CANT_WRITE_AT_CLIENT:
+                    if key in Record._cant_write_at_client_keywords():
                         pass  # XXX : Can't write at Client. (Ignore first)
-                    elif key in AVAILABLE:
+                    elif key in Record._available_keywords():
                         acceptable_changes.append((key, received_changes[key]))
 
             if current_user.username != username:

@@ -15,6 +15,7 @@ from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
 
 from .. import db
+from ..record import Record
 from .progress import Progress
 from .met import Met_Accepted, Met_Rejected
 
@@ -72,11 +73,11 @@ def init(api, jwt):
 
 
             return {'status': 200, 'message': {
-                'success': Success,
-                'someonelovesme': Someone,
-                'notyet': NotYet,
-                'failed': Failed,
-                'result': result_json
+                'success': {i: Record._get(i) for i in Success},
+                'someonelovesme': {i: Record._get(i) for i in Someone},
+                'notyet': {i: Record._get(i) for i in NotYet},
+                'failed': {i: Record._get(i) for i in Failed},
+                'result': {i: Record._get(i) for i in result_json},
             }}
 
     @namespace.route('/<string:i>/love/<string:you>')
