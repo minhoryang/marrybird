@@ -34,7 +34,7 @@ def ComputeNow(request_id):
 
     # Find her/him!
     result = set()
-    for i in Record.parse_comma(rec.district_meetable):
+    for i in Record._parse_comma(rec.district_meetable):
         out = Record.query.filter(
             Record.is_male != rec.is_male,
             Record.district_meetable.contains(i),
@@ -56,7 +56,8 @@ def ComputeNow(request_id):
         if not out.first():
             result2.append(i)
 
-    #
+    # TODO : Regular Member.
+
     r = Response()
     r.request_id = request_id
     r.username = rec.username

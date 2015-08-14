@@ -49,7 +49,7 @@ class Record(db.Model):
     def __setattr__(self, key, value):
         # calc
         if key == "birthday" and value:
-            super(Record, self).__setattr__("age", Record.parse_age(value))
+            super(Record, self).__setattr__("age", Record._parse_age(value))
         if key == "height" and value:
             super(Record, self).__setattr__(
                 "_height",
@@ -65,13 +65,13 @@ class Record(db.Model):
         super(Record, self).__setattr__('modified_at', datetime.now())
 
     @staticmethod
-    def parse_comma(input):
+    def _parse_comma(input):
         for i in input.split(','):
             if i:
                 yield i
 
     @staticmethod
-    def parse_age(birthday):
+    def _parse_age(birthday):
         return 2015 - int(birthday[:4]) + 1
 
 def init(api, jwt):
