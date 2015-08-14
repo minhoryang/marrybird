@@ -41,7 +41,7 @@ class Request(db.Model):
 
 
 def init(api, jwt):
-    namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
+    namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
 

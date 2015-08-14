@@ -61,7 +61,7 @@ def ComputeNow(request_id):
     r.request_id = request_id
     r.username = rec.username
     r.isDone = True
-    r.result_json = str(result2)
+    r.result_json = str(result2).replace("'", '"')
     db.session.add(r)
     db.session.commit()
 

@@ -29,7 +29,7 @@ class Response(db.Model):
 
 
 def init(api, jwt):
-    namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
+    namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
 
@@ -44,7 +44,7 @@ def init(api, jwt):
             latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
             result_json = None
             if latest:
-                result_json = loads(latest.result_json.replace("'", '"'))
+                result_json = loads(latest.result_json)
             else:
                 result_json = []
 
@@ -89,7 +89,7 @@ def init(api, jwt):
             #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
             latest = Response.query.filter(Response.username == current_user.username).order_by(Response.created_at.desc()).first()
             response_id = 0
-            if latest and you in latest.result_json:  # TODO : It will not work.
+            if latest and you in loads(latest.result_json):  # TODO : It will not work.
                 response_id = latest.id
             db.session.add(Progress.Love(i, you, response_id))
             db.session.add(Met_Accepted.create(response_id, i, you))
