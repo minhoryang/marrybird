@@ -12,4 +12,4 @@ def push(message="", channel="#progress"):
         #"channel": channel,
         "text": message
     }
-    r = requests.post(WEB_HOOK_URL, data=json.dumps(payload))
+    requests.post(WEB_HOOK_URL, data=json.dumps(payload))

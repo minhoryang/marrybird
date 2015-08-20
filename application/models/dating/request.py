@@ -8,10 +8,9 @@ GOTO: Compute
 """
 __author__ = 'minhoryang'
 
-from copy import copy
 from datetime import datetime
 
-from flask.ext.restplus import Resource, fields
+from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy.orm import column_property
 
@@ -54,6 +53,7 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self):
+            """Request the matching suggesstion process to backend. (could be Celery.)"""
             username = current_user.username
 
             req = Request()

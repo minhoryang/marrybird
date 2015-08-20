@@ -7,9 +7,9 @@ from urllib.parse import quote
 
 from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
-from flask import current_app, make_response, request
-from flask.ext.restplus import Resource, fields
-from flask_jwt import jwt_required, current_user, JWTError  # TODO: Refactor JWT.
+from flask import current_app, make_response
+from flask.ext.restplus import Resource
+from flask_jwt import jwt_required, JWTError  # TODO: Refactor JWT.
 
 from . import db
 

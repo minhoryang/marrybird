@@ -25,5 +25,8 @@ ENABLE_MODELS = [
     ("Dating", score, (
             score.Score,
     )),
+    ("Dating", tier, (
+    #       tier.Tier,
+    )),
 ] \
     + []  # XXX : ADD ABOVE

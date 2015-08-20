@@ -1,12 +1,6 @@
 """."""
 __author__ = 'minhoryang'
 
-from datetime import datetime
-
-from flask.ext.restplus import Resource, fields
-from flask_jwt import jwt_required, current_user
-from sqlalchemy.orm import column_property
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_enum34 import EnumType
 
 from .. import db
@@ -26,7 +20,7 @@ class Score(db.Model):
     tierr = db.Column(EnumType(TierType))
 
     def __setattr__(self, key, value):
-        old = self.tierr
+        #old = self.tierr
         super(Score, self).__setattr__(key, value)
         if key is 'tier':
             self.tierr = TierType(value)

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
-from sqlalchemy.orm import column_property
+from sqlalchemy.exc import IntegrityError
 
 from . import db
 from .user import User
@@ -82,7 +82,6 @@ class Record(db.Model):
     @staticmethod
     def _available_keywords():
         CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username', 'is_male']
-        CANT_WRITE_AT_CLIENT = __class__._cant_write_at_client_keywords()
         AVAILABLE = list()
 
         for i in __class__.__dict__.keys():
@@ -105,8 +104,8 @@ def init(api, jwt):
 
     @namespace.route('/')
     class GetKeywordsList(Resource):
-        """All Available Keywords List."""
         def get(self):
+            """All Available Keywords List."""
             return {'status': 200, 'message': Record._available_keywords()}
 
     @namespace.route('/<string:username>')
@@ -166,7 +165,7 @@ def init(api, jwt):
                 db.session.add(existed_record)
                 db.session.commit()
                 return {'status': 200, 'message': 'Updated!'}
-            except IntegrityError as e:
+            except IntegrityError:
                 return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400
 
     @namespace.route('/checknickname/<string:nickname>')

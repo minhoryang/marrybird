@@ -11,7 +11,7 @@ __author__ = 'minhoryang'
 from datetime import datetime
 from json import loads
 
-from flask.ext.restplus import Resource, fields
+from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 
 from .. import db
@@ -40,6 +40,7 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def get(self):
+            """Suggestions, Who I Loved, and Somebody who loved me."""
             username = current_user.username
 
             latest = Response.query.filter(Response.username == username).order_by(Response.created_at.desc()).first()
@@ -86,6 +87,7 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self, i, you):
+            """Notify that I LOVE you to backend."""
             #if i != current_user.username:
             #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
             latest = Response.query.filter(Response.username == current_user.username).order_by(Response.created_at.desc()).first()
@@ -103,6 +105,7 @@ def init(api, jwt):
         @jwt_required()
         @api.doc(parser=authorization)
         def post(self, i, you):
+            """Notify that I HATE You to backend."""
             #if i != current_user.username:
             #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
             db.session.add(Met_Rejected.create(0, i, you))

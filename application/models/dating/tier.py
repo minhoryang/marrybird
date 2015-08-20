@@ -1,12 +1,7 @@
 __author__ = 'minhoryang'
 
 import enum
-from datetime import datetime
 from functools import lru_cache
-
-from sqlalchemy.ext.declarative import declared_attr
-
-from .. import db
 
 
 class TierType(enum.Enum):

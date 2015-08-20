@@ -5,8 +5,6 @@ from random import randrange
 from datetime import datetime
 
 from flask.ext.restplus import Resource
-from flask_jwt import jwt_required, current_user
-from sqlalchemy.exc import IntegrityError
 
 from . import db
 from .record import Record
