@@ -28,6 +28,7 @@ def create_app():
     api = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
     jwt = MyJWT(app)
     admin = Admin(app, name="admin")
+    db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
 
     for category, cls, models in ENABLE_MODELS:
@@ -37,4 +38,4 @@ def create_app():
 
     MyJWT.Bridger(jwt)
 
-    return app
+    return app, db
