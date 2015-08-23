@@ -1,7 +1,7 @@
 from os import mkdir
 
 from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask.ext.migrate import Migrate, MigrateCommand, upgrade
 
 from application import create_app
 
@@ -26,7 +26,7 @@ def init():
         mkdir(app.config['UPLOAD_FOLDER'])
     except FileExistsError:
         pass
-    db.create_all()  # TODO: NEED TO KNOW HOW IT WORKS WITHOUT DEFINING WHICH DB WE WANT TO USE.
+    upgrade()
 
 if __name__ == "__main__":
     manager.run()
