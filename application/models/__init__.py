@@ -9,7 +9,6 @@ from . import (
 )
 
 from .dating import ENABLE_MODELS as DATING_ENABLE_MODELS
-from .qna import ENABLE_MODELS as QNA_ENABLE_MODELS
 
 ENABLE_MODELS = [
     ("User", user, (
@@ -31,5 +30,4 @@ ENABLE_MODELS = [
     )),
 ] \
     + DATING_ENABLE_MODELS \
-    + QNA_ENABLE_MODELS \
     + []  # XXX : ADD ABOVE
