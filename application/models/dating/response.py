@@ -83,7 +83,7 @@ def init(api, jwt):
                 'notyet': {i: Record._get(i) for i in NotYet},
                 'failed': {i: Record._get(i) for i in Failed},
                 'result': {i: Record._get(i) for i in result_json},
-                'notice': {idx: item.notice for idx, item in enumerate(Notices)},
+                'notice': {idx: {'message': item.notice, 'photo_url': item.photo_url} for idx, item in enumerate(Notices)},
             }}
 
     @namespace.route('/<string:i>/love/<string:you>')

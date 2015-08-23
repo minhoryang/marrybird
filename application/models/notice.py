@@ -14,7 +14,7 @@ class Notice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50))
     notice = db.Column(db.String(200))
-
+    photo_url = db.Column(db.String(50))
 
 def init(api, jwt):
     pass
