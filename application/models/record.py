@@ -39,6 +39,7 @@ class Record(db.Model):
     photo_url = db.Column(db.String(50))
     photo_thumbnail_url = db.Column(db.String(50))
     phonenum = db.Column(db.String(20), unique=True)
+    motto = db.Column(db.String(200))
 
     regular_company_email = db.Column(db.String(50))
     regular_company_id_photo_url = db.Column(db.String(50))
