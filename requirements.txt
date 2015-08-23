@@ -9,6 +9,7 @@ newrelic
 
 requests
 
+sqlalchemy-enum34
 sqlalchemy-utils
 
 gunicorn
