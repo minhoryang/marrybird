@@ -1,10 +1,15 @@
 """."""
 __author__ = 'minhoryang'
 
-from sqlalchemy_enum34 import EnumType
+from sqlalchemy_enum34 import EnumType as _EnumType
 
 from .. import db
 from .tier import TierType
+
+class EnumType(_EnumType):
+    def copy(self, *args, **kargs):
+        kargs.pop('schema')
+        super(__class__, self).copy(*args, **kargs)
 
 
 # XXX : Need to be close with Record.DB

@@ -6,10 +6,15 @@ from enum import Enum
 from datetime import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy_enum34 import EnumType
+from sqlalchemy_enum34 import EnumType as _EnumType
 
 from .. import db
 
+
+class EnumType(_EnumType):
+    def copy(self, *args, **kargs):
+        kargs.pop('schema')
+        super(__class__, self).copy(*args, **kargs)
 
 class MetType(Enum):
     rejected = "rejected"
