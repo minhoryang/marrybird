@@ -16,6 +16,9 @@ from alembic import op
 import sqlalchemy as sa
 from application.models import _external_types
 
+from application.models.dating.met import MetType
+from application.models.dating.tier import TierType
+
 
 def upgrade(engine_name):
     globals()["upgrade_%s" % engine_name]()
@@ -68,7 +71,7 @@ def upgrade_score():
     sa.Column('work_score', sa.Float(), nullable=False),
     sa.Column('attraction_score', sa.Float(), nullable=False),
     sa.Column('tier', sa.String(length=2), nullable=False),
-    sa.Column('tierr', application.models._external_types.ChoiceType(length=255), nullable=True),
+    sa.Column('tierr', _external_types.ChoiceType(TierType), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username'),
     sa.UniqueConstraint('username')
@@ -126,7 +129,7 @@ def upgrade_met():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('response_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('type', application.models._external_types.ChoiceType(length=255), nullable=False),
+    sa.Column('type', _external_types.ChoiceType(MetType), nullable=False),
     sa.Column('A', sa.String(length=50), nullable=True),
     sa.Column('B', sa.String(length=50), nullable=True),
     sa.PrimaryKeyConstraint('id')

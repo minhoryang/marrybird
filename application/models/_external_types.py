@@ -1,3 +1,3 @@
 from enum import Enum
 
-from sqlalchemy_enum34 import EnumType
+from sqlalchemy_utils.types.choice import ChoiceType
