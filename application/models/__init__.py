@@ -6,6 +6,7 @@ from . import (
     file,
     phone,
     selfstory,
+    notice,
 )
 
 from .dating import ENABLE_MODELS as DATING_ENABLE_MODELS
@@ -28,6 +29,9 @@ ENABLE_MODELS = [
     ("User", selfstory, (
             selfstory.SelfStory,
     )),
+    ("User", notice, (
+            notice.Notice,
+    ))
 ] \
     + DATING_ENABLE_MODELS \
     + []  # XXX : ADD ABOVE

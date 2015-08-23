@@ -16,6 +16,7 @@ from flask_jwt import jwt_required, current_user
 
 from .. import db
 from ..record import Record
+from ..notice import Notice
 from .progress import Progress
 from .met import Met_Accepted, Met_Rejected
 
@@ -72,6 +73,9 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
+            Notices = Notice.query.filter(Notice.username == username)
+            if not Notices:
+                Notices = []
 
             return {'status': 200, 'message': {
                 'success': {i: Record._get(i) for i in Success},
@@ -79,6 +83,7 @@ def init(api, jwt):
                 'notyet': {i: Record._get(i) for i in NotYet},
                 'failed': {i: Record._get(i) for i in Failed},
                 'result': {i: Record._get(i) for i in result_json},
+                'notice': {idx: item.notice for idx, item in enumerate(Notices)},
             }}
 
     @namespace.route('/<string:i>/love/<string:you>')
