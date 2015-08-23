@@ -1,12 +1,12 @@
 """."""
 __author__ = 'minhoryang'
 
-from sqlalchemy_enum34 import EnumType as _EnumType
+from sqlalchemy_utils.types.choice import ChoiceType as _ChoiceType
 
 from .. import db
 from .tier import TierType
 
-class EnumType(_EnumType):
+class ChoiceType(_ChoiceType):
     def copy(self, *args, **kargs):
         if 'schema' in kargs:
             kargs.pop('schema')
@@ -25,13 +25,13 @@ class Score(db.Model):
     attraction_score = db.Column(db.Float, nullable=False)
 
     tier = db.Column(db.String(2), nullable=False)
-    tierr = db.Column(EnumType(TierType))
+    tierr = db.Column(ChoiceType(TierType))
 
     def __setattr__(self, key, value):
         #old = self.tierr
         super(Score, self).__setattr__(key, value)
         if key is 'tier':
-            self.tierr = TierType(value)
+            self.tierr = value
 
 
 def init(api, jwt):
