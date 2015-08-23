@@ -1,18 +1,21 @@
-"""Look at **TODO**."""
+"""Look at campaigns.Campaign."""
 __author__ = 'minhoryang'
 
 from . import (
     questions,
     answers,
-#    type,
+    campaigns,
 )
 
 ENABLE_MODELS = [
     ("Q&A", questions, (
-        #questions.Question,
+        questions.Question,
     )),
     ("Q&A", answers, (
-        #answers.Answer,
+        answers.Answer,
+    )),
+    ("Q&A", campaigns, (
+        campaigns.Campaign,
     )),
 ] \
     + []  # XXX : ADD ABOVE
