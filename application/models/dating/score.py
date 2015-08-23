@@ -8,8 +8,9 @@ from .tier import TierType
 
 class EnumType(_EnumType):
     def copy(self, *args, **kargs):
-        kargs.pop('schema')
-        super(__class__, self).copy(*args, **kargs)
+        if 'schema' in kargs:
+            kargs.pop('schema')
+        return super(__class__, self).copy(*args, **kargs)
 
 
 # XXX : Need to be close with Record.DB

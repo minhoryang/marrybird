@@ -13,8 +13,9 @@ from .. import db
 
 class EnumType(_EnumType):
     def copy(self, *args, **kargs):
-        kargs.pop('schema')
-        super(__class__, self).copy(*args, **kargs)
+        if 'schema' in kargs:
+            kargs.pop('schema')
+        return super(__class__, self).copy(*args, **kargs)
 
 class MetType(Enum):
     rejected = "rejected"
