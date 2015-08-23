@@ -64,12 +64,14 @@ def init(api, jwt):
             output = ComputeNow(req.id)
             return {'status': 200, 'message': 'Done.' + str(output)}
 
-    """
     @namespace.route('/<string:username>')
     class ComputeRequestBySystem(Resource):
         # TODO : LIMIT THIS CALL USED ONLY BY SYSTEM.
-        @jwt_required()
-        @api.doc(parser=authorization)
         def get(self, username):
-            return {'status': 200, 'message': ''}
-    """
+            req = Request()
+            req.username = username
+            req.requester = username
+            db.session.add(req)
+            db.session.commit()
+            output = ComputeNow(req.id)
+            return {'status': 200, 'message': 'Done.' + str(output)}
