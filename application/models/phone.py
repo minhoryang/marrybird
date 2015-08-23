@@ -11,6 +11,8 @@ from .record import Record
 from ..externals.slack import push
 
 class Phone(db.Model):
+    __bind_key__ = "phone"
+
     id = db.Column(db.Integer, primary_key=True)
     phone = db.Column(db.String(10))
     status = db.Column(db.String(10))

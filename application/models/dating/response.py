@@ -21,6 +21,8 @@ from .progress import Progress
 from .met import Met_Accepted, Met_Rejected
 
 class Response(db.Model):
+    __bind_key__ = "response"
+
     id = db.Column(db.Integer, primary_key=True)
     request_id = db.Column(db.Integer)
     username = db.Column(db.String(50))

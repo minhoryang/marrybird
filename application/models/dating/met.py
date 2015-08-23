@@ -17,6 +17,8 @@ class MetType(Enum):
     notresponsed = "notresponsed"
 
 class Met(db.Model):
+    __bind_key__ = "met"
+
     id = db.Column(db.Integer, primary_key=True)
     response_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.now)

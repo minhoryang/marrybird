@@ -12,6 +12,8 @@ from . import db
 
 
 class SelfStory(db.Model):
+    __bind_key__ = "selfstory"
+
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime, nullable=True)
