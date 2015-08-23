@@ -1,6 +1,7 @@
 flask
 flask-admin
 flask-restplus
+alembic<0.8
 flask-migrate
 flask-sqlalchemy
 -e git+https://github.com/mattupstate/flask-jwt.git#egg=flask-jwt

@@ -32,6 +32,8 @@ class Met(db.Model):
 
 
 class Met_Rejected(Met):
+    __bind_key__ = "met"
+
     id = db.Column(db.Integer, db.ForeignKey('met.id'), primary_key=True)
 
     @classmethod
@@ -45,6 +47,8 @@ class Met_Rejected(Met):
 
 
 class Met_Accepted(Met):
+    __bind_key__ = "met"
+
     id = db.Column(db.Integer, db.ForeignKey('met.id'), primary_key=True)
 
     @classmethod
@@ -58,6 +62,8 @@ class Met_Accepted(Met):
 
 
 class Met_NotResponsed(Met):
+    __bind_key__ = "met"
+
     id = db.Column(db.Integer, db.ForeignKey('met.id'), primary_key=True)
 
     @classmethod
