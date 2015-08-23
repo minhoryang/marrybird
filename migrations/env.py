@@ -74,6 +74,7 @@ def run_migrations_offline():
         with open(file_, 'w') as buffer:
             context.configure(url=rec['url'], output_buffer=buffer,
                               target_metadata=get_metadata(name),
+                              user_module_prefix="application.models._external_types.",
                               literal_binds=True)
             with context.begin_transaction():
                 context.run_migrations(engine_name=name)
@@ -117,6 +118,7 @@ def run_migrations_online():
                 connection=rec['connection'],
                 upgrade_token="%s_upgrades" % name,
                 downgrade_token="%s_downgrades" % name,
+                user_module_prefix="application.models._external_types.",
                 target_metadata=get_metadata(name)
             )
             context.run_migrations(engine_name=name)
