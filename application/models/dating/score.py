@@ -9,6 +9,8 @@ from .tier import TierType
 
 # XXX : Need to be close with Record.DB
 class Score(db.Model):
+    __bind_key__ = "score"
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
 

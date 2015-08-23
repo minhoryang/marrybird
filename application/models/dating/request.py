@@ -20,6 +20,8 @@ from .response import Response
 
 
 class Request(db.Model):
+    __bind_key__ = "request"
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50))
 
@@ -29,13 +31,13 @@ class Request(db.Model):
 
     # response
     response_id = db.Column(db.Integer, nullable=True)
-    is_response_ready = column_property(
-        db.select(
-            [Response.isDone]
-        ).where(
-            Response.id==response_id
-        ).correlate_except(Response)
-    )
+    #is_response_ready = column_property(
+    #    db.select(
+    #        [Response.isDone]
+    #    ).where(
+    #        Response.id==response_id
+    #    ).correlate_except(Response)
+    #)
     # TODO : REPLACE THIS WHEN WE USE CELERY
 
 

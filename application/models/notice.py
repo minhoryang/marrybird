@@ -11,6 +11,8 @@ from . import db
 
 
 class Notice(db.Model):
+    __bind_key__ = "notice"
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50))
     notice = db.Column(db.String(200))

@@ -6,6 +6,8 @@ from .. import db
 
 class Progress(db.Model):
     """ User A loves User B."""
+    __bind_key__ = "progress"
+
     id = db.Column(db.Integer, primary_key=True)
     response_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.now)

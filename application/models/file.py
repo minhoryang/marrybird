@@ -15,6 +15,8 @@ from . import db
 
 
 class File(db.Model):
+    __bind_key__ = "file"
+
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     username = db.Column(db.String(50))
