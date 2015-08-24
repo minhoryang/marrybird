@@ -17,10 +17,10 @@ class Record(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime)
     is_male = db.Column(db.Boolean)  # copied
-    username = db.Column(db.String(50), unique=True)
     _height = db.Column(db.Integer)  # converted
 
     # XXX : Can't Write
+    username = db.Column(db.String(50), unique=True)
     is_regular_member = db.Column(db.Boolean, default=False)
     age = db.Column(db.Integer)  # calc-ed
 
@@ -77,12 +77,12 @@ class Record(db.Model):
 
     @staticmethod
     def _cant_write_at_client_keywords():
-        CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age']
+        CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age', 'username']
         return CANT_WRITE_AT_CLIENT
 
     @staticmethod
     def _available_keywords():
-        CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'username', 'is_male']
+        CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'is_male']
         AVAILABLE = list()
 
         for i in __class__.__dict__.keys():
