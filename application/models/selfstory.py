@@ -81,6 +81,11 @@ def init(api, jwt):
                     'photo_url': item.photo_url,
                     'story': item.story,
                     'title': item.title if item.title else "",
+                    'wholikes': [
+                        user.nickname for user in SelfStoryLike.query.filter(
+                            SelfStoryLike.story_id == item.id
+                        ).all()  # TODO : WORLD FAMOUS ** MASERATI PROBLEM LIVES HERE! **
+                    ],
                 } for item in found
             }}, 200
 
