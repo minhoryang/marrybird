@@ -71,8 +71,9 @@ def init(api, jwt):
         def get(self, username):
             """Get List and Stories."""
 
-            found = SelfStory.query.filter(SelfStory.username == username).first()
-            if not found:
+            found = SelfStory.query.filter(SelfStory.username == username)
+            if not found.first():
+                # XXX : [Policy Changed] iOS wanted to show - but okay.
                 return {'status': 404, 'message': 'Not Found'}, 404
 
             return {'status': 200, 'message': {
