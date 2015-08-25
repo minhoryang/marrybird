@@ -3,7 +3,6 @@ __author__ = 'minhoryang'
 
 from . import (
     request,
-    compute,
     response,
     progress,
     met,
@@ -15,9 +14,6 @@ from . import (
 ENABLE_MODELS = [
     ("Dating", request, (
             request.Request,
-    )),
-    ("Dating", compute, (
-    #        compute.Compute,
     )),
     ("Dating", response, (
             response.Response,
