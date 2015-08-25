@@ -67,6 +67,3 @@ def ComputeNow(request_id):
     db.session.commit()
 
     return tuple(result2)
-
-def init(api, jwt):
-    pass
