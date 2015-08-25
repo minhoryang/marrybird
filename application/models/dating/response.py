@@ -75,7 +75,7 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
-            Notices = Notice.query.filter(Notice.username == username)
+            Notices = Notice.query.filter(Notice.username == username).all()
             if not Notices:
                 Notices = []
 

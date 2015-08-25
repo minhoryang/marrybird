@@ -41,7 +41,7 @@ def init(api, jwt):
             if Record.query.filter(Record.phonenum == args['phonenum']).first():
                 return {'status': 400, 'message': 'Already Registered'}
             # Expired Same Numbers
-            for i in Phone.query.filter(Phone.phone == args['phonenum']).filter(Phone.status != "expired"):
+            for i in Phone.query.filter(Phone.phone == args['phonenum']).filter(Phone.status != "expired").all():
                 i.status = "expired"
                 db.session.add(i)
             # TODO: Async-ed Timeout Feature NEEDED!

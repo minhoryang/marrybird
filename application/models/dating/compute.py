@@ -42,7 +42,7 @@ def ComputeNow(request_id):
             Record.age - 4 <= rec.age,
             rec._height + 2 >= Record._height if rec.is_male else Record._height + 2 >= rec._height,
             Record.religion == rec.religion if rec.religion != "무교" else True,
-        )
+        ).all()
         for j in out:
             result.add(j.username)
 
@@ -52,8 +52,8 @@ def ComputeNow(request_id):
         out = Met.query.filter(
             Met.A == rec.username,
             Met.B == i
-        )
-        if not out.first():
+        ).first()
+        if not out:
             result2.append(i)
 
     # TODO : Regular Member.
