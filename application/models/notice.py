@@ -23,7 +23,7 @@ class Notice(db.Model):
         return {
             'message': self.notice,
             'photo_url': self.photo_url,
-            'datetime': self.created_at,
+            'datetime': str(self.created_at),
         }
 
 def init(api, jwt):
