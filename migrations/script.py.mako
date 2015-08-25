@@ -21,16 +21,19 @@ from application.models import _external_types
 ${imports if imports else ""}
 
 def upgrade(engine_name):
-    globals()["upgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["upgrade_%s" % engine_name]()
 
 
 def downgrade(engine_name):
-    globals()["downgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["downgrade_%s" % engine_name]()
 
 <%
     from flask import current_app
     db_names = [''] + list(current_app.config.get("SQLALCHEMY_BINDS").keys())
 %>
+db_names = ${db_names}
 
 ## generate an "upgrade_<xyz>() / downgrade_<xyz>()" function
 ## for each database name in the ini file.

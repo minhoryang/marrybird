@@ -28,6 +28,7 @@ ENABLE_MODELS = [
     )),
     ("User", selfstory, (
             selfstory.SelfStory,
+            selfstory.SelfStoryLike,
     )),
     ("User", notice, (
             notice.Notice,

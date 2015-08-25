@@ -9,6 +9,7 @@ from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
 
 from . import db
+from .record import Record
 
 
 class SelfStory(db.Model):
@@ -20,7 +21,28 @@ class SelfStory(db.Model):
     username = db.Column(db.String(50))
 
     photo_url = db.Column(db.String(50))  # XXX : same length with record.py
+    title = db.Column(db.String(50))
     story = db.Column(db.String(200))
+
+
+class SelfStoryLike(db.Model):
+    __bind_key__ = "selfstorylike"
+
+    id = db.Column(db.Integer, primary_key=True)
+    story_id = db.Column(db.Integer)
+    username = db.Column(db.String(50))
+    nickname = db.Column(db.String(50))
+
+    def __setattr__(self, key, value):
+        if key == "nickname" and value:
+            return  # delegated from below
+        elif key == "username" and value:
+            super(__class__, self).__setattr__(
+                "nickname",
+                Record.query.filter(Record.username == value).first().nickname
+            )
+        else:
+            super(__class__, self).__setattr__(key, value)
 
 
 def init(api, jwt):

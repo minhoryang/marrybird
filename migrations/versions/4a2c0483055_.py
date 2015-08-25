@@ -1,4 +1,4 @@
-"""empty message
+"""Initialize New DB.
 
 Revision ID: 4a2c0483055
 Revises: 
@@ -21,13 +21,16 @@ from application.models.dating.tier import TierType
 
 
 def upgrade(engine_name):
-    globals()["upgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["upgrade_%s" % engine_name]()
 
 
 def downgrade(engine_name):
-    globals()["downgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["downgrade_%s" % engine_name]()
 
 
+db_names = ['', 'score', 'met', 'response', 'request', 'user', 'phone', 'file', 'review', 'notice', 'record', 'progress', 'selfstory']
 
 
 

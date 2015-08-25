@@ -1,4 +1,4 @@
-"""empty message
+"""Notice <- created_at
 
 Revision ID: 272112f86f5
 Revises: 394d4205f2c
@@ -18,14 +18,17 @@ from application.models import _external_types
 
 
 def upgrade(engine_name):
-    globals()["upgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["upgrade_%s" % engine_name]()
 
 
 def downgrade(engine_name):
-    globals()["downgrade_%s" % engine_name]()
+    if engine_name in db_names:
+        globals()["downgrade_%s" % engine_name]()
 
 
 
+db_names = ['', 'score', 'met', 'response', 'request', 'user', 'phone', 'file', 'review', 'notice', 'record', 'progress', 'selfstory']
 
 
 def upgrade_():
