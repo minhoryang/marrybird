@@ -21,7 +21,7 @@ class SelfStory(db.Model):
     username = db.Column(db.String(50))
 
     photo_url = db.Column(db.String(50))  # XXX : same length with record.py
-    title = db.Column(db.String(50))
+    title = db.Column(db.String(50), nullable=True)
     story = db.Column(db.String(200))
 
 
@@ -55,9 +55,10 @@ def init(api, jwt):
         type=api.model('self_story', {
             'photo_url': fields.String(),
             'story': fields.String(),
+            'title': fields.String()
         }),
         required=True,
-        help='{"self_story": {"photo_url": "1", "story": "..."}}',
+        help='{"self_story": {"title": "", "photo_url": "1", "story": "..."}}',
         location='json'
     )
 
@@ -76,7 +77,8 @@ def init(api, jwt):
             return {'status': 200, 'message': {
                 item.id: {
                     'photo_url': item.photo_url,
-                    'story': item.story
+                    'story': item.story,
+                    'title': item.title if item.title else "",
                 } for item in found
             }}, 200
 
@@ -92,6 +94,7 @@ def init(api, jwt):
             new_one.username = username
             new_one.photo_url = insert['photo_url']
             new_one.story = insert['story']
+            new_one.title = insert['title']
             db.session.add(new_one)
             db.session.commit()
             return {'status': 200, 'message': 'putted'}, 200
@@ -116,6 +119,7 @@ def init(api, jwt):
 
             found.photo_url = insert['photo_url']
             found.story = insert['story']
+            found.title = insert['title']
             found.modified_at = datetime.now()
             db.session.add(found)
             db.session.commit()
