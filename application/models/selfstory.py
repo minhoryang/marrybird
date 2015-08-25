@@ -41,6 +41,7 @@ class SelfStoryLike(db.Model):
                 "nickname",
                 Record.query.filter(Record.username == value).first().nickname
             )
+            super(__class__, self).__setattr__(key, value)
         else:
             super(__class__, self).__setattr__(key, value)
 
@@ -70,7 +71,7 @@ def init(api, jwt):
         def get(self, username):
             """Get List and Stories."""
 
-            found = SelfStory.query.filter(SelfStory.username == username)
+            found = SelfStory.query.filter(SelfStory.username == username).first()
             if not found:
                 return {'status': 404, 'message': 'Not Found'}, 404
 
@@ -141,3 +142,64 @@ def init(api, jwt):
             db.session.delete(found)
             db.session.commit()
             return {'status': 200, 'message': 'deleted'}, 200
+
+    @namespace.route('/<string:username>/<int:idx>/like')
+    class ILikeYourSelfStory(Resource):
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def get(self, username, idx):
+            """Check whether I liked it or not."""
+            story = SelfStory.query.get(idx)
+            if not story or story.username != username:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
+            found = SelfStoryLike.query.filter(
+                SelfStoryLike.username == current_user.username,
+                SelfStoryLike.story_id == idx
+            ).first()
+            if found:
+                return {'status': 200, 'message': 'You Liked it.'}, 200
+            else:
+                return {'status': 404, 'message': 'You didn`t like it yet.'}, 404
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def put(self, username, idx):
+            """Like it."""
+            story = SelfStory.query.get(idx)
+            if not story or story.username != username:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
+            found = SelfStoryLike.query.filter(
+                SelfStoryLike.username == current_user.username,
+                SelfStoryLike.story_id == idx
+            ).first()
+            if found:
+                return {'status': 400, 'message': 'ALREADY Liked it!'}, 400
+
+            like = SelfStoryLike()
+            like.username = current_user.username
+            like.story_id = idx
+            db.session.add(like)
+            db.session.commit()
+            return {'status': 200, 'message': 'Like it!'}, 200
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def delete(self, username, idx):
+            """Oops, Now I Hate it."""
+            story = SelfStory.query.get(idx)
+            if not story or story.username != username:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
+            found = SelfStoryLike.query.filter(
+                SelfStoryLike.username == current_user.username,
+                SelfStoryLike.story_id == idx,
+            ).first()
+            if not found:
+                return {'status': 400, 'message': 'ALREADY hated it!'}, 400
+
+            db.session.delete(found)
+            db.session.commit()
+            return {'status': 200, 'message': 'Now You Hate it!'}, 200
