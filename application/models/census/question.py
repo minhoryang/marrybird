@@ -2,8 +2,6 @@
 
 __author__ = 'minhoryang'
 
-from flask.ext.restplus import Resource, fields
-from flask_jwt import jwt_required, current_user
 from sqlalchemy.orm import column_property
 from sqlalchemy_utils import ScalarListType
 
@@ -60,6 +58,7 @@ class QuestionBook(db.Model):
 
 def init(api, jwt):
     pass
+
 
 def module_init(api, jwt, namespace):
     pass

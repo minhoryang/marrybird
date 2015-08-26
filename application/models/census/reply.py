@@ -58,17 +58,10 @@ class ReplyBook(db.Model):
 def init(api, jwt):
     pass  # check below - module_init()
 
+
 def module_init(api, jwt, namespace):
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
-    insert_comment = copy(authorization)
-    insert_comment.add_argument(
-        'comment',
-        type=fields.String(),
-        required=True,
-        help='{"comment": ""}',
-        location='json'
-    )
 
     @namespace.route('/')
     class ReplyBooks(Resource):
@@ -77,10 +70,6 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=authorization)
         def get(self):
             """Get List and Status of QuestionBooks"""
-            # list of question books
-            #    how many people did this
-            #    how much percent did I reply?
-            #    list?
             return
 
     @namespace.route('/<int:question_book_id>')

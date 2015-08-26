@@ -2,6 +2,7 @@
 
 __author__ = 'minhoryang'
 
+from copy import deepcopy as copy
 from datetime import datetime
 
 from flask.ext.restplus import Resource, fields
@@ -18,6 +19,7 @@ class Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     commented_at = db.Column(db.DateTime, default=datetime.now)
+    modified_at = db.Column(db.DateTime, nullable=True)
 
     question_book_id = db.Column(db.Integer, nullable=False)
     username = db.Column(db.String(50), nullable=False)
@@ -68,6 +70,7 @@ class CommentLike(db.Model):
     __bind_key__ = "commentlike"
 
     id = db.Column(db.Integer, primary_key=True)
+    question_book_id = db.Column(db.Integer, nullable=False)
     comment_id = db.Column(db.Integer, nullable=False)
     username = db.Column(db.String(50), nullable=False)
     nickname = db.Column(db.String(50))
@@ -90,28 +93,137 @@ class CommentLike(db.Model):
 def init(api, jwt):
     pass
 
+
 def module_init(api, jwt, namespace):
+    authorization = api.parser()
+    authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+    insert_comment = copy(authorization)
+    insert_comment.add_argument(
+        'comment',
+        type=fields.String(),
+        required=True,
+        help='{"comment": ""}',
+        location='json'
+    )
+
+    @namespace.route('/<int:question_book_id>/comment')
+    class NewComment(Resource):
+
+        @jwt_required()
+        @api.doc(parser=insert_comment)
+        def put(self, question_book_id):
+            """Add your comment."""
+            insert = insert_comment.parse_args()
+            new_one = Comment()
+            new_one.question_book_id = question_book_id
+            new_one.username = current_user.username
+            new_one.content = insert["comment"]
+            db.session.add(new_one)
+            db.session.commit()
+            return {'status': 200, 'message': 'putted'}, 200
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def get(self, question_book_id):
+            """Refresh comments."""
+            pass  # TODO
+
     @namespace.route('/<int:question_book_id>/comment/<int:comment_id>')
     class Comments(Resource):
-        def put(self):
-            """Add new comment."""
-            pass
-        def post(self):
+
+        @jwt_required()
+        @api.doc(parser=insert_comment)
+        def post(self, question_book_id, comment_id):
             """Modify your comment."""
-            pass
-        def delete(self):
+            insert = insert_comment.parse_args()
+
+            found = Comment.query.get(comment_id)
+            if not found:
+                return {'status': 404, 'message': 'Not Found'}, 404
+            if found.question_book_id != question_book_id:
+                return {'status': 400, 'message': 'Not This Question Book'}, 400
+            if found.username != current_user.username:
+                return {'status': 400, 'message': 'Not Yours'}, 400
+            found.content = insert['comment']
+            found.modified_at = datetime.now()
+            db.session.add(found)
+            db.session.commit()
+            return {'status': 200, 'message': 'modified'}, 200
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def delete(self, question_book_id, comment_id):
             """Delete your comment."""
-            pass
+            found = Comment.query.get(comment_id)
+            if not found:
+                return {'status': 404, 'message': 'Not Found'}, 404
+            if found.question_book_id != question_book_id:
+                return {'status': 400, 'message': 'Not This Question Book'}, 400
+            if found.username != current_user.username:
+                return {'status': 400, 'message': 'Not Yours'}, 400
+            db.session.delete(found)
+
+            if CommentLike.isEnabled(api.app):
+                foundComments = CommentLike.query.filter(
+                    CommentLike.question_book_id == question_book_id,
+                    CommentLike.comment_id == comment_id,
+                ).all()
+                db.session.delete(foundComments)
+
+            db.session.commit()
+            return {'status': 200, 'message': 'deleted'}, 200
 
     if CommentLike.isEnabled(api.app):
+
         @namespace.route('/<int:question_book_id>/comment/<int:comment_id>/like')
         class CommentLikes(Resource):
-            def head(self):
+
+            @jwt_required()
+            @api.doc(parser=authorization)
+            def head(self, question_book_id, comment_id):
                 """Did I Like it?"""
-                pass
-            def put(self):
+                found = CommentLike.query.filter(
+                    CommentLike.username == current_user.username,
+                    CommentLike.question_book_id == question_book_id,
+                    CommentLike.comment_id == comment_id,
+                ).first()
+                if found:
+                    return {'status': 200, 'message': 'You Liked it.'}, 200
+                else:
+                    return {'status': 404, 'message': 'You didn`t like it yet'}, 404
+
+            @jwt_required()
+            @api.doc(parser=authorization)
+            def put(self, question_book_id, comment_id):
                 """Like it."""
-                pass
-            def delete(self):
+                found = CommentLike.query.filter(
+                    CommentLike.username == current_user.username,
+                    CommentLike.question_book_id == question_book_id,
+                    CommentLike.comment_id == comment_id,
+                ).first()
+                if found:
+                    return {'status': 400, 'message': 'ALREADY Liked it!'}, 400
+
+                like = CommentLike()
+                like.username = current_user.username
+                like.question_book_id = question_book_id
+                like.comment_id = comment_id
+                db.session.add(like)
+                db.session.commit()
+                return {'status': 200, 'message': 'Like it!'}, 200
+
+            @jwt_required()
+            @api.doc(parser=authorization)
+            def delete(self, question_book_id, comment_id):
                 """Oops, Now I Hate it."""
-                pass
+                found = CommentLike.query.filter(
+                    CommentLike.username == current_user.username,
+                    CommentLike.question_book_id == question_book_id,
+                    CommentLike.comment_id == comment_id,
+                ).first()
+                if not found:
+                    return {'status': 400, 'message': 'ALREADY Hated it!'}, 400
+
+                db.session.delete(found)
+                db.session.commit()
+                return {'status': 200, 'message': 'Now You Hate it!'}, 200
