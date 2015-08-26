@@ -2,6 +2,7 @@
 
 __author__ = 'minhoryang'
 
+from copy import deepcopy as copy
 from datetime import datetime
 
 from flask.ext.restplus import Resource, fields
@@ -10,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
 from .. import db
+from .question import QuestionBook
 
 
 class Reply(db.Model):
@@ -55,9 +57,19 @@ class ReplyBook(db.Model):
 
 
 def init(api, jwt):
-    namespace = api.namespace('census')  # TODO: , description=__doc__.split('.')[0])
+    pass  # check below - module_init()
+
+def module_init(api, jwt, namespace):
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+    insert_comment = copy(authorization)
+    insert_comment.add_argument(
+        'comment',
+        type=fields.String(),
+        required=True,
+        help='{"comment": ""}',
+        location='json'
+    )
 
     @namespace.route('/')
     class ReplyBooks(Resource):

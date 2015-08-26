@@ -6,6 +6,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy_utils import ScalarListType
 
 from .. import db
+from .comment import Comment
 
 
 class Question(db.Model):
@@ -54,9 +55,22 @@ class QuestionBook(db.Model):
         return Question.query.filter(
             Question.book_id == self.id,
         ).order_by(
-            Question.id.asc()
+            Question.id.asc(),
         ).all()
+    """
+    def getcomments(self):
+        return {
+            for c in Comment.query.filter(
+                Comment.question_book_id == self.id,
+            ).order_by(
+                Comment.id.desc(),
+            ).all()
+        }
+    """
 
 
 def init(api, jwt):
     pass  # expected to use it at /admin page.
+
+def module_init(api, jwt, namespace):
+    pass

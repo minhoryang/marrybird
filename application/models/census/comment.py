@@ -2,20 +2,20 @@
 
 __author__ = 'minhoryang'
 
-from copy import deepcopy as copy
 from datetime import datetime
-
-from flask.ext.restplus import Resource, fields
-from flask_jwt import jwt_required, current_user
 
 from .. import db
 from ..record import Record
+
+# TODO: FEATURE FLAG NEEDED
 
 
 class Comment(db.Model):
     __bind_key__ = "comment"
 
     id = db.Column(db.Integer, primary_key=True)
+    commented_at = db.Column(db.DateTime, default=datetime.now)
+
     question_book_id = db.Column(db.Integer, nullable=False)
     username = db.Column(db.String(50), nullable=False)
     nickname = db.Column(db.String(50))  # TODO : Fast-Cache vs Dont-Caching-it
@@ -32,6 +32,20 @@ class Comment(db.Model):
             super(__class__, self).__setattr__(key, value)
         else:
             super(__class__, self).__setattr__(key, value)
+
+    def jsonify(self):
+        return {
+            "nickname": self.nickname,
+            "comment": self.comment,
+            #"wholikes": [
+            #    liker.nickname
+            #    for liker in CommentLike.query.filter(
+            #        CommentLike.comment_id == self.id,
+            #    ).order_by(
+            #        CommentLike.id.desc(),
+            #    ).all()
+            #]
+        }
 
 
 class CommentLike(db.Model):
@@ -56,22 +70,7 @@ class CommentLike(db.Model):
 
 
 def init(api, jwt):
-    namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
-    authorization = api.parser()
-    authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
-    insert_comment = copy(authorization)
-    insert_comment.add_argument(
-        'comment',
-        type=fields.String(),
-        required=True,
-        help='{"comment": ""}',
-        location='json'
-    )
+    pass  # XXX : handled at <reply>.
 
-    @namespace.route('/')
-    class Comments(Resource):
-
-        @jwt_required()
-        @api.doc(parser=authorization)
-        def get(self):
-            return
+def module_init(api, jwt, namespace):
+    pass
