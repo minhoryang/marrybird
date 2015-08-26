@@ -17,6 +17,7 @@ depends_on = ${repr(depends_on)}
 
 from alembic import op
 import sqlalchemy as sa
+import application
 from application.models import _external_types
 ${imports if imports else ""}
 
