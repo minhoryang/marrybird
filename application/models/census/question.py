@@ -2,11 +2,12 @@
 
 __author__ = 'minhoryang'
 
+from flask.ext.restplus import Resource, fields
+from flask_jwt import jwt_required, current_user
 from sqlalchemy.orm import column_property
 from sqlalchemy_utils import ScalarListType
 
 from .. import db
-from .comment import Comment
 
 
 class Question(db.Model):
@@ -47,9 +48,7 @@ class QuestionBook(db.Model):
                 "num_of_questions",
                 len(self.questions)
             )
-            super(__class__, self).__setattr__(key, value)
-        else:
-            super(__class__, self).__setattr__(key, value)
+        super(__class__, self).__setattr__(key, value)
 
     def getQuestions(self):
         return Question.query.filter(
@@ -57,20 +56,10 @@ class QuestionBook(db.Model):
         ).order_by(
             Question.id.asc(),
         ).all()
-    """
-    def getcomments(self):
-        return {
-            for c in Comment.query.filter(
-                Comment.question_book_id == self.id,
-            ).order_by(
-                Comment.id.desc(),
-            ).all()
-        }
-    """
 
 
 def init(api, jwt):
-    pass  # expected to use it at /admin page.
+    pass
 
 def module_init(api, jwt, namespace):
     pass

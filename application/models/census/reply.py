@@ -38,7 +38,7 @@ class ReplyBook(db.Model):
     # compute
     requested_at = db.Column(db.DateTime, nullable=True)
     isDone = column_property(requested_at != None)
-    compute_id = db.Column(db.Integer, nullable=True)  # TODO : ASYNC
+    #compute_id = db.Column(db.Integer, nullable=True)  # TODO : ASYNC
     computed_at = db.Column(db.DateTime, nullable=True)
     result = db.Column(db.String(200), nullable=True)
 
@@ -53,7 +53,6 @@ class ReplyBook(db.Model):
         ).order_by(
             Reply.replied_at.desc()
         ).all()
-
 
 
 def init(api, jwt):
@@ -77,15 +76,33 @@ def module_init(api, jwt, namespace):
         @jwt_required()
         @api.doc(parser=authorization)
         def get(self):
-            """Get List of QuestionBooks-Questions, isDone?-ResultIt."""
+            """Get List and Status of QuestionBooks"""
             # list of question books
             #    how many people did this
             #    how much percent did I reply?
             #    list?
             return
 
-    @namespace.route('/')
-    class Replys(Resource):
+    @namespace.route('/<int:question_book_id>')
+    class YourReplyBooks(Resource):
 
         def get(self):
+            """Get (un)Solved Status"""
+            pass
+
+    @namespace.route('/<int:question_book_id>/result')
+    class YourResults(Resource):
+
+        def get(self):
+            """Show results and comments."""
+            pass
+
+    @namespace.route('/<int:question_book_id>/reply/<int:question_id>')
+    class YourReplies(Resource):
+        def get(self):
+            """Get your reply."""
+            pass
+
+        def post(self):
+            """Set your reply."""
             pass

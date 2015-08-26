@@ -21,8 +21,8 @@ ENABLE_MODELS = [
         comment.Comment,
         #comment.CommentLike,
     )),
-    ("MergedNamespace", type(
-        "MergedNamespace", (), {
+    (None, type(
+        "#MergedNamespace", (), {
             "init": lambda *args, **kwargs: init(*args, **kwargs),
             "module_init": lambda *args, **kwargs: None,
         }
@@ -33,6 +33,6 @@ ENABLE_MODELS = [
 
 
 def init(api, jwt):
-    namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
-    for _, module, _ in ENABLE_MODELS:
-        module.module_init(api, jwt, namespace)
+    merged_namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
+    for _, target_module, _ in ENABLE_MODELS:
+        target_module.module_init(api, jwt, merged_namespace)

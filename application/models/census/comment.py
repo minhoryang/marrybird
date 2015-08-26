@@ -4,10 +4,13 @@ __author__ = 'minhoryang'
 
 from datetime import datetime
 
+from flask.ext.restplus import Resource, fields
+from flask_jwt import jwt_required, current_user
+from sqlalchemy_utils.functions import database_exists
+
+from ...utils.constant import SQLALCHEMY_DATABASE_URI
 from .. import db
 from ..record import Record
-
-# TODO: FEATURE FLAG NEEDED
 
 
 class Comment(db.Model):
@@ -19,33 +22,46 @@ class Comment(db.Model):
     question_book_id = db.Column(db.Integer, nullable=False)
     username = db.Column(db.String(50), nullable=False)
     nickname = db.Column(db.String(50))  # TODO : Fast-Cache vs Dont-Caching-it
-    comment = db.Column(db.String(200), nullable=False)
+    photo_url = db.Column(db.String(50))
+    content = db.Column(db.String(200), nullable=False)
 
     def __setattr__(self, key, value):
-        if key == "nickname" and value:
+        if key in [
+            "nickname",
+            "photo_url",
+        ] and value:
             return  # delegated from below
         elif key == "username" and value:
+            query = Record.query.filter(Record.username == value).first()
             super(__class__, self).__setattr__(
                 "nickname",
-                Record.query.filter(Record.username == value).first().nickname
+                query.nickname
             )
-            super(__class__, self).__setattr__(key, value)
-        else:
-            super(__class__, self).__setattr__(key, value)
+            super(__class__, self).__setattr__(
+                "photo_url",
+                query.photo_url
+            )
+        super(__class__, self).__setattr__(key, value)
 
     def jsonify(self):
-        return {
+        result = {
             "nickname": self.nickname,
-            "comment": self.comment,
-            #"wholikes": [
-            #    liker.nickname
-            #    for liker in CommentLike.query.filter(
-            #        CommentLike.comment_id == self.id,
-            #    ).order_by(
-            #        CommentLike.id.desc(),
-            #    ).all()
-            #]
+            "photo_url": self.photo_url,
+            "comment": self.content,
         }
+        if CommentLike.isEnabled():
+            result["wholikes"] = self.getLikes()
+        return result
+
+    def getLikes(self):
+        return [
+            liker.nickname
+            for liker in CommentLike.query.filter(
+                CommentLike.comment_id == self.id,
+            ).order_by(
+                CommentLike.id.desc(),
+            ).all()
+        ]
 
 
 class CommentLike(db.Model):
@@ -64,13 +80,38 @@ class CommentLike(db.Model):
                 "nickname",
                 Record.query.filter(Record.username == value).first().nickname
             )
-            super(__class__, self).__setattr__(key, value)
-        else:
-            super(__class__, self).__setattr__(key, value)
+        super(__class__, self).__setattr__(key, value)
+
+    @staticmethod
+    def isEnabled(current_app):
+        return database_exists(SQLALCHEMY_DATABASE_URI(current_app, __class__.__bind_key__))
 
 
 def init(api, jwt):
-    pass  # XXX : handled at <reply>.
+    pass
 
 def module_init(api, jwt, namespace):
-    pass
+    @namespace.route('/<int:question_book_id>/comment/<int:comment_id>')
+    class Comments(Resource):
+        def put(self):
+            """Add new comment."""
+            pass
+        def post(self):
+            """Modify your comment."""
+            pass
+        def delete(self):
+            """Delete your comment."""
+            pass
+
+    if CommentLike.isEnabled(api.app):
+        @namespace.route('/<int:question_book_id>/comment/<int:comment_id>/like')
+        class CommentLikes(Resource):
+            def head(self):
+                """Did I Like it?"""
+                pass
+            def put(self):
+                """Like it."""
+                pass
+            def delete(self):
+                """Oops, Now I Hate it."""
+                pass
