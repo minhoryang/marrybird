@@ -100,7 +100,7 @@ def module_init(api, jwt, namespace):
     insert_comment = copy(authorization)
     insert_comment.add_argument(
         'comment',
-        type=fields.String(),
+        type=str,
         required=True,
         help='{"comment": ""}',
         location='json'
@@ -125,7 +125,7 @@ def module_init(api, jwt, namespace):
         @jwt_required()
         @api.doc(parser=authorization)
         def get(self, question_book_id):
-            """Refresh comments."""
+            """TODO TODO TODO TODO TODO TODO Refresh comments."""
             pass  # TODO
 
     @namespace.route('/<int:question_book_id>/comment/<int:comment_id>')
