@@ -26,7 +26,7 @@ class Phone(db.Model):
 def init(api, jwt):
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
-    @namespace.route('/request/')
+    @namespace.route('/request')
     class PhoneCheckRequest(Resource):
         wanted = api.parser()
         wanted.add_argument('phonenum', type=str, required=True, help='{"phonenum": "01062473590"}', location='json')
