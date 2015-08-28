@@ -41,11 +41,42 @@ class ReplyBook(db.Model):
     isDone = column_property(requested_at != None)
     compute_id = db.Column(db.Integer, nullable=True)  # TODO : ASYNC
     computed_at = db.Column(db.DateTime, nullable=True)
-    result = db.Column(db.String(200), nullable=True)
+    computed_result = db.Column(db.String(200), nullable=True)
 
     @hybrid_property
     def isResultReady(self):
-        return self.compute_id != None and self.computed_at != None and self.result != None
+        return self.compute_id != None and self.computed_at != None and self.computed_result != None
+
+    def _jsonify(self, question_book, is_question_included=False):
+        question_included_from = self.max_question_id if is_question_included else None
+        result = question_book.jsonify(question_included_from=question_included_from)
+        if self.isResultReady:
+            result['status'] = 'done'
+            result['progress'] = 100
+        elif self.isDone:
+            result['status'] = 'waiting'
+            result['progress'] = 100
+        else:
+            result['status'] = 'not finished'
+            result['progress'] = int(
+                (self.max_question_id / question_book.num_of_questions) * 100
+            )
+        return result
+
+    @staticmethod
+    def jsonify(username, question_book, is_question_included=False):
+        found_reply_book = __class__.query.filter(
+            __class__.username == username,
+            __class__.question_book_id == question_book.id,
+        ).first()
+        if found_reply_book:
+            return found_reply_book._jsonify(question_book, is_question_included=is_question_included)
+        else:
+            question_included_from = 0 if is_question_included else None
+            result = question_book.jsonify(question_included_from=question_included_from)
+            result['status'] = 'not touched'
+            result['progress'] = 0
+            return result
 
 
 def init(api, jwt):
@@ -71,30 +102,10 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=authorization)
         def get(self):
             """Get List and Status of QuestionBooks"""
-            result = {}
-            for qb in QuestionBook.getQuestionBooks():
-                result[qb.id] = qb.jsonify()
-                found = ReplyBook.query.filter(
-                    ReplyBook.username == current_user.username,
-                    ReplyBook.question_book_id == qb.id,
-                ).first()
-                if found:
-                    if found.isResultReady:
-                        result[qb.id]['result'] = 'done'
-                        result[qb.id]['progress'] = 100
-                    elif found.isDone:
-                        result[qb.id]['result'] = 'waiting'
-                        result[qb.id]['progress'] = 100
-                    else:
-                        result[qb.id]['result'] = 'not finished'
-                        result[qb.id]['progress'] = int(
-                            found.max_question_id / qb.num_of_questions + 1
-                        )
-                else:
-                    result[qb.id]['result'] = 'not touched'
-                    result[qb.id]['progress'] = 0
-
-            return {'status': 200, 'message': result}, 200
+            return {'status': 200, 'message': {
+                qb.id: ReplyBook.jsonify(current_user.username, qb)
+                for qb in QuestionBook.query.all()}
+            }, 200
 
     @namespace.route('/<int:question_book_id>')
     class YourReplyBook(Resource):
@@ -104,27 +115,10 @@ def module_init(api, jwt, namespace):
         def get(self, question_book_id):
             """Get (un)Solved Status"""
             found = QuestionBook.query.get(question_book_id)
-            result = found.jsonify()
-            result['questions'] = {
-                'done': {},
-                'notyet': {},
-            }
+            if not found:
+                return {'status': 404, 'message': 'Not Found'}, 404
 
-            MyReplyBook = ReplyBook.query.filter(
-                ReplyBook.username == current_user.username,
-                ReplyBook.question_book_id == question_book_id,
-            ).first()
-            if not MyReplyBook:
-                result['result'] = 'not touched'
-
-            maxDone = MyReplyBook.max_question_id if MyReplyBook else None
-            idxOfMaxDone = found.questions.index(maxDone) + 1 if maxDone else 0
-            for i in found.questions[:idxOfMaxDone]:
-                result['questions']['done'][i] = Question.query.get(i).jsonify()
-            for i in found.questions[idxOfMaxDone:]:
-                result['questions']['notyet'][i] = Question.query.get(i).jsonify()
-
-            return {'status': 200, 'message': result}
+            return {'status': 200, 'message': ReplyBook.jsonify(current_user.username, found, is_question_included=True)}
 
     @namespace.route('/<int:question_book_id>/result')
     class YourResult(Resource):
@@ -154,18 +148,6 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=authorization)
         def get(self, question_book_id, question_id):
             """Get your reply."""
-            check = Question.query.get(question_id)
-            if not check:
-                return {'status': 400, 'message': 'Target Missed'}, 400
-            if check.book_id != question_book_id:
-                return {'status': 400, 'message': 'Target Missed'}, 400
-
-            register_check = ReplyBook.query.filter(
-                ReplyBook.username == current_user.username,
-                ReplyBook.question_book_id == question_book_id,
-            ).first()
-            if not register_check:
-                return {'status': 400, 'message': 'Target Missed'}, 400
 
             found = Reply.query.filter(
                 Reply.username == current_user.username,
@@ -182,11 +164,15 @@ def module_init(api, jwt, namespace):
             """Set your reply."""
             answer = insert_answer.parse_args()
 
+            check2 = QuestionBook.query.get(question_book_id)
+            if not check2:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
             check = Question.query.get(question_id)
             if not check:
-                return {'status': 400, 'message': 'Target Missed'}, 400
+                return {'status': 404, 'message': 'Not Found'}, 404
             if check.book_id != question_book_id:
-                return {'status': 400, 'message': 'Target Missed'}, 400
+                return {'status': 404, 'message': 'Not Found'}, 404
 
             register_check = ReplyBook.query.filter(
                 ReplyBook.username == current_user.username,

@@ -78,13 +78,21 @@ class QuestionBook(db.Model):
             return  # delegated from below
         super(__class__, self).__setattr__(key, value)
 
-    def jsonify(self):
-        return {
+    def jsonify(self, question_included_from=None):
+        result = {
             'title': self.title,
             'photo_url': self.photo_url,
             'brief_description': self.brief_description,
             'description': self.description,
         }
+        if question_included_from is not None:
+            if question_included_from in self.questions:
+                question_included_from = self.questions.index(question_included_from) + 1
+            result['questions'] = {
+                'done': {idx: Question.query.get(idx).jsonify() for idx in self.questions[:question_included_from]},
+                'notyet': {idx: Question.query.get(idx).jsonify() for idx in self.questions[question_included_from:]},
+            }
+        return result
 
 
 def init(api, jwt):
