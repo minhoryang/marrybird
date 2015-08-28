@@ -5,7 +5,7 @@ __author__ = 'minhoryang'
 from json import loads
 
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import ScalarListType
+from sqlalchemy_utils import ScalarListType, JSONType
 
 from .. import db
 
@@ -18,17 +18,23 @@ class Question(db.Model):
     question = db.Column(db.String(200))
 
     # XXX : If None -> Essay Answer Needed!
-    expected_answers = db.Column(ScalarListType(), nullable=True)
-    json = db.Column(db.String(200), nullable=True)
+    _expected_answers = db.Column(JSONType(), nullable=True)
+    e_a_json = db.Column(db.String(200), nullable=True)
     is_Multiple_Answer_Available = db.Column(db.Boolean, nullable=False)
+
+    _compute_rules = db.Column(JSONType(), nullable=True)
+    c_r_json = db.Column(db.String(200), nullable=True)
 
     @hybrid_property
     def is_Essay_Answer_Needed(self):
-        return self.expected_answers == None
+        return self._expected_answers == None
 
     def __setattr__(self, key, value):
-        if key == "json" and value:
-            super(__class__, self).__setattr__("expected_answers", loads(value.replace("'", '"')))
+        if key == "e_a_json" and value:
+            super(__class__, self).__setattr__("_expected_answers", loads(value.replace("'", '"')))
+            return
+        elif key == "c_r_json" and value:
+            super(__class__, self).__setattr__("_compute_rules", loads(value.replace("'", '"')))
             return
         super(__class__, self).__setattr__(key, value)
 
@@ -37,7 +43,7 @@ class Question(db.Model):
             'question': self.question,
             'is_Essay_Answer_Needed': self.is_Essay_Answer_Needed,
             'is_Multiple_Answer_Available': self.is_Multiple_Answer_Available,
-            'expected_answers': self.expected_answers,
+            'expected_answers': self._expected_answers,
         }
 
 
@@ -53,6 +59,7 @@ class QuestionBook(db.Model):
 
     # details
     description = db.Column(db.String(200))
+    compute_type = db.Column(db.String(50), nullable=False)
 
     # -delegated
     questions = db.Column(ScalarListType(int), default=[])

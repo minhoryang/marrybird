@@ -27,6 +27,9 @@ class Reply(db.Model):
     replied_at = db.Column(db.DateTime, default=datetime.now)
     answer = db.Column(db.String(200), nullable=False)
 
+    def getQuestion(self):
+        return Question.query.get(self.question_id)
+
 
 class ReplyBook(db.Model):
     __bind_key__ = "replybook"
@@ -78,6 +81,13 @@ class ReplyBook(db.Model):
             result['status'] = 'not touched'
             result['progress'] = 0
             return result
+
+    def iter(self):
+        for reply in Reply.query.filter(
+            Reply.username == self.username,
+            Reply.question_book_id == self.question_book_id,
+        ).all():
+            yield reply
 
 
 def init(api, jwt):
