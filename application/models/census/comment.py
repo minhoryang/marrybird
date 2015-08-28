@@ -12,6 +12,7 @@ from sqlalchemy_utils.functions import database_exists
 from ...utils.constant import SQLALCHEMY_DATABASE_URI
 from .. import db
 from ..record import Record
+from .reply import ReplyBook
 
 
 class Comment(db.Model):
@@ -106,6 +107,13 @@ def module_init(api, jwt, namespace):
         location='json'
     )
 
+    def is_user_finished_this_question_book(username, question_book_id):
+        found = ReplyBook.query.filter(
+            ReplyBook.username == username,
+            ReplyBook.question_book_id == question_book_id,
+        ).first()
+        return found is not None
+
     @namespace.route('/<int:question_book_id>/comment')
     class NewComment(Resource):
 
@@ -113,6 +121,10 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=insert_comment)
         def put(self, question_book_id):
             """Add your comment."""
+
+            if not is_user_finished_this_question_book(current_user.username, question_book_id):
+                return {'status': 400, 'message': 'No Yet'}, 400
+
             insert = insert_comment.parse_args()
             new_one = Comment()
             new_one.question_book_id = question_book_id
@@ -126,6 +138,10 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=authorization)
         def get(self, question_book_id):
             """TODO TODO TODO TODO TODO TODO Refresh comments."""
+
+            if not is_user_finished_this_question_book(current_user.username, question_book_id):
+                return {'status': 400, 'message': 'No Yet'}, 400
+
             pass  # TODO
 
     @namespace.route('/<int:question_book_id>/comment/<int:comment_id>')
@@ -180,7 +196,7 @@ def module_init(api, jwt, namespace):
 
             @jwt_required()
             @api.doc(parser=authorization)
-            def head(self, question_book_id, comment_id):
+            def get(self, question_book_id, comment_id):
                 """Did I Like it?"""
                 found = CommentLike.query.filter(
                     CommentLike.username == current_user.username,
@@ -196,6 +212,10 @@ def module_init(api, jwt, namespace):
             @api.doc(parser=authorization)
             def put(self, question_book_id, comment_id):
                 """Like it."""
+
+                if not is_user_finished_this_question_book(current_user.username, question_book_id):
+                    return {'status': 400, 'message': 'No Yet'}, 400
+
                 found = CommentLike.query.filter(
                     CommentLike.username == current_user.username,
                     CommentLike.question_book_id == question_book_id,

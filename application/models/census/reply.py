@@ -135,12 +135,6 @@ def module_init(api, jwt, namespace):
             """Request to calc the result."""
             pass  # TODO
 
-        @jwt_required()
-        @api.doc(parser=authorization)
-        def head(self):
-            """is Ready?"""
-            pass  # TODO
-
     @namespace.route('/<int:question_book_id>/reply/<int:question_id>')
     class YourReply(Resource):
 
