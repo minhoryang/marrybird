@@ -11,8 +11,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
 from .. import db
-from .question import QuestionBook, Question
 from .compute import ComputeNow
+from .question import QuestionBook, Question
 
 
 class Reply(db.Model):

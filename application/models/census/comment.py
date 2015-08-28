@@ -88,8 +88,8 @@ class CommentLike(db.Model):
         super(__class__, self).__setattr__(key, value)
 
     @staticmethod
-    def isEnabled(current_app):
-        return database_exists(SQLALCHEMY_DATABASE_URI(current_app, __class__.__bind_key__))
+    def isEnabled(_current_app):
+        return database_exists(SQLALCHEMY_DATABASE_URI(_current_app, __class__.__bind_key__))
 
 
 def init(api, jwt):

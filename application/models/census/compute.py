@@ -10,16 +10,17 @@ class Compute:
         self.record = record
         self.reply_book = reply_book
         self.question_book = question_book
-        self._init()
+        self.init()
 
     def run(self):
         raise NotImplementedError()
 
-    def _init(self):
+    def init(self):
         raise NotImplementedError()
 
 
-class ComputeException(Exception): pass
+class ComputeException(Exception):
+    pass
 
 
 class Compute_MBTI(Compute):
@@ -60,7 +61,7 @@ class Compute_MBTI(Compute):
         compare("J", "P")
         return ''.join(result)
 
-    def _init(self):
+    def init(self):
         self.gender = "Man" if self.record.is_male else "Woman"
 
     def _apply_score(self, reply):
@@ -68,12 +69,14 @@ class Compute_MBTI(Compute):
         Selected_R = None
 
         Possible = [R if reply.answer in R else None for R in CR.keys()]
-        for _ in range(Possible.count(None)): Possible.remove(None)
+        for _ in range(Possible.count(None)):
+            Possible.remove(None)
         if len(Possible) == 1:
             Selected_R = Possible[0]
         else:
             Possible = [R if self.gender in R else None for R in Possible]
-            for _ in range(Possible.count(None)): Possible.remove(None)
+            for _ in range(Possible.count(None)):
+                Possible.remove(None)
             if len(Possible) == 1:
                 Selected_R = Possible[0]
             else:
@@ -111,7 +114,7 @@ def ComputeNow(reply_book_id):
         result = "NotImplementedError"
 
     RB.computed_at = datetime.now()
-    RB.computed_result = result  # TODO : CALC HOW?
+    RB.computed_result = result
     db.session.add(RB)
     db.session.commit()
 
