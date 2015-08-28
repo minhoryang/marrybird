@@ -5,7 +5,7 @@ __author__ = 'minhoryang'
 from copy import deepcopy as copy
 from datetime import datetime
 
-from flask.ext.restplus import Resource, fields
+from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy_utils.functions import database_exists
 

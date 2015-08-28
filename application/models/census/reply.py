@@ -5,7 +5,7 @@ __author__ = 'minhoryang'
 from copy import deepcopy as copy
 from datetime import datetime
 
-from flask.ext.restplus import Resource, fields
+from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
@@ -45,20 +45,8 @@ class ReplyBook(db.Model):
 
     @hybrid_property
     def isResultReady(self):
-        return compute_id != None and computed_at != None and result != None
+        return self.compute_id != None and self.computed_at != None and self.result != None
 
-    def getMyReplies(self):
-        return Reply.query.filter(
-            Reply.username == self.username,
-            Reply.question_book_id == self.question_book_id,
-        ).order_by(
-            Reply.id.desc()
-        ).all()
-
-    def getMyLastReply(self):
-        if len(self.getMyReplies) > 0:
-            return self.getMyReplies[0]
-        return None
 
 def init(api, jwt):
     pass  # check below - module_init()
@@ -128,7 +116,6 @@ def module_init(api, jwt, namespace):
             ).first()
             if not MyReplyBook:
                 result['result'] = 'not touched'
-
 
             maxDone = MyReplyBook.max_question_id if MyReplyBook else None
             idxOfMaxDone = found.questions.index(maxDone) + 1 if maxDone else 0

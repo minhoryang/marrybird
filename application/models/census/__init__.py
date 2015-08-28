@@ -19,7 +19,7 @@ ENABLE_MODELS = [
     )),
     ("Census", comment, (
         comment.Comment,
-        #comment.CommentLike,
+        # comment.CommentLike,
     )),
     (None, type(
         "#MergedNamespace", (), {

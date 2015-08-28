@@ -2,13 +2,9 @@
 
 __author__ = 'minhoryang'
 
-from copy import deepcopy as copy
-from datetime import datetime
 from json import loads
 
-from flask.ext.restplus import Resource, fields
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import column_property
 from sqlalchemy_utils import ScalarListType
 
 from .. import db
@@ -81,14 +77,6 @@ class QuestionBook(db.Model):
             )
             return  # delegated from below
         super(__class__, self).__setattr__(key, value)
-
-    @staticmethod
-    def getQuestionBooks():
-        return __class__.query.all()
-
-    @staticmethod
-    def get(id):
-        return __class__.query.get(id)
 
     def jsonify(self):
         return {
