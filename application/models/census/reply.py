@@ -177,6 +177,8 @@ def module_init(api, jwt, namespace):
                 register_check.username = current_user.username
                 register_check.question_book_id = question_book_id
                 register_check.max_question_id = 0
+            if register_check.isDone:
+                return {'status': 400, 'message': 'Already Calc Requested'}, 400
             if int(question_id) > register_check.max_question_id:
                 register_check.max_question_id = question_id
             db.session.add(register_check)
