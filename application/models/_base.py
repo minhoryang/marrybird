@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask.ext.sqlalchemy import SQLAlchemy as BaseSQLAlchemy
 from flask.ext.sqlalchemy import SignallingSession as BaseSignallingSession
 from flask.ext.sqlalchemy import orm, partial, get_state

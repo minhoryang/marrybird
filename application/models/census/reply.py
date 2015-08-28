@@ -12,6 +12,7 @@ from sqlalchemy.orm import column_property
 
 from .. import db
 from .question import QuestionBook, Question
+from .compute import ComputeNow
 
 
 class Reply(db.Model):
@@ -126,14 +127,34 @@ def module_init(api, jwt, namespace):
         @jwt_required()
         @api.doc(parser=authorization)
         def get(self, question_book_id):
-            """Show results and comments."""
-            pass  # TODO
+            """Show results."""
+            found = ReplyBook.query.filter(
+                ReplyBook.username == current_user.username,
+                ReplyBook.question_book_id == question_book_id,
+            ).first()
+            if not found or not found.isDone or not found.isResultReady:
+                return {'status': 404, 'message': 'Not Ready'}, 404
+            return {'status': 200, 'message': found.computed_result}, 200
 
         @jwt_required()
         @api.doc(parser=authorization)
-        def put(self):
+        def put(self, question_book_id):
             """Request to calc the result."""
-            pass  # TODO
+            found = ReplyBook.query.filter(
+                ReplyBook.username == current_user.username,
+                ReplyBook.question_book_id == question_book_id,
+            ).first()
+            if not found:
+                return {'status': 404, 'message': "Not Found"}, 404
+            if found.isResultReady:
+                return {'status': 400, 'message': 'Already got the result'}, 400
+            if found.isDone:
+                return {'status': 400, 'message': 'Already Requested'}, 400
+            found.requested_at = datetime.now()
+            db.session.add(found)
+            db.session.commit()
+            output = ComputeNow(found.id)
+            return {'status': 200, 'message': 'Done.' + str(output)}
 
     @namespace.route('/<int:question_book_id>/reply/<int:question_id>')
     class YourReply(Resource):
