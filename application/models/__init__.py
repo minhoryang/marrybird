@@ -10,6 +10,7 @@ from . import (
 )
 
 from .dating import ENABLE_MODELS as DATING_ENABLE_MODELS
+from .census import ENABLE_MODELS as CENSUS_ENABLE_MODELS
 
 ENABLE_MODELS = [
     ("User", user, (
@@ -35,4 +36,5 @@ ENABLE_MODELS = [
     ))
 ] \
     + DATING_ENABLE_MODELS \
+    + CENSUS_ENABLE_MODELS \
     + []  # XXX : ADD ABOVE

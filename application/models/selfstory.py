@@ -84,6 +84,8 @@ def init(api, jwt):
                     'wholikes': [
                         user.nickname for user in SelfStoryLike.query.filter(
                             SelfStoryLike.story_id == item.id
+                        ).order_by(
+                            SelfStoryLike.id.desc()
                         ).all()  # TODO : WORLD FAMOUS ** MASERATI PROBLEM LIVES HERE! **
                     ],
                 } for item in found

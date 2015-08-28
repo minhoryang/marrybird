@@ -1,3 +1,7 @@
 from enum import Enum
 
-from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy_utils import (
+    ChoiceType,
+    ScalarListType,
+    JSONType,
+)
