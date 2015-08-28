@@ -141,12 +141,20 @@ def module_init(api, jwt, namespace):
         @jwt_required()
         @api.doc(parser=authorization)
         def get(self, question_book_id):
-            """TODO TODO TODO TODO TODO TODO Refresh comments."""
+            """(Re)Fresh comments."""
 
             if not is_user_finished_this_question_book(current_user.username, question_book_id):
                 return {'status': 400, 'message': 'No Yet'}, 400
 
-            pass  # TODO
+            found = Comment.query.filter(
+                Comment.question_book_id == question_book_id,
+            ).order_by(
+                Comment.id.desc(),
+            ).all()
+
+            return {'status': 200, 'message': {
+                f.id: f.jsonify() for f in found
+            }}, 200
 
     @namespace.route('/<int:question_book_id>/comment/<int:comment_id>')
     class Comments(Resource):
