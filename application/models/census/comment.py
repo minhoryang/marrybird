@@ -112,7 +112,11 @@ def module_init(api, jwt, namespace):
             ReplyBook.username == username,
             ReplyBook.question_book_id == question_book_id,
         ).first()
-        return found is not None
+        if not found:
+            return False
+        if not found.isResultReady():
+            return False
+        return True
 
     @namespace.route('/<int:question_book_id>/comment')
     class NewComment(Resource):
