@@ -5,6 +5,7 @@ __author__ = 'minhoryang'
 from copy import deepcopy as copy
 from datetime import datetime
 
+from flask import current_app
 from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy_utils.functions import database_exists
@@ -52,7 +53,7 @@ class Comment(db.Model):
             "photo_url": self.photo_url,
             "comment": self.content,
         }
-        if CommentLike.isEnabled():
+        if CommentLike.isEnabled(current_app):
             result["wholikes"] = self.getLikes()
         return result
 
