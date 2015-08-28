@@ -114,7 +114,7 @@ def module_init(api, jwt, namespace):
         ).first()
         if not found:
             return False
-        if not found.isResultReady():
+        if not found.isResultReady:
             return False
         return True
 
