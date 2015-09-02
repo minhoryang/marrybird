@@ -4,11 +4,13 @@ __author__ = 'minhoryang'
 
 from copy import deepcopy as copy
 from datetime import datetime
+from json import loads
 
 from flask.ext.restplus import Resource
 from flask_jwt import jwt_required, current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
+from sqlalchemy_utils import JSONType
 
 from .. import db
 from .compute import ComputeNow
@@ -25,10 +27,23 @@ class Reply(db.Model):
     question_id = db.Column(db.Integer, nullable=False)
 
     replied_at = db.Column(db.DateTime, default=datetime.now)
-    answer = db.Column(db.String(200), nullable=False)
+    _answers = db.Column(JSONType(), nullable=True)
+    a_json = db.Column(db.String(200), nullable=True)
+
+    # XXX : TRASHED -- TODO : HOWTO?
+    answer = db.Column(db.String(200), nullable=False)  # can't change the definition.
 
     def getQuestion(self):
         return Question.query.get(self.question_id)
+
+    def __setattr__(self, key, value):
+        if key == "a_json" and value:
+            super(__class__, self).__setattr__("_answers", loads(value.replace("'", '"')))
+            return
+        elif key == "answer":  # XXX : TRASHED
+            super(__class__, self).__setattr__("answer", ".")
+            return
+        super(__class__, self).__setattr__(key, value)
 
 
 class ReplyBook(db.Model):
