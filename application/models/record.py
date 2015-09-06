@@ -22,8 +22,8 @@ class Record(db.Model):
     # XXX : Can't Write
     username = db.Column(db.String(50), unique=True)
     is_regular_member = db.Column(db.Boolean, default=False)  # TODO : TO BE REMOVED WITH SUCCESSFUL MIGRATION PROCESS.
-    is_regular_member_job = db.Column(db.Boolean, nullable=True)
-    is_regular_member_grad_univ = db.Column(db.Boolean, nullable=True)
+    is_regular_member_job = db.Column(db.String(10), default="No")
+    is_regular_member_grad_univ = db.Column(db.String(10), default="No")
     age = db.Column(db.Integer)  # calc-ed
 
     # XXX : Readable & Writable
@@ -64,6 +64,10 @@ class Record(db.Model):
                 "is_male",
                 User.query.filter(User.username == value).first().isMale
             )
+        # filtering
+        if key in ["is_regular_member_job", "is_regular_member_grad_univ"] and value:
+            if not value in ["No", "NotYet", "Yes"]:
+                return
         super(Record, self).__setattr__(key, value)
         super(Record, self).__setattr__('modified_at', datetime.now())
 
