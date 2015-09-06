@@ -21,7 +21,9 @@ class Record(db.Model):
 
     # XXX : Can't Write
     username = db.Column(db.String(50), unique=True)
-    is_regular_member = db.Column(db.Boolean, default=False)
+    is_regular_member = db.Column(db.Boolean, default=False)  # TODO : TO BE REMOVED WITH SUCCESSFUL MIGRATION PROCESS.
+    is_regular_member_job = db.Column(db.Boolean, default=False)
+    is_regular_member_grad_univ = db.Column(db.Boolean, default=False)
     age = db.Column(db.Integer)  # calc-ed
 
     # XXX : Readable & Writable
@@ -77,12 +79,23 @@ class Record(db.Model):
 
     @staticmethod
     def _cant_write_at_client_keywords():
-        CANT_WRITE_AT_CLIENT = ['is_regular_member', 'age', 'username']
+        CANT_WRITE_AT_CLIENT = [
+            'is_regular_member_job',
+            'is_regular_member_grad_univ',
+            'age',
+            'username',
+        ]
         return CANT_WRITE_AT_CLIENT
 
     @staticmethod
     def _available_keywords():
-        CANT_READ_AND_WRITE_AT_CLIENT = ['id', 'created_at', 'modified_at', 'is_male']
+        CANT_READ_AND_WRITE_AT_CLIENT = [
+            'id',
+            'created_at',
+            'modified_at',
+            'is_male',
+            'is_regular_member',  # TODO : TO BE REMOVED WITH SUCCESSFUL MIGRATION PROCESS.
+        ]
         AVAILABLE = list()
 
         for i in __class__.__dict__.keys():
