@@ -18,9 +18,38 @@ class Compute:
     def init(self):
         raise NotImplementedError()
 
+    @staticmethod
+    def _rule_reducer(query, rules):
+        Possible = [R if query in R else None for R in rules]
+        for _ in range(Possible.count(None)):
+            Possible.remove(None)
+        return Possible
+
+    @staticmethod
+    def rule_reducer(queries, rules, chain_and_or='or'):
+        Possible = rules
+        for query in queries:
+            Possible = _rule_reducer(query, Possible)
+            if chain_and_or == 'or':
+                if len(Possible) == 1:
+                    return Possible[0]
+            elif chain_and_or == 'and':
+                pass
+        return Possible
+
 
 class ComputeException(Exception):
     pass
+
+
+class Compute_Test(Compute):
+    def init(self):
+        pass
+
+    def run(self):
+        for reply in self.reply_book.iter():
+            print((reply._answers, type(reply._answers)))
+        return 'check console'
 
 
 class Compute_MBTI(Compute):
@@ -40,21 +69,21 @@ class Compute_MBTI(Compute):
     }
     """
     scores = {
-        "E": 0,
-        "I": 0,
-        "S": 0,
-        "N": 0,
-        "T": 0,
-        "F": 0,
-        "J": 0,
-        "P": 0,
+        "E": [],
+        "I": [],
+        "S": [],
+        "N": [],
+        "T": [],
+        "F": [],
+        "J": [],
+        "P": [],
     }
 
     def run(self):
         for reply in self.reply_book.iter():
             self._apply_score(reply)
         result = []
-        compare = lambda a, b: result.append(a if self.scores[a] >= self.scores[b] else b)
+        compare = lambda a, b: result.append(a if sum(self.scores[a]) >= sum(self.scores[b]) else b)
         compare("E", "I")
         compare("S", "N")
         compare("T", "F")
@@ -66,26 +95,17 @@ class Compute_MBTI(Compute):
 
     def _apply_score(self, reply):
         CR = reply.getQuestion()._compute_rules
-        Selected_R = None
-
-        Possible = [R if reply.answer in R else None for R in CR.keys()]
-        for _ in range(Possible.count(None)):
-            Possible.remove(None)
-        if len(Possible) == 1:
-            Selected_R = Possible[0]
-        else:
-            Possible = [R if self.gender in R else None for R in Possible]
-            for _ in range(Possible.count(None)):
-                Possible.remove(None)
-            if len(Possible) == 1:
-                Selected_R = Possible[0]
-            else:
-                raise Exception("Oops")
-        for key, value in CR[Selected_R].items():
-            if key in self.scores:
-                self.scores[key] += value
-            else:
-                self.scores[key] = value
+        for r in reply._answer:
+            Selected_R = rule_reducer(
+                (
+                    r,  # try this
+                    self.gender,   # then this.
+                ),
+                CR.keys(),
+                chain_and_or='or'
+            )
+            for mbti_key, mbti_scores in CR[Selected_R].items():
+                self.scores[mbti_key].append(mbti_scores)
 
 
 def ComputeNow(reply_book_id):
