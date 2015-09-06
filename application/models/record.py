@@ -22,8 +22,8 @@ class Record(db.Model):
     # XXX : Can't Write
     username = db.Column(db.String(50), unique=True)
     is_regular_member = db.Column(db.Boolean, default=False)  # TODO : TO BE REMOVED WITH SUCCESSFUL MIGRATION PROCESS.
-    is_regular_member_job = db.Column(db.Boolean, default=False)
-    is_regular_member_grad_univ = db.Column(db.Boolean, default=False)
+    is_regular_member_job = db.Column(db.Boolean, nullable=True)
+    is_regular_member_grad_univ = db.Column(db.Boolean, nullable=True)
     age = db.Column(db.Integer)  # calc-ed
 
     # XXX : Readable & Writable
