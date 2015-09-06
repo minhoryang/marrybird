@@ -42,6 +42,16 @@ class ComputeException(Exception):
     pass
 
 
+class Compute_Test(Compute):
+    def init(self):
+        pass
+
+    def run(self):
+        for reply in self.reply_book.iter():
+            print((reply._answers, type(reply._answers)))
+        return 'check console'
+
+
 class Compute_MBTI(Compute):
     """.
 
@@ -85,10 +95,10 @@ class Compute_MBTI(Compute):
 
     def _apply_score(self, reply):
         CR = reply.getQuestion()._compute_rules
-        for r in reply.answer:
+        for r in reply._answer:
             Selected_R = rule_reducer(
                 (
-                    reply.answer,  # try this
+                    r,  # try this
                     self.gender,   # then this.
                 ),
                 CR.keys(),
