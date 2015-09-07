@@ -169,6 +169,8 @@ def module_init(api, jwt, namespace):
                 return {'status': 400, 'message': 'Already got the result'}, 400
             if found.isDone:
                 return {'status': 400, 'message': 'Already Requested'}, 400
+            if found.max_question_id != QuestionBook.query.get(question_book_id).num_of_questions:
+                return {'status': 400, 'message': 'Not Finished'}, 400
             found.requested_at = datetime.now()
             db.session.add(found)
             db.session.commit()
