@@ -85,9 +85,9 @@ class Compute_MBTI(Compute):
         result = []
         compare = lambda a, b: result.append(a if sum(self.scores[a]) >= sum(self.scores[b]) else b)
         compare("E", "I")
-        compare("S", "N")
-        compare("T", "F")
-        compare("J", "P")
+        compare("N", "S")  # N>=S
+        compare("F", "T")  # F>=T
+        compare("P", "J")  # P>=J
         return ''.join(result)
 
     def init(self):
