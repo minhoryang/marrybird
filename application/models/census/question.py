@@ -23,13 +23,10 @@ class Question(db.Model):
     _expected_answers = db.Column(JSONType(), nullable=True)
     e_a_json = db.Column(db.String(200), nullable=True)
     expected_answer_count = db.Column(db.Integer, nullable=False)
+    is_Essay_Answer_Needed = db.Column(db.Boolean, default=False)
 
     _compute_rules = db.Column(JSONType(), nullable=True)
     c_r_json = db.Column(db.String(200), nullable=True)
-
-    @hybrid_property
-    def is_Essay_Answer_Needed(self):
-        return self._expected_answers == None
 
     def __setattr__(self, key, value):
         if key == "e_a_json" and value:
@@ -44,7 +41,7 @@ class Question(db.Model):
         return {
             'question': self.question,
             'is_Essay_Answer_Needed': self.is_Essay_Answer_Needed,
-            'is_Multiple_Answer_Available': self.is_Multiple_Answer_Available,
+            'expected_answer_count': self.expected_answer_count,
             'expected_answers': self._expected_answers,
         }
 
@@ -114,7 +111,6 @@ def init(api, jwt):
                 db.session.add(question.convert(book_id=book_idx))
             db.session.commit()
             return 'Done', 200
-
 
 
 def module_init(api, jwt, namespace):
