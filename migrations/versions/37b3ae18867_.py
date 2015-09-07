@@ -234,7 +234,7 @@ def upgrade_question():
     sa.Column('question', sa.String(length=200), nullable=True),
     sa.Column('_expected_answers', application.models._external_types.JSONType(), nullable=True),
     sa.Column('e_a_json', sa.String(length=200), nullable=True),
-    sa.Column('is_Multiple_Answer_Available', sa.Boolean(), nullable=False),
+    sa.Column('expected_answer_count', sa.Integer(), nullable=False),
     sa.Column('_compute_rules', application.models._external_types.JSONType(), nullable=True),
     sa.Column('c_r_json', sa.String(length=200), nullable=True),
     sa.PrimaryKeyConstraint('id')

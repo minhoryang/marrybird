@@ -4,10 +4,12 @@ __author__ = 'minhoryang'
 
 from json import loads
 
+from flask.ext.restplus import Resource
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import ScalarListType, JSONType
 
 from .. import db
+from ...externals.mbti import MBTI_Question
 
 
 class Question(db.Model):
@@ -20,7 +22,7 @@ class Question(db.Model):
     # XXX : If None -> Essay Answer Needed!
     _expected_answers = db.Column(JSONType(), nullable=True)
     e_a_json = db.Column(db.String(200), nullable=True)
-    is_Multiple_Answer_Available = db.Column(db.Boolean, nullable=False)
+    expected_answer_count = db.Column(db.Integer, nullable=False)
 
     _compute_rules = db.Column(JSONType(), nullable=True)
     c_r_json = db.Column(db.String(200), nullable=True)
@@ -103,7 +105,16 @@ class QuestionBook(db.Model):
 
 
 def init(api, jwt):
-    pass
+    namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
+
+    @namespace.route('/mbti_import/<int:book_idx>')
+    class MBTI_Import(Resource):
+        def get(self, book_idx):
+            for question in MBTI_Question.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
 
 
 def module_init(api, jwt, namespace):
