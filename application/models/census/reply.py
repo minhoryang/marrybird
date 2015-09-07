@@ -221,8 +221,6 @@ def module_init(api, jwt, namespace):
                 register_check.max_question_id = 0
             if register_check.isDone:
                 return {'status': 400, 'message': 'Already Calc Requested'}, 400
-            if int(question_id) > register_check.max_question_id:
-                register_check.max_question_id = question_id
             db.session.add(register_check)
 
             found = Reply.query.filter(
@@ -235,8 +233,10 @@ def module_init(api, jwt, namespace):
                 found.username = current_user.username
                 found.question_book_id = question_book_id
                 found.question_id = question_id
+                register_check.max_question_id += 1
             found._answers = answer['answer']
             found.replied_at = datetime.now()
             db.session.add(found)
+            db.session.add(register_check)
             db.session.commit()
             return {'status': 200, 'message': "added"}, 200
