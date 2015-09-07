@@ -1,4 +1,4 @@
-"""will served with dating.response"""
+"""Notice per user."""
 
 __author__ = 'minhoryang'
 
@@ -27,4 +27,19 @@ class Notice(db.Model):
         }
 
 def init(api, jwt):
-    pass
+    namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
+    authorization = api.parser()
+    authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+    @namespace.route('/')
+    class GetNotice(Resource):
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def get(self):
+            Notices = Notice.query.filter(Notice.username == current_user.username).all()
+            if not Notices:
+                Notices = []
+            return {'status': 200, 'message': {
+                'notice': {idx: item.jsonify() for idx, item in enumerate(Notices)},
+            }}, 200

@@ -75,17 +75,12 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
-            Notices = Notice.query.filter(Notice.username == username).all()
-            if not Notices:
-                Notices = []
-
             return {'status': 200, 'message': {
                 'success': {i: Record._get(i) for i in Success},
                 'someonelovesme': {i: Record._get(i) for i in Someone},
                 'notyet': {i: Record._get(i) for i in NotYet},
                 'failed': {i: Record._get(i) for i in Failed},
                 'result': {i: Record._get(i) for i in result_json},
-                'notice': {idx: item.jsonify() for idx, item in enumerate(Notices)},
             }}
 
     @namespace.route('/<string:i>/love/<string:you>')
