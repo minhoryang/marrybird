@@ -29,7 +29,7 @@ class Compute:
     def rule_reducer(queries, rules, chain_and_or='or'):
         Possible = rules
         for query in queries:
-            Possible = _rule_reducer(query, Possible)
+            Possible = Compute._rule_reducer(query, Possible)
             if chain_and_or == 'or':
                 if len(Possible) == 1:
                     return Possible[0]
@@ -95,8 +95,8 @@ class Compute_MBTI(Compute):
 
     def _apply_score(self, reply):
         CR = reply.getQuestion()._compute_rules
-        for r in reply._answer:
-            Selected_R = rule_reducer(
+        for r in reply._answers:
+            Selected_R = Compute.rule_reducer(
                 (
                     r,  # try this
                     self.gender,   # then this.

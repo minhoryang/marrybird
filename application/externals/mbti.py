@@ -64,7 +64,7 @@ class MBTI_Question:
                     mq.expected_answer_list[key[1:-1]] = value
                 elif key in ['A', 'B', 'C', 'A-Man', 'A-Woman', 'B-Man', 'B-Woman']:
                     if int(value[1]):
-                        mq.compute_rules[key] = {value[0]: value[1]}
+                        mq.compute_rules[key] = {value[0]: int(value[1])}
                 else:
                     raise MBTI_Exception('%s %s' % (key, value))
             mq.isDone()
