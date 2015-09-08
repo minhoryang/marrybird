@@ -92,7 +92,9 @@ class QuestionBook(db.Model):
             'description': self.description,
         }
         if question_included_from is not None:
-            question_included_from = self.questions.index(question_included_from) + 1
+            question_included_from = 0
+            if question_included_from in self.questions:
+                question_included_from = self.questions.index(question_included_from) + 1
             result['questions'] = {
                 'done': {idx: Question.query.get(idx).jsonify() for idx in self.questions[:question_included_from]},
                 'notyet': {idx: Question.query.get(idx).jsonify() for idx in self.questions[question_included_from:]},
