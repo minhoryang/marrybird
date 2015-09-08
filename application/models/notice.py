@@ -41,5 +41,5 @@ def init(api, jwt):
             if not Notices:
                 Notices = []
             return {'status': 200, 'message': {
-                'notice': {idx: item.jsonify() for idx, item in enumerate(Notices)},
+                idx: item.jsonify() for idx, item in enumerate(Notices)
             }}, 200
