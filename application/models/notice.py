@@ -39,7 +39,7 @@ def init(api, jwt):
         def get(self):
             Notices = Notice.query.filter(Notice.username == current_user.username).all()
             if not Notices:
-                Notices = []
+                return {'status': 404, 'message': 'No Notice'}, 404
             return {'status': 200, 'message': {
                 idx: item.jsonify() for idx, item in enumerate(Notices[::-1])
             }}, 200
