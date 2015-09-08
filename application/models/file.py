@@ -133,7 +133,7 @@ def init(api, jwt):
             @jwt_required()
             @api.doc(parser=wanted, description="1. Copy below base64 strings at 'message'\n"
                                                 "2. Launch new blank page (about:blank)\n"
-                                                "3. \<img src=\'PASTE_IT_HERE\'/\>")
+                                                "3. \(img src=\'PASTE_IT_HERE\'/\)")
             def get(self, idx):
                 """Download file. (without approval check) (but checked the user)"""  # TODO: APPROVAL CHECK!
                 f = File.query.get(idx)
