@@ -14,7 +14,7 @@ class MyJWT(JWT):
         app.config['JWT_EXPIRATION_DELTA'] = timedelta(hours=1)  # TODO: need to change.
 
     def _error_callback(self, e):
-        return jsonify(dict([('status', e.status_code), ('message', e.error + ' - ' + e.description)])), 401, e.headers  # e.status_code
+        return jsonify(dict([('status', 401), ('message', e.error + ' - ' + e.description)])), 401, e.headers  # e.status_code
 
     @staticmethod
     def Bridger(jwt):

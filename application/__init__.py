@@ -22,6 +22,7 @@ def create_app():
     app.config['CSRF_SESSION_KEY'] = 'secret'
     #app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_BINDS'] = {}
+    app.config['PROPAGATE_EXCEPTIONS'] = True
 
     api = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
     jwt = MyJWT(app)
