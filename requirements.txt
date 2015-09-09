@@ -1,5 +1,6 @@
 flask
 flask-admin
+-e git+https://github.com/marrybird/flask-restful.git@MARRYBIRD#egg=flask-restful
 flask-restplus
 alembic
 flask-migrate
