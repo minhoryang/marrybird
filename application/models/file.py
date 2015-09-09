@@ -48,14 +48,14 @@ def init(api, jwt):
     """
 
     def _allowed_file(filename):
-        return '.' in filename and filename.rsplit('.', 1)[1] in ['jpg', 'png']
+        return '.' in filename and filename.rsplit('.', 1)[1] in ['jpg', 'png', 'jpeg']
 
     @namespace.route('/<string:username>')  # TODO: REGEX .jpg, .png
     @api.doc(responses={200:'Successfully Uploaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
     class FileUploadByMultipart(Resource):
         wanted = api.parser()
         #wanted.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
-        wanted.add_argument('file1', type=FileStorage, required=True, help='.jpg .png', location='files')
+        wanted.add_argument('file1', type=FileStorage, required=True, help='.jpg .jpeg .png', location='files')
         #wanted.add_argument('file2', type=FileStorage, required=True, help='', location='files')  # TODO: Multiple
 
         #@jwt_required()
