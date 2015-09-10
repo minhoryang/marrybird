@@ -1,6 +1,7 @@
 __author__ = 'minhoryang'
 
 from datetime import datetime
+from hashlib import md5
 
 from .. import db
 
@@ -50,6 +51,23 @@ class Compute_Test(Compute):
         for reply in self.reply_book.iter():
             print((reply._answers, type(reply._answers)))
         return 'check console'
+
+
+class Compute_Hash(Compute):
+    """ResultBook will Hash You!"""
+    def init(self):
+        from .result import ResultBook
+        self.values = ResultBook.query.filter(
+            ResultBook.question_book_id == self.question_book.id
+        ).all()
+
+    def run(self):
+        target = ""
+        for reply in self.reply_book.iter():
+            target += str(reply._answers)
+        key = int(md5(target.encode("utf-8")).hexdigest(), 16)
+        key %= len(self.values)
+        return self.values[key].result
 
 
 class Compute_MBTI(Compute):
