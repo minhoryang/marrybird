@@ -26,7 +26,7 @@ class Reply(db.Model):
     username = db.Column(db.String(50), nullable=False)
     question_book_id = db.Column(db.Integer, nullable=False)
     question_id = db.Column(db.Integer, nullable=False)
-    question_idx = db.Column(db.Integer, nullable=False)
+    question_idx = db.Column(db.Integer, nullable=True)  # forced nullable caused by Migration.
 
     replied_at = db.Column(db.DateTime, default=datetime.now)
     _answers = db.Column(JSONType(), nullable=True)
