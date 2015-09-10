@@ -5,6 +5,7 @@ from . import (
     question,
     reply,
     comment,
+    result,
 )
 
 
@@ -20,6 +21,9 @@ ENABLE_MODELS = [
     ("Census", comment, (
         comment.Comment,
         # comment.CommentLike,
+    )),
+    ("Census", result, (
+        result.ResultBook,
     )),
     (None, type(
         "#MergedNamespace", (), {

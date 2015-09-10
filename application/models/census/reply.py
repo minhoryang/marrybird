@@ -15,6 +15,7 @@ from sqlalchemy_utils import JSONType
 from .. import db
 from .compute import ComputeNow
 from .question import QuestionBook, Question
+from .result import ResultBook
 
 
 class Reply(db.Model):
@@ -153,7 +154,16 @@ def module_init(api, jwt, namespace):
             ).first()
             if not found or not found.isDone or not found.isResultReady:
                 return {'status': 404, 'message': 'Not Ready'}, 404
-            return {'status': 200, 'message': found.computed_result}, 200
+            result = found.computed_result
+
+            description = None
+            found = ResultBook.query.filter(
+                ResultBook.question_book_id == question_book_id,
+                ResultBook.result == result,
+            ).first()
+            if found:
+                description =  found.description
+            return {'status': 200, 'message': {'result': result, 'description': description}}, 200
 
         @jwt_required()
         @api.doc(parser=authorization)
