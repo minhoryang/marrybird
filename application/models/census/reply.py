@@ -26,6 +26,7 @@ class Reply(db.Model):
     username = db.Column(db.String(50), nullable=False)
     question_book_id = db.Column(db.Integer, nullable=False)
     question_id = db.Column(db.Integer, nullable=False)
+    question_idx = db.Column(db.Integer, nullable=False)
 
     replied_at = db.Column(db.DateTime, default=datetime.now)
     _answers = db.Column(JSONType(), nullable=True)
@@ -48,7 +49,7 @@ class ReplyBook(db.Model):
 
     username = db.Column(db.String(50), nullable=False)
     question_book_id = db.Column(db.Integer, nullable=False)
-    max_question_id = db.Column(db.Integer, default=0, nullable=False)
+    max_question_idx = db.Column(db.Integer, default=0, nullable=False)
 
     # compute
     requested_at = db.Column(db.DateTime, nullable=True)
@@ -62,7 +63,7 @@ class ReplyBook(db.Model):
         return self.compute_id != None and self.computed_at != None and self.computed_result != None
 
     def _jsonify(self, question_book, is_question_included=False):
-        question_included_from = self.max_question_id if is_question_included else None
+        question_included_from = self.max_question_idx if is_question_included else None
         result = question_book.jsonify(question_included_from=question_included_from)
         if not result:
             return None
@@ -75,7 +76,7 @@ class ReplyBook(db.Model):
         else:
             result['status'] = 'not finished'
             result['progress'] = int(
-                (self.max_question_id / question_book.num_of_questions) * 100
+                (self.max_question_idx / question_book.num_of_questions) * 100
             )
         return result
 
@@ -190,7 +191,7 @@ def module_init(api, jwt, namespace):
                 return {'status': 400, 'message': 'Already got the result'}, 400
             if found.isDone:
                 return {'status': 400, 'message': 'Already Requested'}, 400
-            if found.max_question_id != QuestionBook.query.get(question_book_id).num_of_questions:
+            if found.max_question_idx != QuestionBook.query.get(question_book_id).num_of_questions:
                 return {'status': 400, 'message': 'Not Finished'}, 400
             found.requested_at = datetime.now()
             db.session.add(found)
@@ -198,25 +199,21 @@ def module_init(api, jwt, namespace):
             output = ComputeNow(found.id)
             return {'status': 200, 'message': 'Done.' + str(output)}
 
-    @namespace.route('/<int:question_book_id>/reply/<int:question_id>')
+    @namespace.route('/<int:question_book_id>/reply/<int:question_idx>')
     class YourReply(Resource):
 
         @jwt_required()
         @api.doc(parser=authorization)
-        def get(self, question_book_id, question_id):
+        def get(self, question_book_id, question_idx):
             """Get your reply."""
             found = QuestionBook.query.get(question_book_id)
             if not found:
-                return {'status': 400, 'message': 'Not Found'}, 400
-            try:
-                question_id = found.questions[question_id-1]
-            except IndexError:
-                return {'status': 400, 'message': 'Not Found'}, 400
+                return {'status': 404, 'message': 'Not Found'}, 404
 
             found = Reply.query.filter(
                 Reply.username == current_user.username,
                 Reply.question_book_id == question_book_id,
-                Reply.question_id == question_id
+                Reply.question_idx == question_idx
             ).first()
             if not found:
                 return {'status': 404, 'message': 'Not Found'}, 404
@@ -224,7 +221,7 @@ def module_init(api, jwt, namespace):
 
         @jwt_required()
         @api.doc(parser=insert_answer)
-        def post(self, question_book_id, question_id):
+        def post(self, question_book_id, question_idx):
             """Set your reply."""
             answer = insert_answer.parse_args()
 
@@ -232,9 +229,9 @@ def module_init(api, jwt, namespace):
             if not check2:
                 return {'status': 404, 'message': 'Not Found'}, 404
             try:
-                question_id = check2.questions[question_id-1]
+                question_id = check2.questions[question_idx-1]
             except IndexError:
-                return {'status': 400, 'message': 'Not Found'}, 400
+                return {'status': 404, 'message': 'Not Found'}, 404
 
             check = Question.query.get(question_id)
             if not check:
@@ -250,7 +247,7 @@ def module_init(api, jwt, namespace):
                 register_check = ReplyBook()
                 register_check.username = current_user.username
                 register_check.question_book_id = question_book_id
-                register_check.max_question_id = 0
+                register_check.max_question_idx = 0
             if register_check.isDone:
                 return {'status': 400, 'message': 'Already Calc Requested'}, 400
             db.session.add(register_check)
@@ -258,14 +255,15 @@ def module_init(api, jwt, namespace):
             found = Reply.query.filter(
                 Reply.username == current_user.username,
                 Reply.question_book_id == question_book_id,
-                Reply.question_id == question_id
+                Reply.question_idx == question_idx
             ).first()
             if not found:
                 found = Reply()
                 found.username = current_user.username
                 found.question_book_id = question_book_id
+                found.question_idx = question_idx
                 found.question_id = question_id
-                register_check.max_question_id += 1
+                register_check.max_question_idx += 1
             found._answers = answer['answer']
             found.replied_at = datetime.now()
             db.session.add(found)
