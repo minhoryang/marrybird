@@ -122,8 +122,9 @@ class Compute_MBTI(Compute):
                 CR.keys(),
                 chain_and_or='or'
             )
-            for mbti_key, mbti_scores in CR[Selected_R].items():
-                self.scores[mbti_key].append(mbti_scores)
+            if Selected_R:
+                for mbti_key, mbti_scores in CR[Selected_R].items():
+                    self.scores[mbti_key].append(mbti_scores)
 
 
 def ComputeNow(reply_book_id):
