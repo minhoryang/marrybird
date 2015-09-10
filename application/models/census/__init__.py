@@ -17,6 +17,8 @@ ENABLE_MODELS = [
     ("Census", reply, (
         reply.Reply,
         reply.ReplyBook,
+        reply.OldReply,
+        reply.OldReplyBook,
     )),
     ("Census", comment, (
         comment.Comment,

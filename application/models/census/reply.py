@@ -18,9 +18,7 @@ from .question import QuestionBook, Question
 from .result import ResultBook
 
 
-class Reply(db.Model):
-    __bind_key__ = "reply"
-
+class ReplyMixIn(object):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(50), nullable=False)
@@ -32,6 +30,10 @@ class Reply(db.Model):
     _answers = db.Column(JSONType(), nullable=True)
     a_json = db.Column(db.String(200), nullable=True)
 
+
+class Reply(ReplyMixIn, db.Model):
+    __bind_key__ =  __tablename__ = "reply"
+
     def getQuestion(self):
         return Question.query.get(self.question_id)
 
@@ -42,9 +44,20 @@ class Reply(db.Model):
         super(__class__, self).__setattr__(key, value)
 
 
-class ReplyBook(db.Model):
-    __bind_key__ = "replybook"
+class OldReply(ReplyMixIn, db.Model):
+    __bind_key__ = __tablename__ = "oldreply"
 
+    retries = db.Column(db.Integer)
+
+    def CopyAndPaste(self, replybook):
+        for key in ReplyMixIn.__dict__.keys():
+            if 'id' == key:
+                continue
+            elif not '__' in key:
+                self.__setattr__(key, replybook.__dict__[key])
+
+
+class ReplyBookMixIn(object):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(50), nullable=False)
@@ -53,14 +66,21 @@ class ReplyBook(db.Model):
 
     # compute
     requested_at = db.Column(db.DateTime, nullable=True)
-    isDone = column_property(requested_at != None)
     compute_id = db.Column(db.Integer, nullable=True)  # TODO : ASYNC
     computed_at = db.Column(db.DateTime, nullable=True)
     computed_result = db.Column(db.String(200), nullable=True)
 
+
+class ReplyBook(ReplyBookMixIn, db.Model):
+    __bind_key__ = __tablename__ = "replybook"
+
     @hybrid_property
     def isResultReady(self):
         return self.compute_id != None and self.computed_at != None and self.computed_result != None
+
+    @hybrid_property
+    def isDone(self):
+        return self.requested_at != None
 
     def _jsonify(self, question_book, is_question_included=False):
         question_included_from = self.max_question_idx if is_question_included else None
@@ -103,6 +123,40 @@ class ReplyBook(db.Model):
             Reply.question_book_id == self.question_book_id,
         ).all():
             yield reply
+
+
+class OldReplyBook(ReplyBookMixIn, db.Model):
+    __bind_key__ = __tablename__  = "oldreplybook"
+
+    retries = db.Column(db.Integer)
+    retried_at = db.Column(db.DateTime, default=datetime.now)
+
+    def iter(self):
+        for oldreply in OldReply.query.filter(
+            OldReply.username == self.username,
+            OldReply.question_book_id == self.question_book_id,
+            OldReply.retries == self.retries,
+        ).all():
+            yield oldreply
+
+    @staticmethod
+    def findMaxRetries(username, question_book_id):
+        foundMax = __class__.query.filter(
+            __class__.username == username,
+            __class__.question_book_id == question_book_id,
+        ).order_by(
+            __class__.retries.desc(),
+        ).first()
+        if foundMax:
+            return foundMax.retries
+        return 0
+
+    def CopyAndPaste(self, replybook):
+        for key in ReplyBookMixIn.__dict__.keys():
+            if 'id' == key:
+                continue
+            elif not '__' in key:
+                self.__setattr__(key, replybook.__dict__[key])
 
 
 def init(api, jwt):
@@ -198,6 +252,38 @@ def module_init(api, jwt, namespace):
             db.session.commit()
             output = ComputeNow(found.id)
             return {'status': 200, 'message': 'Done.' + str(output)}
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def delete(self, question_book_id):
+            """Reset your results and all replies."""
+            origin_rb = ReplyBook.query.filter(
+                ReplyBook.username == current_user.username,
+                ReplyBook.question_book_id == question_book_id,
+            ).first()
+            if not origin_rb:
+                return {'status': 404, 'message': "Not Found"}, 404
+            if not origin_rb.isResultReady:
+                return {'status': 400, 'message': 'Not Yet to get the result'}, 400
+
+            retries = OldReplyBook.findMaxRetries(current_user.username, question_book_id) + 1
+
+            target_rb = OldReplyBook()
+            target_rb.CopyAndPaste(origin_rb)
+            target_rb.retries = retries
+            db.session.add(target_rb)
+            db.session.delete(origin_rb)
+
+            for origin_r in origin_rb.iter():
+                target_r = OldReply()
+                target_r.CopyAndPaste(origin_r)
+                target_r.retries = retries
+                db.session.add(target_r)
+                db.session.delete(origin_r)
+            db.session.commit()
+            return {'status': 200, 'message': 'reset done'}, 200
+
+
 
     @namespace.route('/<int:question_book_id>/reply/<int:question_idx>')
     class YourReply(Resource):
