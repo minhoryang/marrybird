@@ -64,6 +64,8 @@ class ReplyBook(db.Model):
     def _jsonify(self, question_book, is_question_included=False):
         question_included_from = self.max_question_id if is_question_included else None
         result = question_book.jsonify(question_included_from=question_included_from)
+        if not result:
+            return None
         if self.isResultReady:
             result['status'] = 'done'
             result['progress'] = 100
@@ -88,6 +90,8 @@ class ReplyBook(db.Model):
         else:
             question_included_from = 0 if is_question_included else None
             result = question_book.jsonify(question_included_from=question_included_from)
+            if not result:
+                return None
             result['status'] = 'not touched'
             result['progress'] = 0
             return result
@@ -112,9 +116,16 @@ def module_init(api, jwt, namespace):
         'answer',
         type=list,  # XXX : IT ABSORB ALL "" -> [""], {"": ''} -> [""] (GAE PAN)
         required=True,
-        help='{"answer": [""]}',
+        help='{"answer": [""]}',  # "id": __id__}',
         location='json'
     )
+    #insert_answer.add_argument(
+    #    'id',
+    #    type=int,
+    #    required=False,
+    #    help='if needed'
+    #    location='json'
+    #)
 
     @namespace.route('/')
     class ReplyBooks(Resource):
@@ -194,6 +205,13 @@ def module_init(api, jwt, namespace):
         @api.doc(parser=authorization)
         def get(self, question_book_id, question_id):
             """Get your reply."""
+            found = QuestionBook.query.get(question_book_id)
+            if not found:
+                return {'status': 400, 'message': 'Not Found'}, 400
+            try:
+                question_id = found.questions[question_id-1]
+            except IndexError:
+                return {'status': 400, 'message': 'Not Found'}, 400
 
             found = Reply.query.filter(
                 Reply.username == current_user.username,
@@ -213,6 +231,10 @@ def module_init(api, jwt, namespace):
             check2 = QuestionBook.query.get(question_book_id)
             if not check2:
                 return {'status': 404, 'message': 'Not Found'}, 404
+            try:
+                question_id = check2.questions[question_id-1]
+            except IndexError:
+                return {'status': 400, 'message': 'Not Found'}, 400
 
             check = Question.query.get(question_id)
             if not check:

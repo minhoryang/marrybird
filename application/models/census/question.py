@@ -39,6 +39,7 @@ class Question(db.Model):
 
     def jsonify(self):
         return {
+            #'__id__': self.id,
             'question': self.question,
             'is_Essay_Answer_Needed': self.is_Essay_Answer_Needed,
             'expected_answer_count': self.expected_answer_count,
@@ -95,8 +96,8 @@ class QuestionBook(db.Model):
             if question_included_from in self.questions:
                 question_included_from = self.questions.index(question_included_from) + 1
             result['questions'] = {
-                'done': {idx: Question.query.get(idx).jsonify() for idx in self.questions[:question_included_from]},
-                'notyet': {idx: Question.query.get(idx).jsonify() for idx in self.questions[question_included_from:]},
+                'done': {n+1: Question.query.get(idx).jsonify() for n, idx in enumerate(self.questions[:question_included_from])},
+                'notyet': {n+1+question_included_from: Question.query.get(idx).jsonify() for n, idx in enumerate(self.questions[question_included_from:])},
             }
         return result
 
