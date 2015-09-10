@@ -349,10 +349,11 @@ def module_init(api, jwt, namespace):
                 found.question_book_id = question_book_id
                 found.question_idx = question_idx
                 found.question_id = question_id
-                register_check.max_question_idx = max(register_check.max_question_idx, question_idx)
+            if register_check.max_question_idx < question_idx:
+                register_check.max_question_idx = question_idx
+                db.session.add(register_check)
             found._answers = answer['answer']
             found.replied_at = datetime.now()
             db.session.add(found)
-            db.session.add(register_check)
             db.session.commit()
             return {'status': 200, 'message': "added"}, 200
