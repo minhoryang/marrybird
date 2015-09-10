@@ -92,7 +92,6 @@ class QuestionBook(db.Model):
             'description': self.description,
         }
         if question_included_from is not None:
-            question_included_from = 0
             if question_included_from in self.questions:
                 question_included_from = self.questions.index(question_included_from) + 1
             result['questions'] = {
