@@ -19,3 +19,5 @@ eventlet
 greenlet
 
 -e git+https://github.com/jelmer/dulwich.git#egg=dulwich
+
+celery

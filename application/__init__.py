@@ -48,6 +48,8 @@ def create_app(isolated=False):
 
 
 def create_celery(app=None):
+    from celery import Celery
+
     app = app or create_app(isolated=True)
 
     celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
