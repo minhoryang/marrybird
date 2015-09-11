@@ -7,10 +7,10 @@ from .. import db
 from .tier import TierType
 
 class ChoiceType(_ChoiceType):
-    def copy(self, *args, **kargs):
+    def copy(self, **kargs):
         if 'schema' in kargs:
             kargs.pop('schema')
-        return super(__class__, self).copy(*args, **kargs)
+        return super(__class__, self).copy(**kargs)
 
 
 # XXX : Need to be close with Record.DB
@@ -34,5 +34,5 @@ class Score(db.Model):
             self.tierr = value
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass  # XXX: No plan

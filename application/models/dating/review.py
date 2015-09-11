@@ -8,5 +8,5 @@ class Review(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-def init(api, jwt):
+def init(**kwargs):
     pass

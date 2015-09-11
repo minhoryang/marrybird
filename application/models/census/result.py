@@ -14,8 +14,8 @@ class ResultBook(db.Model):
     description = db.Column(db.String(200), nullable=True)
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass
 
-def module_init(api, jwt, namespace):
+def module_init( **kwargs):
     pass

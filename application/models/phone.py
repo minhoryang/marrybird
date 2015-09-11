@@ -23,7 +23,9 @@ class Phone(db.Model):
         super(Phone, self).__setattr__(key, value)
         super(Phone, self).__setattr__('modified_at', datetime.now())
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/request')
