@@ -24,17 +24,14 @@ def create_app(isolated=False):
     app.config['SQLALCHEMY_BINDS'] = {}
     app.config['PROPAGATE_EXCEPTIONS'] = True
 
-    api = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
-    jwt = MyJWT(app)
-    admin = Admin(app, name="admin")
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
 
     plugins = {}
     if not isolated:
-        plugins['admin'] = admin
-        plugins['api'] = api
-        plugins['jwt'] = jwt
+        plugins['admin'] = Admin(app, name="admin")
+        plugins['api'] = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
+        plugins['jwt'] = MyJWT(app)
 
     for category, cls, models in ENABLE_MODELS:
         if not isolated:
@@ -42,9 +39,9 @@ def create_app(isolated=False):
         for model in models:
             SQLALCHEMY_BINDS_RULES(app, model.__bind_key__)
             if not isolated:
-                admin.add_view(ModelView(model, db.session, category=category))
+                plugins['admin'].add_view(ModelView(model, db.session, category=category))
 
-    if 'jwt' in plugins:
-        MyJWT.Bridger(jwt)
+    if not isolated:
+        MyJWT.Bridger(plugins['jwt'])
 
-    return app, db
+    return app
