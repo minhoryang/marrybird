@@ -17,7 +17,6 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI(app, 'global')
     app.config['SECRET_KEY'] = 'developer'  # TODO: need to change.
     app.config['UPLOAD_FOLDER'] = 'images/'
-    app.config['THREADS_PER_PAGE'] = 2
     app.config['CSRF_ENABLED'] = True
     app.config['CSRF_SESSION_KEY'] = 'secret'
     #app.config['SQLALCHEMY_ECHO'] = True
