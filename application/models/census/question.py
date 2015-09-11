@@ -102,7 +102,9 @@ class QuestionBook(db.Model):
         return result
 
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/mbti_import/<int:book_idx>')
@@ -114,5 +116,5 @@ def init(api, jwt):
             return 'Done', 200
 
 
-def module_init(api, jwt, namespace):
+def module_init(**kwargs):
     pass

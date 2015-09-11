@@ -48,5 +48,5 @@ class Progress(db.Model):
         return lover
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass

@@ -40,7 +40,9 @@ class FemaleUser(User):
 
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/<string:username>')
