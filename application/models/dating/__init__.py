@@ -23,6 +23,8 @@ ENABLE_MODELS = [
     )),
     ("Dating", met, (
             met.Met,
+            met.Met_Accepted,
+            met.Met_Rejected,
     )),
     ("Dating", review, (
             review.Review,
