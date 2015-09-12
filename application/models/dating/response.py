@@ -75,6 +75,10 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
+            for i in Failed:
+                if i in result_json:
+                    result_json.remove(i)
+
             return {'status': 200, 'message': {
                 'success': {i: Record._get(i) for i in Success},
                 'someonelovesme': {i: Record._get(i) for i in Someone},

@@ -47,6 +47,16 @@ class Progress(db.Model):
         lover.response_id = response_id
         return lover
 
+    @staticmethod
+    def Hate(i, you):
+        found = __class__.query.filter(
+            __class__.A == you,
+            __class__.B == i,
+        ).first()
+        if found:
+            return found
+        return None
+
 
 def init(api, jwt):
     pass
