@@ -3,9 +3,9 @@ from os.path import abspath, dirname, join
 from flask import Flask
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
-from flask.ext.restplus import Api
 
 from .models import ENABLE_MODELS, db
+from .utils.my_api import MyApi
 from .utils.my_jwt import MyJWT
 from .utils.constant import *
 
@@ -29,7 +29,7 @@ def create_app(isolated=False):
     plugins = {}
     if not isolated:
         plugins['admin'] = Admin(app, name="admin")
-        plugins['api'] = Api(app, version='1.1', title='MarryBird API', description='Hi There!')
+        plugins['api'] = MyApi(app, version='1.1', title='MarryBird API', description='Hi There!')
         plugins['jwt'] = MyJWT(app)
 
     for category, cls, models in ENABLE_MODELS:
