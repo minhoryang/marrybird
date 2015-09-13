@@ -79,6 +79,10 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
+            for i in Success:
+                if i in result_json:
+                    result_json.remove(i)
+
             SomeoneLovesMe = []
             for i in Someone:
                 hater = Met_Rejected.query.filter(
