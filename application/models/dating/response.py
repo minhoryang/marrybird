@@ -79,9 +79,18 @@ def init(api, jwt):
                 if i in result_json:
                     result_json.remove(i)
 
+            SomeoneLovesMe = []
+            for i in Someone:
+                hater = Met_Rejected.query.filter(
+                    Met_Rejected.A == username,
+                    Met_Rejected.B == i,
+                ).first()
+                if not hater:
+                    SomeoneLovesMe.append(i)
+
             return {'status': 200, 'message': {
                 'success': {i: Record._get(i) for i in Success},
-                'someonelovesme': {i: Record._get(i) for i in Someone},
+                'someonelovesme': {i: Record._get(i) for i in SomeoneLovesMe},
                 'notyet': {i: Record._get(i) for i in NotYet},
                 'failed': {i: Record._get(i) for i in Failed},
                 'result': {i: Record._get(i) for i in result_json},
