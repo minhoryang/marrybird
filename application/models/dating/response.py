@@ -53,14 +53,18 @@ def init(api, jwt):
             else:
                 result_json = []
 
-            Success, Someone, Mine = Progress.SearchHeLovesSheOrNot(
+            Success, Someone, _Mine = Progress.SearchHeLovesSheOrNot(
                 Progress.SearchWhoLovesMe(username),
                 Progress.SearchMeLovesWho(username)
             )
+            for i in [Success, _Someone, _Mine]:
+                for j in i:
+                    if j in result_json:
+                        result_json.remove(j)
 
             NotYet = []
             Failed = []
-            for wanted_lover_username in Mine:
+            for wanted_lover_username in _Mine:
                 hater = Met_Rejected.query.filter(
                     Met_Rejected.A == wanted_lover_username
                 ).filter(
@@ -71,20 +75,8 @@ def init(api, jwt):
                 else:
                     NotYet.append(wanted_lover_username)
 
-            for i in NotYet:
-                if i in result_json:
-                    result_json.remove(i)
-
-            for i in Failed:
-                if i in result_json:
-                    result_json.remove(i)
-
-            for i in Success:
-                if i in result_json:
-                    result_json.remove(i)
-
             SomeoneLovesMe = []
-            for i in Someone:
+            for i in _Someone:
                 hater = Met_Rejected.query.filter(
                     Met_Rejected.A == username,
                     Met_Rejected.B == i,
