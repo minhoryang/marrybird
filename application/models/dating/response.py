@@ -53,7 +53,7 @@ def init(api, jwt):
             else:
                 result_json = []
 
-            Success, Someone, _Mine = Progress.SearchHeLovesSheOrNot(
+            Success, _Someone, _Mine = Progress.SearchHeLovesSheOrNot(
                 Progress.SearchWhoLovesMe(username),
                 Progress.SearchMeLovesWho(username)
             )
