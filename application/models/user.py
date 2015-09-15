@@ -100,3 +100,10 @@ def init(**kwargs):
     @jwt.user_handler
     def load_user(payload):
         return User.query.filter(User.id == payload['user_id']).first()
+
+    @namespace.route('/test/<string:username>')
+    class CeleryTest(Resource):
+        def get(self, username):
+            from ..tasks.user import test
+            t = test.delay(username)
+            return 'called %s ' % (t,)

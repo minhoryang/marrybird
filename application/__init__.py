@@ -22,8 +22,12 @@ def create_app(isolated=False):
     #app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_BINDS'] = {}
     app.config['PROPAGATE_EXCEPTIONS'] = True
-    app.config['CELERY_BROKER_URL'] = 'amqp://marrybird@marrybird-localhost@localhost:5672/marrybird/'
+    app.config['CELERY_BROKER_URL'] = 'amqp://marrybird:marrybird-localhost@localhost:5672/marrybird'
     app.config['CELERY_BACKEND_URL'] = app.config['CELERY_BROKER_URL']
+    app.config['CELERY_IMPORTS'] = ['application.tasks.user']
+    app.config['CELERY_ACCEPT_CONTENT'] = ['json',]
+    app.config['CELERY_TASK_SERIALIZER'] = 'json'
+    app.config['CELERY_RESULT_SERIALIZER'] = 'json'
 
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
