@@ -7,6 +7,7 @@ from . import (
     phone,
     selfstory,
     notice,
+    tomarrybird,
 )
 
 from .dating import ENABLE_MODELS as DATING_ENABLE_MODELS
@@ -32,7 +33,10 @@ ENABLE_MODELS = [
     )),
     ("User", notice, (
             notice.Notice,
-    ))
+    )),
+    ("User", tomarrybird, (
+            tomarrybird.ToMarrybird,
+    )),
 ] \
     + DATING_ENABLE_MODELS \
     + CENSUS_ENABLE_MODELS \
