@@ -14,7 +14,6 @@ from .census import ENABLE_MODELS as CENSUS_ENABLE_MODELS
 
 ENABLE_MODELS = [
     ("User", user, (
-            user.User,
             user.MaleUser,
             user.FemaleUser,
     )),

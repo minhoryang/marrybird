@@ -22,7 +22,6 @@ ENABLE_MODELS = [
             progress.Progress,
     )),
     ("Dating", met, (
-            met.Met,
             met.Met_Accepted,
             met.Met_Rejected,
             met.Met_NotResponsed,
