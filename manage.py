@@ -4,8 +4,9 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand, upgrade
 
 from application import create_app
+from application.models._base import db
 
-app, db = create_app()
+app = create_app()
 manager = Manager(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)

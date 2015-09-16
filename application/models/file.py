@@ -30,8 +30,10 @@ class File(db.Model):
     # TODO: add GraphicHash
 
 
-def init(api, jwt):
+def init(**kwargs):
     """."""
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     """TODO: Refactor JWT.

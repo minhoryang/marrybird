@@ -41,7 +41,10 @@ class Request(db.Model):
     # TODO : REPLACE THIS WHEN WE USE CELERY
 
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
+
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')

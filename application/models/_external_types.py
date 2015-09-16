@@ -4,4 +4,5 @@ from sqlalchemy_utils import (
     ChoiceType,
     ScalarListType,
     JSONType,
+    UUIDType,
 )

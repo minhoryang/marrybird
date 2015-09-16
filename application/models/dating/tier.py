@@ -30,5 +30,5 @@ class TierType(enum.Enum):
         return tuple(matchables)
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass  # XXX: No plan

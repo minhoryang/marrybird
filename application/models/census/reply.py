@@ -159,11 +159,15 @@ class OldReplyBook(ReplyBookMixIn, db.Model):
                 self.__setattr__(key, replybook.__dict__[key])
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass  # check below - module_init()
 
 
-def module_init(api, jwt, namespace):
+def module_init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
+    namespace = kwargs['namespace']
+
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
     insert_answer = copy(authorization)

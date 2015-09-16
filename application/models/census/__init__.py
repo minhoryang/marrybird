@@ -29,8 +29,8 @@ ENABLE_MODELS = [
     )),
     (None, type(
         "#MergedNamespace", (), {
-            "init": lambda *args, **kwargs: init(*args, **kwargs),
-            "module_init": lambda *args, **kwargs: None,
+            "init": lambda **kwargs: init(**kwargs),
+            "module_init": lambda **kwargs: None,
         }
     ), (
     )),
@@ -38,7 +38,7 @@ ENABLE_MODELS = [
     + []  # XXX : ADD ABOVE
 
 
-def init(api, jwt):
-    merged_namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
+def init(**kwargs):
+    merged_namespace = kwargs['api'].namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
     for _, target_module, _ in ENABLE_MODELS:
-        target_module.module_init(api, jwt, merged_namespace)
+        target_module.module_init(namespace=merged_namespace, **kwargs)

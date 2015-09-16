@@ -40,7 +40,9 @@ class FemaleUser(User):
 
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/<string:username>')
@@ -98,3 +100,10 @@ def init(api, jwt):
     @jwt.user_handler
     def load_user(payload):
         return User.query.filter(User.id == payload['user_id']).first()
+
+    @namespace.route('/test/<string:username>')
+    class CeleryTest(Resource):
+        def get(self, username):
+            from ..tasks.user import test
+            t = test.delay(username)
+            return 'called %s ' % (t,)

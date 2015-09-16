@@ -92,11 +92,15 @@ class CommentLike(db.Model):
         return database_exists(SQLALCHEMY_DATABASE_URI(_current_app, __class__.__bind_key__))
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass
 
 
-def module_init(api, jwt, namespace):
+def module_init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
+    namespace = kwargs['namespace']
+
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
     insert_comment = copy(authorization)

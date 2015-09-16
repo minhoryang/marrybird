@@ -12,10 +12,10 @@ from .. import db
 
 
 class ChoiceType(_ChoiceType):
-    def copy(self, *args, **kargs):
+    def copy(self, **kargs):
         if 'schema' in kargs:
             kargs.pop('schema')
-        return super(__class__, self).copy(*args, **kargs)
+        return super(__class__, self).copy(**kargs)
 
 class MetType(Enum):
     rejected = "rejected"
@@ -82,5 +82,5 @@ class Met_NotResponsed(Met):
         return c
 
 
-def init(api, jwt):
+def init(**kwargs):
     pass

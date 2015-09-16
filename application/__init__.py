@@ -10,7 +10,7 @@ from .utils.my_jwt import MyJWT
 from .utils.constant import *
 
 
-def create_app():
+def create_app(isolated=False):
     app = Flask(__name__)
     # TODO: EXTRACT!!!!
     app.config['PROJECT_PATH'] = abspath(join(dirname(__file__), '..'))
@@ -22,19 +22,50 @@ def create_app():
     #app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_BINDS'] = {}
     app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.config['CELERY_BROKER_URL'] = 'amqp://marrybird:marrybird-localhost@localhost:5672/marrybird'
+    app.config['CELERY_BACKEND_URL'] = app.config['CELERY_BROKER_URL']
+    app.config['CELERY_IMPORTS'] = ['application.tasks.user', 'application.tasks.phone']
+    app.config['CELERY_ACCEPT_CONTENT'] = ['json',]
+    app.config['CELERY_TASK_SERIALIZER'] = 'json'
+    app.config['CELERY_RESULT_SERIALIZER'] = 'json'
 
-    api = MyApi(app, version='1.1', title='MarryBird API', description='Hi There!')
-    jwt = MyJWT(app)
-    admin = Admin(app, name="admin")
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
 
+    plugins = {}
+    if not isolated:
+        plugins['admin'] = Admin(app, name="admin")
+        plugins['api'] = MyApi(app, version='1.1', title='MarryBird API', description='Hi There!')
+        plugins['jwt'] = MyJWT(app)
+
     for category, cls, models in ENABLE_MODELS:
-        cls.init(api, jwt)
+        if not isolated:
+            cls.init(**plugins)  # TODO : NEED TO INVERSE
         for model in models:
             SQLALCHEMY_BINDS_RULES(app, model.__bind_key__)
-            admin.add_view(ModelView(model, db.session, category=category))
+            if not isolated:
+                plugins['admin'].add_view(ModelView(model, db.session, category=category))
 
-    MyJWT.Bridger(jwt)
+    if not isolated:
+        MyJWT.Bridger(plugins['jwt'])
 
-    return app, db
+    return app
+
+
+def create_celery(app=None):
+    from celery import Celery
+
+    app = app or create_app(isolated=True)
+
+    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_BACKEND_URL'])
+    celery.conf.update(app.config)
+
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+
+    return celery

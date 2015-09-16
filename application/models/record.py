@@ -117,7 +117,9 @@ class Record(db.Model):
             return {key : existed_record.__dict__[key] for key in __class__._available_keywords()}
         return {}
 
-def init(api, jwt):
+def init(**kwargs):
+    api = kwargs['api']
+    jwt = kwargs['jwt']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/')
