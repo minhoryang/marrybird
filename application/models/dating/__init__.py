@@ -9,6 +9,7 @@ from . import (
     review,
     score,
     tier,
+    condition,
 )
 
 ENABLE_MODELS = [
@@ -34,6 +35,9 @@ ENABLE_MODELS = [
     )),
     ("Dating", tier, (
     #       tier.Tier,
+    )),
+    ("Dating", condition, (
+            condition.Condition,
     )),
 ] \
     + []  # XXX : ADD ABOVE
