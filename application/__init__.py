@@ -24,7 +24,7 @@ def create_app(isolated=False):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['CELERY_BROKER_URL'] = 'amqp://marrybird:marrybird-localhost@localhost:5672/marrybird'
     app.config['CELERY_BACKEND_URL'] = app.config['CELERY_BROKER_URL']
-    app.config['CELERY_IMPORTS'] = ['application.tasks.user']
+    app.config['CELERY_IMPORTS'] = []
     app.config['CELERY_ACCEPT_CONTENT'] = ['json',]
     app.config['CELERY_TASK_SERIALIZER'] = 'json'
     app.config['CELERY_RESULT_SERIALIZER'] = 'json'
@@ -39,6 +39,8 @@ def create_app(isolated=False):
         plugins['jwt'] = MyJWT(app)
 
     for category, cls, models in ENABLE_MODELS:
+        if not '#' in cls.__name__:
+            app.config['CELERY_IMPORTS'].append(cls.__name__)
         if not isolated:
             cls.init(**plugins)  # TODO : NEED TO INVERSE
         for model in models:
