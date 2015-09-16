@@ -33,14 +33,14 @@ def init(**kwargs):
         'value': fields.String(),
     }), required=True, help='{"condition": {"index": "1"(1~4), "value": "Age++"(200)}}', location='json')
 
-    @namespace.route('/<string:username>')
+    @namespace.route('/')
     class GetSetYourConditions(Resource):
 
         @jwt_required()
         @api.doc(parser=authorization)
-        def get(self, username, target=('1','2','3','4')):
+        def get(self, target=('1','2','3','4')):
             found = Condition.query.filter(
-                Condition.username == username,
+                Condition.username == current_user.username,
             ).order_by(
                 Condition.updated_at.desc(),
             ).all()
@@ -54,10 +54,10 @@ def init(**kwargs):
 
         @jwt_required()
         @api.doc(parser=insert_condition)
-        def post(self, username, target=('1','2','3','4')):
+        def post(self, target=('1','2','3','4')):
             insert = insert_condition.parse_args()['condition']
             new_one = Condition()
-            new_one.username = username
+            new_one.username = current_user.username
             if not insert['index'] in target:
                 return {'status': 400, 'message': 'wrong index'}, 400
             new_one.index = int(insert['index'])
