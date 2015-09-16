@@ -23,4 +23,4 @@ def PhoneCheckRequest_post(self):
     db.session.add(found)
     db.session.commit()
 
-    return 'done'
+    return '%s - %s' % (found.phone, found.status)
