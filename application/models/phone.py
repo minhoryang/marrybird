@@ -5,10 +5,10 @@ from random import randrange
 from datetime import datetime
 
 from flask.ext.restplus import Resource
+from sqlalchemy_utils import UUIDType
 
 from . import db
 from .record import Record
-from ..externals.slack import push
 
 class Phone(db.Model):
     __bind_key__ = "phone"
@@ -18,6 +18,8 @@ class Phone(db.Model):
     status = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime, default=datetime.now)
+    celery_id = db.Column(UUIDType(), nullable=True)  # XXX : db.String(36)
+    celery_status = db.Column(db.String(10), nullable=True)
 
     def __setattr__(self, key, value):
         super(Phone, self).__setattr__(key, value)
@@ -36,6 +38,8 @@ def init(**kwargs):
         @api.doc(parser=wanted)
         def post(self):
             """Request Token and Sending Push to Slack."""
+            from ..tasks.phone import PhoneCheckRequest_post
+
             args = self.wanted.parse_args()
             if not check_phone_number(args['phonenum']):
                 return {'status': 400, 'message': 'Wrong Phone Number'}, 400
@@ -52,11 +56,10 @@ def init(**kwargs):
             add = Phone()
             add.phone = args['phonenum']
             add.status = str(randrange(1000, 9999))
+            add.celery_id = PhoneCheckRequest_post.delay()
+            add.celery_status = 'requested'
             db.session.add(add)
             db.session.commit()
-            # XXX: Push to slack(Human Agent)
-            # TODO: Need to connect externals/phonenum-check-by-company
-            push('휴대폰인증)' + add.phone + ' 로 ' + add.status + ' 를 보내주세요.')
             return {'status': 200, 'message': 'requested'}
 
     @namespace.route('/validate/<string:phonenum>/<int:token>')
