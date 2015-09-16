@@ -7,7 +7,8 @@ Celery = create_celery()
 
 
 @Celery.task(bind=True)
-def PhoneCheckRequest_post():
+def PhoneCheckRequest_post(self):
+    from .. import db
     from ..externals.slack import push
     from ..models.phone import Phone
 
