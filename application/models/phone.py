@@ -56,10 +56,10 @@ def init(**kwargs):
             add = Phone()
             add.phone = args['phonenum']
             add.status = str(randrange(1000, 9999))
-            add.celery_id = PhoneCheckRequest_post.delay().id
             add.celery_status = 'requested'
             db.session.add(add)
             db.session.commit()
+            PhoneCheckRequest_post.delay(add.phone, add.status)
             return {'status': 200, 'message': 'requested'}
 
     @namespace.route('/validate/<string:phonenum>/<int:token>')
