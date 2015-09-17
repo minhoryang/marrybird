@@ -49,7 +49,7 @@ class Action(_ActionMixIn, db.Model):
 class _ActionInheritedMixIn(object):
     def _init(self, *args, **kwargs):
         """Inject the type when I initialized."""
-        super(object, self).__init__(*args, **kwargs)
+        super(_ActionInheritedMixIn, self).__init__(*args, **kwargs)
         self._type = self.__class__.__name__
 
     def _parent(self):
@@ -61,7 +61,7 @@ for cls in ActionType.__members__.keys():
     globals()[cls] = type(cls, (_ActionInheritedMixIn, Action), {
         '__init__': _ActionInheritedMixIn._init,
         '__tablename__': cls.lower(),  # divide the table
-        '__bind_key__': 'action',
+        '__bind_key__': Action.__bind_key__,
         'id': db.Column(
             db.Integer,
             db.ForeignKey('action._id'),
