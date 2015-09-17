@@ -67,7 +67,7 @@ for cls in StateType.__members__.keys():
         '__bind_key__': State.__bind_key__,
         'id': db.Column(
             db.Integer,
-            db.ForeignKey('state._id'),
+            db.ForeignKey(State.__tablename__ + '._id'),
             primary_key=True
         ),
     })
