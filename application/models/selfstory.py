@@ -76,7 +76,8 @@ def init(**kwargs):
             found = SelfStory.query.filter(SelfStory.username == username)
             if not found.first():
                 # XXX : [Policy Changed] iOS wanted to show - but okay.
-                return {'status': 404, 'message': 'Not Found'}, 404
+                #return {'status': 404, 'message': 'Not Found'}, 404
+                return {'status': 200, 'message': None, 'warn': 'will be deprecated by 404'}, 200  # [MBIRD-105]
 
             return {'status': 200, 'message': {
                 item.id: {
