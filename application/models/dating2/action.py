@@ -64,7 +64,7 @@ for cls in ActionType.__members__.keys():
         '__bind_key__': Action.__bind_key__,
         'id': db.Column(
             db.Integer,
-            db.ForeignKey(Action.__tablename__ + 'action._id'),
+            db.ForeignKey(Action.__tablename__ + '._id'),
             primary_key=True
         ),
     })
