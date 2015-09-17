@@ -2,7 +2,7 @@
 
 __author__ = 'minhoryang'
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from json import loads
 
@@ -80,6 +80,20 @@ class _EventCopyMixIn(object):
 
 class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadevent"
+
+    @staticmethod
+    def RestInPeace(now=datetime.now()):  # TODO : NOT TESTED
+        target = now - timedelta(days=7)
+        for evt in Event.query.filter(
+            Event.at <= target,
+        ).order_by(
+            Event.at.asc(),
+        ).all():
+            out = DeadEvent()
+            out.CopyAndPaste(evt)
+            db.session.add(out)
+            db.session.delete(evt)
+        db.session.commit()
 
 
 def init(**kwargs):

@@ -2,7 +2,7 @@
 
 __author__ = 'minhoryang'
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 
 from .. import db
@@ -40,7 +40,7 @@ class StateType(Enum):
 
 class _StateMixIn(object):
     _id = db.Column(db.Integer, primary_key=True)
-    _type = db.Column(EnumType(StateType))
+    _state = db.Column(EnumType(StateType))
     username = db.Column(db.String(50))
     at = db.Column(db.DateTime, default=datetime.now)
 
@@ -48,12 +48,21 @@ class _StateMixIn(object):
 class State(_StateMixIn, db.Model):
     __bind_key__ = __tablename__ = "state"
 
+    @staticmethod
+    def TransitionTo(current_state, next_state_type):  # TODO : NOT TESTED
+        out = OldState()
+        out.CopyAndPaste(current_state)
+        out.next_state = next_state_type
+        db.session.add(out)
+        db.session.delete(current_state)
+        db.session.commit()
+
 
 class _StateInheritedMixIn(object):
     def _init(self, *args, **kwargs):
         """Inject the type when I initialized."""
         super(_StateInheritedMixIn, self).__init__(*args, **kwargs)
-        self._type = self.__class__.__name__
+        self._state = self.__class__.__name__
 
     def _parent(self):
         return State.query.get(self.id)
@@ -75,6 +84,7 @@ for cls in StateType.__members__.keys():
 
 class _StateCopyMixIn(object):
     copied_at = db.Column(db.DateTime, default=datetime.now)
+    next_state = db.Column(EnumType(StateType))
 
     def CopyAndPaste(self, state):
         for key in _StateMixIn.__dict__.keys():
@@ -90,6 +100,20 @@ class OldState(_StateMixIn, _StateCopyMixIn, db.Model):
 
 class DeadState(_StateMixIn, _StateCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadstate"
+
+    @staticmethod
+    def RestInPeace(now=datetime.now()):  # TODO : NOT TESTED
+        target = now - timedelta(days=7)
+        for act in OldState.query.filter(
+            OldState.at <= target,
+        ).order_by(
+            OldState.at.asc(),
+        ).all():
+            out = DeadState()
+            out.CopyAndPaste(act)
+            db.session.add(out)
+            db.session.delete(act)
+        db.session.commit()
 
 
 def init(**kwargs):

@@ -2,7 +2,7 @@
 
 __author__ = 'minhoryang'
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from json import loads
 
@@ -87,6 +87,21 @@ class OldAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
 
 class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadaction"
+
+    @staticmethod
+    def RestInPeace(now=datetime.now()):  # TODO : NOT TESTED
+        target = now - timedelta(days=7)
+        for DB in (Action, OldAction):
+            for act in DB.query.filter(
+                DB.at <= target,
+            ).order_by(
+                DB.at.asc(),
+            ).all():
+                out = DeadAction()
+                out.CopyAndPaste(act)
+                db.session.add(out)
+                db.session.delete(act)
+        db.session.commit()
 
 
 def init(**kwargs):
