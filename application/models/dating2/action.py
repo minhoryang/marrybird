@@ -1,12 +1,16 @@
-"""."""
+"""Shall We Dance."""
 
 __author__ = 'minhoryang'
 
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from json import loads
 
 from .. import db
-from .._external_types import EnumType, JSONType
+from .._external_types import (
+    EnumType,
+    JSONType,  # TODO : Manual Migration Needed!
+)
 
 
 class ActionType(Enum):
@@ -21,96 +25,67 @@ class ActionType(Enum):
     Action_09_EndOfDating_And_Feedback = "Action_09_EndOfDating_And_Feedback"
 
 
-class ActionMixIn(object):
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(EnumType(ActionType), nullable=False)
-    fromA = db.Column(db.String(50), nullable=True)
-    toB = db.Column(db.String(50), nullable=False)
+class _ActionMixIn(object):
+    _id = db.Column(db.Integer, primary_key=True)
+    _type = db.Column(EnumType(ActionType))
+    from_A = db.Column(db.String(50), default="")
+    to_B = db.Column(db.String(50), nullable=False)
     at = db.Column(db.DateTime, default=datetime.now)
-    json = db.Column(JSONType(), nullable=True)
+    _json = db.Column(JSONType(), default=None)
 
 
-class Action(ActionMixIn, db.Model):
+class Action(_ActionMixIn, db.Model):
     __bind_key__ = __tablename__ = "action"
 
+    json = db.Column(db.String(200), default="''")  # TODO : flask-admin.sqla
 
-class Action_01_NotResponsed_ByMe(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_01_NotResponsed_ByMe".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class Action_02_NotResponsed_ByYou(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_02_NotResponsed_ByYou".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
+    def __setattr__(self, key, value):
+        if key == 'json' and value:
+            self._json = loads(value.replace("'", '"'))
+            return
+        super(db.Model, self).__setattr__(key, value)
 
 
-class Action_03_AskedOut(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_03_AskedOut".lower()
+class _ActionInheritedMixIn(object):
+    def _init(self, *args, **kwargs):
+        """Inject the type when I initialized."""
+        super(object, self).__init__(*args, **kwargs)
+        self._type = self.__class__.__name__
 
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class Action_04_Got_AskedOut(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_04_Got_AskedOut".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
+    def _parent(self):
+        return Action.query.get(self.id)
 
 
-class Action_05_Got_AskedOut_And_Accept(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_05_Got_AskedOut_And_Accept".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class Action_06_Got_AskedOut_And_Reject(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_06_Got_AskedOut_And_Reject".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class Action_07_AskedOut_Accepted(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_07_AskedOut_Accepted".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
+# XXX : Generated - Action Inherited DB per ActionType.
+for cls in ActionType.__members__.keys():
+    globals()[cls] = type(cls, (_ActionInheritedMixIn, Action), {
+        '__init__': _ActionInheritedMixIn._init,
+        '__tablename__': cls.lower(),  # divide the table
+        '__bind_key__': 'action',
+        'id': db.Column(
+            db.Integer,
+            db.ForeignKey('action._id'),
+            primary_key=True
+        ),
+    })
 
 
-class Action_08_EndOfDating(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_08_EndOfDating".lower()
+class _ActionCopyMixIn(object):
+    copied_at = db.Column(db.DateTime, default=datetime.now)
 
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class Action_09_EndOfDating_And_Feedback(Action):
-    __bind_key__ = "action"
-    __tablename__ = "Action_09_EndOfDating_And_Feedback".lower()
-
-    id = db.Column(db.Integer, db.ForeignKey('action.id'), primary_key=True)
-
-
-class ActionCopyMixIn(object):
     def CopyAndPaste(self, action):
-        for key in ActionMixIn.__dict__.keys():
+        for key in _ActionMixIn.__dict__.keys():
             if 'id' == key:
                 continue
             elif '__' not in key:
                 self.__setattr__(key, action.__dict__[key])
 
 
-class OldAction(ActionMixIn, ActionCopyMixIn, db.Model):
+class OldAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "oldaction"
 
 
-class DeadAction(ActionMixIn, ActionCopyMixIn, db.Model):
+class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadaction"
 
 
