@@ -1,4 +1,4 @@
-"""Look at .request.Request, It handles all."""
+"""Action->State->Event."""
 __author__ = 'minhoryang'
 
 from . import (
@@ -36,17 +36,17 @@ ENABLE_MODELS = [
         state.OldState,
         state.DeadState,
     )),
-#    ("Dating V2 Event", event, (
-#        #event.Event,
-#        Event.Event_00_Server_Suggested,  # -> result
-#        Event.Event_03_AskedOut,  # -> notyet
-#        Event.Event_04_Got_AskedOut,  # -> someonelovesme
-#        Event.Event_05_Got_AskedOut_And_Accept,  # -> success
-#        Event.Event_06_Got_AskedOut_And_Reject,  # -x
-#        Event.Event_07_AskedOut_Accepted,  # -> success
-#        Event.Event_99_AskedOut_Rejected,  # -> failed
-#        Event.DeadEvent,
-#    )),
+    ("Dating V2 Event", event, (
+        #event.Event,
+        event.Event_00_Server_Suggested,  # -> result
+        event.Event_03_AskedOut,  # -> notyet
+        event.Event_04_Got_AskedOut,  # -> someonelovesme
+        event.Event_05_Got_AskedOut_And_Accept,  # -> success
+        event.Event_06_Got_AskedOut_And_Reject,  # -x
+        event.Event_07_AskedOut_Accepted,  # -> success
+        event.Event_99_AskedOut_Rejected,  # -> failed
+        event.DeadEvent,
+    )),
     (None, type(
         "#MergedNamespace", (), {
             "init": lambda **kwargs: init(**kwargs),
