@@ -15,14 +15,14 @@ from .._external_types import (
 
 
 class StateType(Enum):
-    State_02_Abcd = "State_02_Abcd"
-    State_04_ABcd = "State_04_ABcd"
-    State_06_AbCd = "State_06_AbCd"
-    State_08_ABCd = "State_08_ABCd"
-    State_09_abcD = "State_09_abcD"
-    State_11_aBcD = "State_11_aBcD"
-    State_13_abCD = "State_13_abCD"
-    State_15_aBCD = "State_15_aBCD"
+    State_02_A___ = "State_02_A___"
+    State_04_AB__ = "State_04_AB__"
+    State_06_A_C_ = "State_06_A_C_"
+    State_08_ABC_ = "State_08_ABC_"
+    State_09____D = "State_09____D"
+    State_11__B_D = "State_11__B_D"
+    State_13___CD = "State_13___CD"
+    State_15__BCD = "State_15__BCD"
 
     @property
     def isA(self):
