@@ -24,7 +24,7 @@ class EventType(Enum):
 
 
 class _EventMixIn(object):
-    _id = db.Column(db.Integer, primary_key=True)
+    id__ = db.Column(db.Integer, primary_key=True)
     _type = db.Column(EnumType(EventType))
     username = db.Column(db.String(50))
     _results = db.Column(ScalarListType(), default=[])
@@ -59,20 +59,18 @@ for cls in EventType.__members__.keys():
         '__init__': _EventInheritedMixIn._init,
         '__tablename__': cls.lower(),  # divide the table
         '__bind_key__': Event.__bind_key__,
-        'id': db.Column(
+        'id__': db.Column(
             db.Integer,
-            db.ForeignKey(Event.__tablename__ + '._id'),
+            db.ForeignKey(Event.__tablename__ + '.id__'),
             primary_key=True
         ),
     })
 
 
 class _EventCopyMixIn(object):
-    copied_at = db.Column(db.DateTime, default=datetime.now)
-
     def CopyAndPaste(self, event):
-        for key in _EventMixIn.__dict__.keys():
-            if 'id' == key:
+        for key in event.__dict__.keys():
+            if key == '_sa_instance_state':
                 continue
             elif '__' not in key:
                 self.__setattr__(key, event.__dict__[key])
@@ -81,11 +79,13 @@ class _EventCopyMixIn(object):
 class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadevent"
 
+    dead_at = db.Column(db.DateTime, default=datetime.now)
+
     @staticmethod
-    def RestInPeace(now=datetime.now()):  # TODO : NOT TESTED
-        target = now - timedelta(days=7)
+    def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
+        target = now - timeout
         for evt in Event.query.filter(
-            Event.at <= target,
+            Event.at >= target,
         ).order_by(
             Event.at.asc(),
         ).all():

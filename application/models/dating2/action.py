@@ -26,7 +26,7 @@ class ActionType(Enum):
 
 
 class _ActionMixIn(object):
-    _id = db.Column(db.Integer, primary_key=True)
+    id__ = db.Column(db.Integer, primary_key=True)
     _type = db.Column(EnumType(ActionType))
     from_A = db.Column(db.String(50), default="")
     to_B = db.Column(db.String(50), nullable=False)
@@ -53,7 +53,7 @@ class _ActionInheritedMixIn(object):
         self._type = self.__class__.__name__
 
     def _parent(self):
-        return Action.query.get(self.id)
+        return Action.query.get(self.id__)
 
 
 # XXX : Generated - Action Inherited DB per ActionType.
@@ -62,20 +62,20 @@ for cls in ActionType.__members__.keys():
         '__init__': _ActionInheritedMixIn._init,
         '__tablename__': cls.lower(),  # divide the table
         '__bind_key__': Action.__bind_key__,
-        'id': db.Column(
+        'id__': db.Column(
             db.Integer,
-            db.ForeignKey(Action.__tablename__ + '._id'),
+            db.ForeignKey(Action.__tablename__ + '.id__'),
             primary_key=True
         ),
     })
 
 
 class _ActionCopyMixIn(object):
-    copied_at = db.Column(db.DateTime, default=datetime.now)
+    old_at = db.Column(db.DateTime, default=datetime.now)
 
     def CopyAndPaste(self, action):
-        for key in _ActionMixIn.__dict__.keys():
-            if 'id' == key:
+        for key in action.__dict__.keys():
+            if key == '_sa_instance_state':
                 continue
             elif '__' not in key:
                 self.__setattr__(key, action.__dict__[key])
@@ -88,12 +88,14 @@ class OldAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
 class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     __bind_key__ = __tablename__ = "deadaction"
 
+    dead_at = db.Column(db.DateTime, default=datetime.now)
+
     @staticmethod
-    def RestInPeace(now=datetime.now()):  # TODO : NOT TESTED
-        target = now - timedelta(days=7)
+    def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
+        target = now - timeout
         for DB in (Action, OldAction):
             for act in DB.query.filter(
-                DB.at <= target,
+                DB.at >= target,
             ).order_by(
                 DB.at.asc(),
             ).all():
