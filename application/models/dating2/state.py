@@ -52,7 +52,7 @@ class State(_StateMixIn, db.Model):
     __bind_key__ = __tablename__ = "state"
 
     @hybrid_property
-    def _link(cls):  # TODO : More Efficient Way such as relationship :(
+    def __link(cls):  # TODO : More Efficient Way such as relationship :(
         target_class = globals()[cls._state.value]
         return target_class.query.filter(
             target_class.id__ == cls.id__,
@@ -139,7 +139,7 @@ def module_init(**kwargs):
     @namespace.route('/statetransitiontest/<int:id>')
     class StateTransitionTest(Resource):
         def get(self, id):
-            current = State.query.get(id)._link
+            current = State.query.get(id).__link
             old, next = current.TransitionTo(StateType.State_06_AbCd)
             db.session.add(old)
             db.session.add(next)

@@ -45,15 +45,22 @@ class Action(_ActionMixIn, db.Model):
             return
         super(db.Model, self).__setattr__(key, value)
 
+    @hybrid_property
+    def __link(cls):  # TODO : More Efficient Way such as relationship :(
+        target_class = globals()[cls._type.value]
+        return target_class.query.filter(
+            target_class.id__ == cls.id__,
+        ).first()
+
+    def __str__(self):
+        return 'Linked'  # XXX : Flask-admin
+
 
 class _ActionInheritedMixIn(object):
     def _init(self, *args, **kwargs):
         """Inject the type when I initialized."""
         super(_ActionInheritedMixIn, self).__init__(*args, **kwargs)
         self._type = self.__class__.__name__
-
-    def _parent(self):
-        return Action.query.get(self.id__)
 
 
 # XXX : Generated - Action Inherited DB per ActionType.
@@ -67,6 +74,7 @@ for cls in ActionType.__members__.keys():
             db.ForeignKey(Action.__tablename__ + '.id__'),
             primary_key=True
         ),
+        '__link': db.relationship(Action, uselist=False),
     })
 
 

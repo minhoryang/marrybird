@@ -42,15 +42,22 @@ class Event(_EventMixIn, db.Model):
             return
         super(db.Model, self).__setattr__(key, value)
 
+    @hybrid_property
+    def __link(cls):  # TODO : More Efficient Way such as relationship :(
+        target_class = globals()[cls._type.value]
+        return target_class.query.filter(
+            target_class.id__ == cls.id__,
+        ).first()
+
+    def __str__(self):
+        return 'Linked'  # XXX : Flask-admin
+
 
 class _EventInheritedMixIn(object):
     def _init(self, *args, **kwargs):
         """Inject the type when I initialized."""
         super(_EventInheritedMixIn, self).__init__(*args, **kwargs)
         self._type = self.__class__.__name__
-
-    def _parent(self):
-        return Event.query.get(self.id)
 
 
 # XXX : Generated - Event Inherited DB per EventType.
@@ -64,6 +71,7 @@ for cls in EventType.__members__.keys():
             db.ForeignKey(Event.__tablename__ + '.id__'),
             primary_key=True
         ),
+        '__link': db.relationship(Event, uselist=False),
     })
 
 
