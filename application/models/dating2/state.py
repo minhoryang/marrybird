@@ -14,6 +14,34 @@ from .._external_types import (
 )
 
 
+class StateCode(Enum):
+    State_02_A___ = 8
+    State_04_AB__ = 12  # 8 + 4
+    State_06_A_C_ = 10  # 8 + 2
+    State_08_ABC_ = 14  # 8 + 4 + 2
+    State_09____D = 1
+    State_11__B_D = 5  # 4 + 1
+    State_13___CD = 3  # 2 + 1
+    State_15__BCD = 7  # 4 + 2 + 1
+
+    @property
+    def abcd(self):
+        return (
+            True if self.value >= 8 else False,
+            True if self.value - 8 >= 4 else False,
+            True if self.value - 8 - 4 >= 2 else False,
+            True if self.value - 8 - 4 - 2 >= 1 else False,
+        )  # TODO : SHAME ON YOU MINHO!
+
+    @property
+    def type(self):
+        return StateType[self.name]
+
+    @staticmethod
+    def fromType(type):
+        return StateCode[type.name]
+
+
 class StateType(Enum):
     State_02_A___ = "State_02_A___"
     State_04_AB__ = "State_04_AB__"
@@ -25,20 +53,17 @@ class StateType(Enum):
     State_15__BCD = "State_15__BCD"
 
     @property
-    def isA(self):
-        return True if self.value[-4] == 'A' else False
+    def abcd(self):
+        return self.code.abcd
 
     @property
-    def isB(self):
-        return True if self.value[-3] == 'B' else False
+    def code(self):
+        return StateCode[self.value]
 
-    @property
-    def isC(self):
-        return True if self.value[-2] == 'C' else False
-
-    @property
-    def isD(self):
-        return True if self.value[-1] == 'D' else False
+    @staticmethod
+    def fromCode(code):
+        found = StateCode(code)
+        return StateType(found.name)
 
 
 class _StateMixIn(object):
