@@ -33,7 +33,7 @@ ENABLE_MODELS = [
         state.DeadState,
     )),
     ("Dating V2 Event", event, (
-        # event.Event,
+        event.Event,
         event.Event_00_Server_Suggested,  # -> result
         event.Event_03_AskedOut,  # -> notyet
         event.Event_04_Got_AskedOut,  # -> someonelovesme

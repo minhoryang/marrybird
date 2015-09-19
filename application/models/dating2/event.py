@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from json import loads
 
+from flask.ext.restplus import Resource
+from flask_jwt import jwt_required, current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .. import db
@@ -13,6 +15,8 @@ from .._external_types import (
     EnumType,
     ScalarListType,
 )
+from ..dating.response import Response
+from ..record import Record
 
 
 class EventType(Enum):
@@ -107,7 +111,121 @@ def init(**kwargs):
 
 
 def module_init(**kwargs):
-    pass
+    api = kwargs['api']
+    namespace = kwargs['namespace']
+    authorization = api.parser()
+    authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+
+    @namespace.route('/events')
+    class GetEvents(Resource):
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def get(self, now=datetime.now()):
+            username = current_user.username
+
+            _result_json = {}
+            for e in Event_00_Server_Suggested.query.filter(
+                Event_00_Server_Suggested.username == username,
+            ).all():
+                _result_json[e] = e._results
+
+            _Feedbacked = {}
+            for e in Event_09_EndOfDating_And_Feedback.query.filter(
+                Event_09_EndOfDating_And_Feedback.username == username,
+            ).all():
+                _Feedbacked[e] = e._results
+
+            _FeedbackNeeded = {}
+            for e in Event_08_EndOfDating.query.filter(
+                Event_08_EndOfDating.username == username,
+            ).all():
+                _FeedbackNeeded[e] = e._results
+
+            _Success = {}
+            for DB in [Event_05_Got_AskedOut_And_Accept, Event_07_AskedOut_Accepted]:
+                for e in DB.query.filter(
+                    DB.username == username,
+                ).all():
+                    _Success[e] = e._results
+
+            _SomeoneLovesMe = {}
+            for e in Event_04_Got_AskedOut.query.filter(
+                Event_04_Got_AskedOut.username == username,
+            ).all():
+                _SomeoneLovesMe[e] = e._results
+
+            _NotYet = {}
+            for e in Event_03_AskedOut.query.filter(
+                Event_03_AskedOut.username == username,
+            ).all():
+                _NotYet[e] = e._results
+
+            _Failed = {}
+            for e in Event_99_AskedOut_Rejected.query.filter(
+                Event_99_AskedOut_Rejected.username == username,
+            ).all():
+                _Failed[e] = e._results
+
+            result_json = {}
+            for e, names in _result_json.items():
+                for name in names:
+                    result_json[name] = Record._get(name)
+                    result_json[name]['expired_at'] = 7 - (now - e.at).days
+
+            Feedbacked = {}
+            for e, names in _Feedbacked.items():
+                for name in names:
+                    Feedbacked[name] = Record._get(name)
+                    Feedbacked[name]['expired_at'] = 7 - (now - e.at).days
+
+            FeedbackNeeded = {}
+            for e, names in _FeedbackNeeded.items():
+                for name in names:
+                    FeedbackNeeded[name] = Record._get(name)
+                    FeedbackNeeded[name]['expired_at'] = 7 - (now - e.at).days
+
+            Success = {}
+            for e, names in _Success.items():
+                for name in names:
+                    Success[name] = Record._get(name)
+                    Success[name]['expired_at'] = 7 - (now - e.at).days
+
+            SomeoneLovesMe = {}
+            for e, names in _SomeoneLovesMe.items():
+                for name in names:
+                    SomeoneLovesMe[name] = Record._get(name)
+                    SomeoneLovesMe[name]['expired_at'] = 7 - (now - e.at).days
+
+            NotYet = {}
+            for e, names in _NotYet.items():
+                for name in names:
+                    NotYet[name] = Record._get(name)
+                    NotYet[name]['expired_at'] = 7 - (now - e.at).days
+
+            Failed = {}
+            for e, names in _Failed.items():
+                for name in names:
+                    Failed[name] = Record._get(name)
+                    Failed[name]['expired_at'] = 7 - (now - e.at).days
+
+            return {'status': 200, 'message': {
+                'success': Success,
+                'someonelovesme': SomeoneLovesMe,
+                'notyet': NotYet,
+                'failed': Failed,
+                'result': result_json,
+                'feedbackneeded': FeedbackNeeded,
+                'feedbacked': Feedbacked,
+            }}
+
+    @namespace.route('/addfortest/<string:i>/<string:you>')
+    class AddFeedForTest(Resource):
+
+        @api.doc()
+        def get(self, i, you):
+            db.session.add(Event_00_Server_Suggested(i, [you]))
+            db.session.commit()
 
 
 # XXX : Generated - Event Inherited DB per EventType.
