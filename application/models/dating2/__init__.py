@@ -11,13 +11,9 @@ from . import (
 ENABLE_MODELS = [
     ("Dating V2 Action", action, (
         # action.Action,
-        action.Action_01_NotResponsed_ByMe,
-        action.Action_02_NotResponsed_ByYou,
         action.Action_03_AskedOut,
-        action.Action_04_Got_AskedOut,
         action.Action_05_Got_AskedOut_And_Accept,
         action.Action_06_Got_AskedOut_And_Reject,
-        action.Action_07_AskedOut_Accepted,
         action.Action_08_EndOfDating,
         action.Action_09_EndOfDating_And_Feedback,
         action.OldAction,
@@ -45,6 +41,7 @@ ENABLE_MODELS = [
         event.Event_06_Got_AskedOut_And_Reject,  # -x
         event.Event_07_AskedOut_Accepted,  # -> success
         event.Event_99_AskedOut_Rejected,  # -> failed
+        event.OldEvent,
         event.DeadEvent,
     )),
     (None, type(

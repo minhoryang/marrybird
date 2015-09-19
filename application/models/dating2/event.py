@@ -56,10 +56,56 @@ class Event(_EventMixIn, db.Model):
 
 
 class _EventInheritedMixIn(object):
-    def _init(self, *args, **kwargs):
+    def _init(self, username, _results, *args, **kwargs):
         """Inject the type when I initialized."""
         super(_EventInheritedMixIn, self).__init__(*args, **kwargs)
         self._type = self.__class__.__name__
+        self.username = username
+        self._results = _results
+
+
+class _EventCopyMixIn(object):
+    old_at = db.Column(db.DateTime, default=datetime.now)
+
+    def CopyAndPaste(self, event):
+        for key in event.__dict__.keys():
+            if key == '_sa_instance_state':
+                continue
+            elif '__' not in key:
+                self.__setattr__(key, event.__dict__[key])
+
+
+class OldEvent(_EventMixIn, _EventCopyMixIn, db.Model):
+    __bind_key__ = __tablename__ = "oldevent"
+
+
+class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
+    __bind_key__ = __tablename__ = "deadevent"
+
+    dead_at = db.Column(db.DateTime, default=datetime.now)
+
+    @staticmethod
+    def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
+        target = now - timeout
+        for DB in (Event, OldEvent):
+            for evt in DB.query.filter(
+                DB.at >= target,
+            ).order_by(
+                DB.at.asc(),
+            ).all():
+                out = DeadEvent()
+                out.CopyAndPaste(evt)
+                db.session.add(out)
+                db.session.delete(evt)
+        db.session.commit()
+
+
+def init(**kwargs):
+    pass
+
+
+def module_init(**kwargs):
+    pass
 
 
 # XXX : Generated - Event Inherited DB per EventType.
@@ -75,40 +121,3 @@ for cls in EventType.__members__.keys():
         ),
         '__link': db.relationship(Event, uselist=False),
     })
-
-
-class _EventCopyMixIn(object):
-    def CopyAndPaste(self, event):
-        for key in event.__dict__.keys():
-            if key == '_sa_instance_state':
-                continue
-            elif '__' not in key:
-                self.__setattr__(key, event.__dict__[key])
-
-
-class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
-    __bind_key__ = __tablename__ = "deadevent"
-
-    dead_at = db.Column(db.DateTime, default=datetime.now)
-
-    @staticmethod
-    def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
-        target = now - timeout
-        for evt in Event.query.filter(
-            Event.at >= target,
-        ).order_by(
-            Event.at.asc(),
-        ).all():
-            out = DeadEvent()
-            out.CopyAndPaste(evt)
-            db.session.add(out)
-            db.session.delete(evt)
-        db.session.commit()
-
-
-def init(**kwargs):
-    pass
-
-
-def module_init(**kwargs):
-    pass

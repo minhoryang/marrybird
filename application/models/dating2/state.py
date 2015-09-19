@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 from flask.ext.restplus import Resource
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from .. import db
 from .._external_types import (
@@ -14,24 +13,38 @@ from .._external_types import (
 )
 
 
+class StateException(Exception):
+    pass
+
+
+class s(Enum):
+    A = 8
+    B = 4
+    C = 2
+    D = 1
+
+    def __int__(self):
+        return self.value
+
+
 class StateCode(Enum):
-    State_02_A___ = 8
-    State_04_AB__ = 12  # 8 + 4
-    State_06_A_C_ = 10  # 8 + 2
-    State_08_ABC_ = 14  # 8 + 4 + 2
-    State_09____D = 1
-    State_11__B_D = 5  # 4 + 1
-    State_13___CD = 3  # 2 + 1
-    State_15__BCD = 7  # 4 + 2 + 1
+    State_02_A___ = s.A.value
+    State_04_AB__ = s.A.value + s.B.value
+    State_06_A_C_ = s.A.value + s.C.value
+    State_08_ABC_ = s.A.value + s.B.value + s.C.value
+    State_09____D = s.D.value
+    State_11__B_D = s.B.value + s.D.value
+    State_13___CD = s.C.value + s.D.value
+    State_15__BCD = s.D.value + s.C.value + s.D.value
 
     @property
     def abcd(self):
         return (
-            True if self.value >= 8 else False,
-            True if self.value - 8 >= 4 else False,
-            True if self.value - 8 - 4 >= 2 else False,
-            True if self.value - 8 - 4 - 2 >= 1 else False,
-        )  # TODO : SHAME ON YOU MINHO!
+            True if self.value >= s.A.value else False,
+            True if self.value % s.A.value >= s.B.value else False,
+            True if self.value % s.B.value >= s.C.value else False,
+            True if self.value % s.C.value >= s.D.value else False,
+        )
 
     @property
     def type(self):
@@ -40,6 +53,12 @@ class StateCode(Enum):
     @staticmethod
     def fromType(type):
         return StateCode[type.name]
+
+    def __add__(self, _s):
+        return self.value + _s
+
+    def __sub__(self, _s):
+        return self.value - _s
 
 
 class StateType(Enum):
@@ -65,6 +84,82 @@ class StateType(Enum):
         found = StateCode(code)
         return StateType(found.name)
 
+    def A(self):
+        if self.abcd[0]:
+            return self
+        raise StateException('Want A but ~A')
+
+    def a(self):
+        try:
+            self.A()
+        except StateException:
+            return self
+        else:
+            raise StateException('Want ~A but A')
+
+    def _A(self):
+        return self.a()
+
+    def _a(self):
+        return self.A()
+
+    def B(self):
+        if self.abcd[1]:
+            return self
+        raise StateException('Want B but ~B')
+
+    def b(self):
+        try:
+            self.B()
+        except StateException:
+            return self
+        else:
+            raise StateException('Want ~B but B')
+
+    def _B(self):
+        return self.b()
+
+    def _b(self):
+        return self.B()
+
+    def C(self):
+        if self.abcd[2]:
+            return self
+        raise StateException('Want C but ~C')
+
+    def c(self):
+        try:
+            self.C()
+        except StateException:
+            return self
+        else:
+            raise StateException('Want ~C but C')
+
+    def _C(self):
+        return self.c()
+
+    def _c(self):
+        return self.C()
+
+    def D(self):
+        if self.abcd[3]:
+            return self
+        raise StateException('Want D but ~D')
+
+    def d(self):
+        try:
+            self.D()
+        except StateException:
+            return self
+        else:
+            raise StateException('Want ~D but D')
+
+    def _D(self):
+        return self.d()
+
+    def _d(self):
+        return self.D()
+
 
 class _StateMixIn(object):
     id__ = db.Column(db.Integer, primary_key=True)
@@ -76,11 +171,10 @@ class _StateMixIn(object):
 class State(_StateMixIn, db.Model):
     __bind_key__ = __tablename__ = "state"
 
-    @hybrid_property
-    def __link(cls):  # TODO : More Efficient Way such as relationship :(
-        target_class = globals()[cls._state.value]
+    def link__(self):  # TODO : More Efficient Way such as relationship :(
+        target_class = globals()[self._state.value]
         return target_class.query.filter(
-            target_class.id__ == cls.id__,
+            target_class.id__ == self.id__,
         ).first()
 
     def __str__(self):
@@ -101,21 +195,6 @@ class _StateInheritedMixIn(object):
         next._state = next_state_type
         next.username = self.username
         return old, next
-
-
-# XXX : Generated - State Inherited DB per StateType.
-for cls in StateType.__members__.keys():
-    globals()[cls] = type(cls, (_StateInheritedMixIn, State), {
-        '__init__': _StateInheritedMixIn._init,
-        '__tablename__': cls.lower(),  # divide the table
-        '__bind_key__': State.__bind_key__,
-        'id__': db.Column(
-            db.Integer,
-            db.ForeignKey(State.__tablename__ + '.id__'),
-            primary_key=True
-        ),
-        '__link': db.relationship(State, uselist=False),
-    })
 
 
 class _StateCopyMixIn(object):
@@ -164,7 +243,7 @@ def module_init(**kwargs):
     @namespace.route('/statetransitiontest/<int:id>')
     class StateTransitionTest(Resource):
         def get(self, id):
-            current = State.query.get(id).__link
+            current = State.query.get(id).link__()
             old, next = current.TransitionTo(StateType.State_06_AbCd)
             db.session.add(old)
             db.session.add(next)
@@ -175,3 +254,18 @@ def module_init(**kwargs):
     class RestInPeaceTest(Resource):
         def get(self):
             DeadState.RestInPeace(timeout=timedelta(minutes=1))
+
+
+# XXX : Generated - State Inherited DB per StateType.
+for cls in StateType.__members__.keys():
+    globals()[cls] = type(cls, (_StateInheritedMixIn, State), {
+        '__init__': _StateInheritedMixIn._init,
+        '__tablename__': cls.lower(),  # divide the table
+        '__bind_key__': State.__bind_key__,
+        'id__': db.Column(
+            db.Integer,
+            db.ForeignKey(State.__tablename__ + '.id__'),
+            primary_key=True
+        ),
+        '__link': db.relationship(State, uselist=False),
+    })
