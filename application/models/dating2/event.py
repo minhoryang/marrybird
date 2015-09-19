@@ -31,7 +31,7 @@ class _EventMixIn(object):
     id__ = db.Column(db.Integer, primary_key=True)
     _type = db.Column(EnumType(EventType))
     username = db.Column(db.String(50))
-    _results = db.Column(ScalarListType(), default=[])
+    _results = db.Column(ScalarListType(separator="\uFF0C"), default=[])
     at = db.Column(db.DateTime, default=datetime.now)
 
 
