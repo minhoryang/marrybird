@@ -177,6 +177,27 @@ def module_init(**kwargs):
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
 
+    @namespace.route('/<string:i>/goodbye/<string:you>')
+    class Goodbye(Resource):
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def put(self, i, you):
+            # if i != current_user.username:
+            #     return {'status': 400, 'message': 'Not You'}, 400  # TODO
+
+            i_state = State.find(i)
+            you_state = State.find(you)
+
+            # XXX : Check that 'you' and 'i' currently dating.
+            found_accepted = Accepts(i)
+
+            if you in found_accepted:
+                # XXX : Action 8. EndOfDating (Goodbye)
+                return Action8(i_state, you_state, found_accepted)
+            else:
+                return {'status': 404, 'message': 'Not Found'}, 404
+
 
 # XXX : Generated - Action Inherited DB per ActionType.
 for cls in ActionType.__members__.keys():
@@ -199,7 +220,7 @@ def Action3(i, you):
     new_you_state = None
     old_you_state = None
     try:
-        i._state._a()._B()._D()
+        i._state.A().b().d()
 
         old_i_state, new_i_state = i.TransitionTo(
             StateType.fromCode(
@@ -241,11 +262,18 @@ def Action4(i, you, found_asked_out):
     old_you_state = None
     try:
         i._state.C()
+        you._state.B()
 
         if len(found_asked_out) == 1:
             old_i_state, new_i_state = i.TransitionTo(
                 StateType.fromCode(
                     i._state.code - int(s.C)
+                )
+            )
+        else:
+            old_i_state, new_i_state = i.TransitionTo(
+                StateType.fromCode(
+                    i._state.code
                 )
             )
         old_you_state, new_you_state = you.TransitionTo(
@@ -301,25 +329,47 @@ def Action5(i, you, found_asked_out):
     old_you_state = None
     try:
         i._state.C()
+        you._state.B()
 
         # TODO: all? or not?
         if len(found_asked_out) == 1:
-            old_i_state, new_i_state = i.TransitionTo(
+            if i._state.A().d():
+                old_i_state, new_i_state = i.TransitionTo(
+                    StateType.fromCode(
+                        i._state.code - int(s.A) - int(s.C) + int(s.D)
+                    )
+                )
+            else:
+                old_i_state, new_i_state = i.TransitionTo(
+                    StateType.fromCode(
+                        i._state.code - int(s.C)
+                    )
+                )
+        else:
+            if i._state.A().d():
+                old_i_state, new_i_state = i.TransitionTo(
+                    StateType.fromCode(
+                        i._state.code - int(s.A) + int(s.D)
+                    )
+                )
+            else:
+                old_i_state, new_i_state = i.TransitionTo(
+                    StateType.fromCode(
+                        i._state.code
+                    )
+                )
+        if you._state.A().d():
+            old_you_state, new_you_state = you.TransitionTo(
                 StateType.fromCode(
-                    i._state.code - int(s.A) - int(s.C) + int(s.D)
+                    you._state.code - int(s.A) - int(s.B) + int(s.D)
                 )
             )
         else:
-            old_i_state, new_i_state = i.TransitionTo(
+            old_you_state, new_you_state = you.TransitionTo(
                 StateType.fromCode(
-                    i._state.code - int(s.A) + int(s.D)
+                    you._state.code - int(s.B)
                 )
             )
-        old_you_state, new_you_state = you.TransitionTo(
-            StateType.fromCode(
-                you._state.code - int(s.A) - int(s.B) + int(s.D)
-            )
-        )
     except StateException as e:
         print(e)
         newrelic_exception(*exc_info())
@@ -360,3 +410,102 @@ def Action5(i, you, found_asked_out):
                     break
         db.session.commit()
     return {'status': 200, 'message': 'accept'}, 200
+
+
+def Action8(i, you, found_accepted):
+    new_i_state = None
+    old_i_state = None
+    new_you_state = None
+    old_you_state = None
+    try:
+        i._state.a().D()
+        you._state.a().D()
+
+        # TODO: all? or not?
+        if len(found_accepted) == 1:
+            old_i_state, new_i_state = i.TransitionTo(
+                StateType.fromCode(
+                    i._state.code + int(s.A) - int(s.D)
+                )
+            )
+        else:
+            old_i_state, new_i_state = i.TransitionTo(
+                StateType.fromCode(
+                    i._state.code
+                )
+            )
+
+        found_accepted_you = Accepts(you.username)
+
+        if len(found_accepted_you) == 1:
+            old_you_state, new_you_state = you.TransitionTo(
+                StateType.fromCode(
+                    you._state.code + int(s.A) - int(s.D)
+                )
+            )
+        else:
+            old_you_state, new_you_state = you.TransitionTo(
+                StateType.fromCode(
+                    you._state.code
+                )
+            )
+    except StateException as e:
+        print(e)
+        newrelic_exception(*exc_info())
+        return {'status': 400, 'message': 'Not Available Condition'}, 400
+    except ValueError as e:
+        print(e)
+        newrelic_exception(*exc_info())
+        return {'status': 400, 'message': 'Not Available Next State'}, 400
+    else:
+        db.session.add(Action_08_EndOfDating(i.username, you.username))
+        if new_you_state:
+            db.session.add(new_you_state)
+            db.session.add(old_you_state)
+            db.session.delete(you)
+            deleted = False
+            for DB in [Event_05_Got_AskedOut_And_Accept, Event_07_AskedOut_Accepted]:
+                if not deleted:
+                    for e in DB.query.filter(
+                        DB.username == you.username,
+                    ).all():
+                        if i.username in e._results:
+                            old = OldEvent()
+                            old.CopyAndPaste(e)
+                            db.session.add(old)
+                            db.session.delete(e)
+                            deleted = True
+                            break
+            if not deleted:
+                return {'status': 400, 'message': 'Hey You! Did We know each others?'}, 400
+        if new_i_state:
+            db.session.add(new_i_state)
+            db.session.add(old_i_state)
+            db.session.delete(i)
+            deleted = False
+            for DB in [Event_05_Got_AskedOut_And_Accept, Event_07_AskedOut_Accepted]:
+                if not deleted:
+                    for e in DB.query.filter(
+                        DB.username == i.username,
+                    ).all():
+                        if you.username in e._results:
+                            old = OldEvent()
+                            old.CopyAndPaste(e)
+                            db.session.add(old)
+                            db.session.delete(e)
+                            deleted = True
+                            break
+            if not deleted:
+                return {'status': 400, 'message': 'Oops! Did We know each others?'}, 400
+        db.session.commit()
+    return {'status': 200, 'message': 'goodbye'}, 200
+
+
+def Accepts(username):  # TODO : Func Lamdba :)
+    found_accepted = []
+    for DB in [Event_05_Got_AskedOut_And_Accept, Event_07_AskedOut_Accepted]:
+        for e in DB.query.filter(
+            DB.username == username,
+        ).all():
+            found_accepted.extend(e._results)
+    return found_accepted
