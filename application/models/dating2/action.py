@@ -23,6 +23,8 @@ from .event import (
     Event_05_Got_AskedOut_And_Accept,
     Event_06_Got_AskedOut_And_Reject,
     Event_07_AskedOut_Accepted,
+    Event_08_EndOfDating,
+    Event_09_EndOfDating_And_Feedback,
     Event_99_AskedOut_Rejected,
     OldEvent,
 )
@@ -459,6 +461,8 @@ def Action8(i, you, found_accepted):
         return {'status': 400, 'message': 'Not Available Next State'}, 400
     else:
         db.session.add(Action_08_EndOfDating(i.username, you.username))
+        db.session.add(Event_08_EndOfDating(i.username, [you.username]))
+        db.session.add(Event_08_EndOfDating(you.username, [i.username]))
         if new_you_state:
             db.session.add(new_you_state)
             db.session.add(old_you_state)

@@ -22,6 +22,8 @@ class EventType(Enum):
     Event_05_Got_AskedOut_And_Accept = "Event_05_Got_AskedOut_And_Accept"
     Event_06_Got_AskedOut_And_Reject = "Event_06_Got_AskedOut_And_Reject"
     Event_07_AskedOut_Accepted = "Event_07_AskedOut_Accepted"
+    Event_08_EndOfDating = "Event_08_EndOfDating"
+    Event_09_EndOfDating_And_Feedback = "Event_09_EndOfDating_And_Feedback"
     Event_99_AskedOut_Rejected = "Event_99_AskedOut_Rejected"
 
 

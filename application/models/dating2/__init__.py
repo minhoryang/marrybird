@@ -40,6 +40,8 @@ ENABLE_MODELS = [
         event.Event_05_Got_AskedOut_And_Accept,  # -> success
         event.Event_06_Got_AskedOut_And_Reject,  # -x
         event.Event_07_AskedOut_Accepted,  # -> success
+        event.Event_08_EndOfDating,
+        event.Event_09_EndOfDating_And_Feedback,
         event.Event_99_AskedOut_Rejected,  # -> failed
         event.OldEvent,
         event.DeadEvent,
