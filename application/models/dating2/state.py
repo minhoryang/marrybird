@@ -171,6 +171,15 @@ class _StateMixIn(object):
 class State(_StateMixIn, db.Model):
     __bind_key__ = __tablename__ = "state"
 
+    @staticmethod
+    def find(username):
+        state = State.query.filter(
+            State.username == username,
+        ).first()
+        if not state:
+            return None
+        return state.link__()
+
     def link__(self):  # TODO : More Efficient Way such as relationship :(
         target_class = globals()[self._state.value]
         return target_class.query.filter(

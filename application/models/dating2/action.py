@@ -21,7 +21,9 @@ from .event import (
     Event_03_AskedOut,
     Event_04_Got_AskedOut,
     Event_05_Got_AskedOut_And_Accept,
+    Event_06_Got_AskedOut_And_Reject,
     Event_07_AskedOut_Accepted,
+    Event_99_AskedOut_Rejected,
     OldEvent,
 )
 from .state import (
@@ -135,19 +137,8 @@ def module_init(**kwargs):
             # if i != current_user.username:
             #     return {'status': 400, 'message': 'Not You'}, 400  # TODO
 
-            i_state = State.query.filter(
-                State.username == i,
-            ).first()
-            if not i_state:
-                return {'status': 404, 'message': 'Not Found %s' % (i,)}, 404
-            i_state = i_state.link__()
-
-            you_state = State.query.filter(
-                State.username == you,
-            ).first()
-            if not you_state:
-                return {'status': 404, 'message': 'Not Found %s' % (you,)}, 404
-            you_state = you_state.link__()
+            i_state = State.find(i)
+            you_state = State.find(you)
 
             # XXX : Check that 'you' already asked out to 'i'
             found_asked_out = []
@@ -161,6 +152,30 @@ def module_init(**kwargs):
             else:
                 # XXX : Action 5. Accept
                 return Action5(i_state, you_state, found_asked_out)
+
+    @namespace.route('/<string:i>/hate/<string:you>')
+    class Hate(Resource):
+
+        @jwt_required()
+        @api.doc(parser=authorization)
+        def put(self, i, you):
+            # if i != current_user.username:
+            #     return {'status': 400, 'message': 'Not You'}, 400  # TODO
+
+            i_state = State.find(i)
+            you_state = State.find(you)
+
+            # XXX : Check that 'you' already asked out to 'i'
+            found_asked_out = []
+            for e in Event_04_Got_AskedOut.query.filter(
+                Event_04_Got_AskedOut.username == i,
+            ).all():
+                found_asked_out.extend(e._results)
+            if you in found_asked_out:
+                # XXX : Action 4. Hate
+                return Action4(i_state, you_state, found_asked_out)
+            else:
+                return {'status': 404, 'message': 'Not Found'}, 404
 
 
 # XXX : Generated - Action Inherited DB per ActionType.
@@ -217,6 +232,66 @@ def Action3(i, you):
             db.session.delete(you)
         db.session.commit()
     return {'status': 200, 'message': 'asked out'}, 200
+
+
+def Action4(i, you, found_asked_out):
+    new_i_state = None
+    old_i_state = None
+    new_you_state = None
+    old_you_state = None
+    try:
+        i._state.C()
+
+        if len(found_asked_out) == 1:
+            old_i_state, new_i_state = i.TransitionTo(
+                StateType.fromCode(
+                    i._state.code - int(s.C)
+                )
+            )
+        old_you_state, new_you_state = you.TransitionTo(
+            StateType.fromCode(
+                you._state.code - int(s.B)
+            )
+        )
+    except StateException:
+        newrelic_exception(*exc_info())
+        return {'status': 400, 'message': 'Not Available Condition'}, 400
+    except ValueError:
+        newrelic_exception(*exc_info())
+        return {'status': 400, 'message': 'Not Available Next State'}, 400
+    else:
+        db.session.add(Action_06_Got_AskedOut_And_Reject(i.username, you.username))
+        db.session.add(Event_06_Got_AskedOut_And_Reject(i.username, [you.username]))
+        db.session.add(Event_99_AskedOut_Rejected(you.username, [i.username]))
+        if new_you_state:
+            db.session.add(new_you_state)
+            db.session.add(old_you_state)
+            db.session.delete(you)
+            for e in Event_03_AskedOut.query.filter(
+                Event_03_AskedOut.username == you.username,
+            ).all():
+                if i.username in e._results:
+                    old = OldEvent()
+                    old.CopyAndPaste(e)
+                    db.session.add(old)
+                    db.session.delete(e)
+                    break
+        if new_i_state:
+            db.session.add(new_i_state)
+            db.session.add(old_i_state)
+            db.session.delete(i)
+            for e in Event_04_Got_AskedOut.query.filter(
+                Event_04_Got_AskedOut.username == i.username,
+            ).all():
+                if you.username in e._results:
+                    old = OldEvent()
+                    old.CopyAndPaste(e)
+                    db.session.add(old)
+                    db.session.delete(e)
+                    break
+
+        db.session.commit()
+    return {'status': 200, 'message': 'reject'}, 200
 
 
 def Action5(i, you, found_asked_out):
