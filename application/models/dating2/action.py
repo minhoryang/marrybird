@@ -2,12 +2,13 @@
 
 __author__ = 'minhoryang'
 
+from copy import deepcopy as copy
 from datetime import datetime, timedelta
 from enum import Enum
 from json import loads
 from sys import exc_info
 
-from flask.ext.restplus import Resource
+from flask.ext.restplus import Resource, fields
 from flask_jwt import jwt_required, current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from newrelic.agent import record_exception as newrelic_exception
@@ -129,6 +130,17 @@ def module_init(**kwargs):
     namespace = kwargs['namespace']
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
+    insert_feedback = copy(authorization)
+    insert_feedback.add_argument(
+        'feedback',
+        type=api.model('feedback', {
+            'score': fields.String(),
+            'text': fields.String(),
+        }),
+        required=True,
+        help='{"feedback": {"score": "1", "text": "1"}}',
+        location='json'
+    )
 
     @namespace.route('/<string:i>/love/<string:you>')
     class Love(Resource):
@@ -199,6 +211,37 @@ def module_init(**kwargs):
                 return Action8(i_state, you_state, found_accepted)
             else:
                 return {'status': 404, 'message': 'Not Found'}, 404
+
+    @namespace.route('/<string:i>/feedback/<string:you>')
+    class Feedback(Resource):
+
+        @jwt_required()
+        @api.doc(parser=insert_feedback)
+        def put(self, i, you):
+            # if i != current_user.username:
+            #     return {'status': 400, 'message': 'Not You'}, 400  # TODO
+            feedback = insert_feedback.parse_args()['feedback']
+
+            found_goodbye = {}
+            for e in Event_08_EndOfDating.query.filter(
+                Event_08_EndOfDating.username == i
+            ).all():
+                found_goodbye[e] = e._results
+
+            for goodbye, names in found_goodbye.items():
+                if you in names:
+                    # XXX : Action 9. EndOfDating_And_Feedback
+                    return Action9(i, you, goodbye, feedback)
+            return {'status': 404, 'message': 'Not Found'}, 404
+
+    @namespace.route('/feedbacktest')
+    class FeedbackTest(Resource):
+
+        @api.doc()
+        def get(self):
+            feedback = Event_09_EndOfDating_And_Feedback.query.get(15)
+            for i in feedback._results:
+                print((i, type(i)))  # All Text
 
 
 # XXX : Generated - Action Inherited DB per ActionType.
@@ -503,6 +546,13 @@ def Action8(i, you, found_accepted):
                 return {'status': 400, 'message': 'Oops! Did We know each others?'}, 400
         db.session.commit()
     return {'status': 200, 'message': 'goodbye'}, 200
+
+
+def Action9(my_name, your_name, goodbye, feedback):
+    db.session.add(Event_09_EndOfDating_And_Feedback(my_name, [your_name, str(feedback)]))
+    db.session.delete(goodbye)
+    db.session.commit()
+    return {'status': 200, 'message': 'feedback'}, 200
 
 
 def Accepts(username):  # TODO : Func Lamdba :)
