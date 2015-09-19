@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from json import loads
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from .. import db
 from .._external_types import (
     EnumType,
