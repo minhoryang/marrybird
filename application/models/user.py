@@ -82,6 +82,10 @@ def init(**kwargs):
                 new_user = FemaleUser(**args['register'])
             try:
                 db.session.add(new_user)
+                from .dating2.state import State_02_A___
+                state = State_02_A___()
+                state.username = args['register']['username']
+                db.session.add(state)
                 db.session.commit()
             except IntegrityError as e:
                 return {'status': 400, 'message': 'Existed Account\n'+str(e)}, 400
