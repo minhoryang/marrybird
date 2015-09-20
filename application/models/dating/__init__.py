@@ -5,7 +5,7 @@ from . import (
     # request,
     # response,
     # progress,
-    # met,
+    met,
     # review,
     # score,
     # tier,
@@ -22,11 +22,12 @@ ENABLE_MODELS = [
     # ("Dating", progress, (
     #         progress.Progress,
     # )),
-    # ("Dating", met, (
-    #         met.Met_Accepted,
-    #         met.Met_Rejected,
-    #         met.Met_NotResponsed,
-    # )),
+    ("Dating", met, (
+            # met.Met,
+            met.Met_Accepted,
+            met.Met_Rejected,
+            met.Met_NotResponsed,
+    )),
     # ("Dating", review, (
     #         review.Review,
     # )),
