@@ -7,3 +7,6 @@ __pycache__
 images/
 db/flower
 db/flower.*
+db/celerybeat*
+supervisord.*
+celerybeat.pid
