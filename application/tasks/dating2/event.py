@@ -25,7 +25,7 @@ def SuggestionAll(max=2):
         try:
             user._state.A()
         except StateException:
-            push("%s은 지금 데이트 중이십니다 :)", "#matching")
+            push("%s은 지금 데이트 중이십니다 :)" % (user.username,), "#matching")
         else:
             Suggestion.delay(user.username, max)
 
