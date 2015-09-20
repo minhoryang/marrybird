@@ -81,6 +81,12 @@ class Met_NotResponsed(Met):
         c.B = B
         return c
 
+    @staticmethod
+    def find(i, you):
+        return Met_NotResponsed.query.filter(
+            Met_NotResponsed.A == i,
+            Met_NotResponsed.B == you,
+        ).first()
 
 def init(**kwargs):
     pass

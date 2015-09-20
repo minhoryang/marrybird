@@ -15,7 +15,7 @@ from .._external_types import (
     EnumType,
     ScalarListType,
 )
-from ..dating.response import Response
+from ..dating.met import Met_NotResponsed
 from ..record import Record
 
 
@@ -192,6 +192,7 @@ def module_init(**kwargs):
             @api.doc()
             def get(self, i, you):
                 db.session.add(Event_00_Server_Suggested(i, [you]))
+                db.session.add(Met_NotResponsed.create(0, i, you))
                 db.session.commit()
 
 
