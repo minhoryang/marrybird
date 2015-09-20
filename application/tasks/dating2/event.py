@@ -82,5 +82,7 @@ def Suggestion(username, max=2):
         push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
 
 
+@Celery.task(ignore_result=True)
 def RestInPeace():
-    pass
+    from ...models.dating2.event import DeadEvent
+    DeadEvent.RestInPeace()

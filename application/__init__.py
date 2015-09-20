@@ -28,7 +28,9 @@ def create_app(isolated=False):
     app.config['CELERY_IMPORTS'] = [  # TODO : Don't Exposed.
         'application.tasks.user',
         'application.tasks.phone',
+        'application.tasks.dating2.action',
         'application.tasks.dating2.event',
+        'application.tasks.dating2.state',
     ]
     app.config['CELERY_ACCEPT_CONTENT'] = ['json',]
     app.config['CELERY_TASK_SERIALIZER'] = 'json'
@@ -43,6 +45,18 @@ def create_app(isolated=False):
                 # hour='0', minute='30',
             ),
             #'args': (2),
+        },
+        'Rest-In-Peace--Event':{
+            'task': 'application.tasks.dating2.action.RestInPeace',
+            'schedule': crontab(hour='2', minute='30'),
+        },
+        'Rest-In-Peace--Event':{
+            'task': 'application.tasks.dating2.event.RestInPeace',
+            'schedule': crontab(hour='3', minute='0'),
+        },
+        'Rest-In-Peace--Event':{
+            'task': 'application.tasks.dating2.state.RestInPeace',
+            'schedule': crontab(hour='3', minute='30'),
         },
         # 'Knock-Knock-Knock-Penny--Are-You-There' : {
         #     'task': '',
