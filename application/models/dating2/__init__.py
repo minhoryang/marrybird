@@ -16,7 +16,6 @@ ENABLE_MODELS = [
         action.Action_06_Got_AskedOut_And_Reject,
         action.Action_08_EndOfDating,
         action.Action_09_EndOfDating_And_Feedback,
-        action.OldAction,
         action.DeadAction,
     )),
     ("Dating V2 State", state, (
