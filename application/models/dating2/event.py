@@ -125,51 +125,31 @@ def module_init(**kwargs):
             username = current_user.username
 
             _result_json = {}
-            for e in Event_00_Server_Suggested.query.filter(
-                Event_00_Server_Suggested.username == username,
-            ).all():
-                _result_json[e] = e._results
-
             _Feedbacked = {}
-            for e in Event_09_EndOfDating_And_Feedback.query.filter(
-                Event_09_EndOfDating_And_Feedback.username == username,
-            ).all():
-                _Feedbacked[e] = e._results
-
             _FeedbackNeeded = {}
-            for e in Event_08_EndOfDating.query.filter(
-                Event_08_EndOfDating.username == username,
-            ).all():
-                _FeedbackNeeded[e] = e._results
-
             _Success = {}
-            for DB in [Event_05_Got_AskedOut_And_Accept, Event_07_AskedOut_Accepted]:
-                for e in DB.query.filter(
-                    DB.username == username,
-                ).all():
-                    _Success[e] = e._results
-
             _SomeoneLovesMe = {}
-            for e in Event_04_Got_AskedOut.query.filter(
-                Event_04_Got_AskedOut.username == username,
-            ).all():
-                _SomeoneLovesMe[e] = e._results
-
             _NotYet = {}
-            for e in Event_03_AskedOut.query.filter(
-                Event_03_AskedOut.username == username,
-            ).all():
-                _NotYet[e] = e._results
-
             _Failed = {}
-            for e in Event_99_AskedOut_Rejected.query.filter(
-                Event_99_AskedOut_Rejected.username == username,
-            ).all():
-                _Failed[e] = e._results
+            for SOURCE, DESTINATION in (
+                (Event_00_Server_Suggested, _result_json),
+                (Event_09_EndOfDating_And_Feedback, _Feedbacked),
+                (Event_08_EndOfDating, _FeedbackNeeded),
+                (Event_05_Got_AskedOut_And_Accept, _Success),
+                (Event_07_AskedOut_Accepted, _Success),
+                (Event_04_Got_AskedOut, _SomeoneLovesMe),
+                (Event_03_AskedOut, _NotYet),
+                (Event_99_AskedOut_Rejected, _Failed)
+            ):
+                for e in SOURCE.query.filter(
+                    SOURCE.username == username,
+                ).all():
+                    DESTINATION[e] = e._results
 
             EXPIRED_AT = lambda e: 6 - (now - e.at).days
 
-            result_json = {}
+            result_json = {}  # XXX : WARN (Need to show off what if result comes together.):w
+
             for e, names in _result_json.items():
                 for name in names:
                     result_json[name] = Record._get(name)
