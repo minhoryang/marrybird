@@ -272,10 +272,16 @@ def Action3(i, you, e):
                 i._state.code + int(s.B)
             )
         )
-        if you._state.c():
+        if you._state.c(False):
             old_you_state, new_you_state = you.TransitionTo(
                 StateType.fromCode(
                     you._state.code + int(s.C)
+                )
+            )
+        else:
+            old_you_state, new_you_state = you.TransitionTo(
+                StateType.fromCode(
+                    you._state.code
                 )
             )
     except StateException:
@@ -366,7 +372,6 @@ def Action4(i, you, found_asked_out):
                     db.session.add(old)
                     db.session.delete(e)
                     break
-
         db.session.commit()
     return {'status': 200, 'message': 'reject'}, 200
 
@@ -382,12 +387,12 @@ def Action5(i, you, found_asked_out):
 
         # TODO: all? or not?
         if len(found_asked_out) == 1:
-            if i._state.A().d():
-                old_i_state, new_i_state = i.TransitionTo(
-                    StateType.fromCode(
-                        i._state.code - int(s.A) - int(s.C) + int(s.D)
+            if i._state.A(False) and i._state.d(False):
+                    old_i_state, new_i_state = i.TransitionTo(
+                        StateType.fromCode(
+                            i._state.code - int(s.A) - int(s.C) + int(s.D)
+                        )
                     )
-                )
             else:
                 old_i_state, new_i_state = i.TransitionTo(
                     StateType.fromCode(
@@ -395,7 +400,7 @@ def Action5(i, you, found_asked_out):
                     )
                 )
         else:
-            if i._state.A().d():
+            if i._state.A(False) and i._state.d(False):
                 old_i_state, new_i_state = i.TransitionTo(
                     StateType.fromCode(
                         i._state.code - int(s.A) + int(s.D)
@@ -407,7 +412,7 @@ def Action5(i, you, found_asked_out):
                         i._state.code
                     )
                 )
-        if you._state.A().d():
+        if you._state.A(False) and you._state.d(False):
             old_you_state, new_you_state = you.TransitionTo(
                 StateType.fromCode(
                     you._state.code - int(s.A) - int(s.B) + int(s.D)

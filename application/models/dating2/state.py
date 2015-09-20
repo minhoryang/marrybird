@@ -84,81 +84,89 @@ class StateType(Enum):
         found = StateCode(code)
         return StateType(found.name)
 
-    def A(self):
+    def A(self, exception=True):
         if self.abcd[0]:
             return self
-        raise StateException('Want A but ~A')
+        if exception:
+            raise StateException('Want A but ~A')
 
-    def a(self):
+    def a(self, exception=True):
         try:
             self.A()
         except StateException:
             return self
         else:
-            raise StateException('Want ~A but A')
+            if exception:
+                raise StateException('Want ~A but A')
 
-    def _A(self):
-        return self.a()
+    def _A(self, exception=True):
+        return self.a(exception=exception)
 
-    def _a(self):
-        return self.A()
+    def _a(self, exception=True):
+        return self.A(exception=exception)
 
-    def B(self):
+    def B(self, exception=True):
         if self.abcd[1]:
             return self
-        raise StateException('Want B but ~B')
+        if exception:
+            raise StateException('Want B but ~B')
 
-    def b(self):
+    def b(self, exception=True):
         try:
             self.B()
         except StateException:
             return self
         else:
-            raise StateException('Want ~B but B')
+            if exception:
+                raise StateException('Want ~B but B')
 
-    def _B(self):
-        return self.b()
+    def _B(self, exception=True):
+        return self.b(exception=exception)
 
-    def _b(self):
-        return self.B()
+    def _b(self, exception=True):
+        return self.B(exception=exception)
 
-    def C(self):
+    def C(self, exception=True):
         if self.abcd[2]:
             return self
-        raise StateException('Want C but ~C')
+        if exception:
+            raise StateException('Want C but ~C')
 
-    def c(self):
+    def c(self, exception=True):
         try:
             self.C()
         except StateException:
             return self
         else:
-            raise StateException('Want ~C but C')
+            if exception:
+                raise StateException('Want ~C but C')
 
-    def _C(self):
-        return self.c()
+    def _C(self, exception=True):
+        return self.c(exception=exception)
 
-    def _c(self):
-        return self.C()
+    def _c(self, exception=True):
+        return self.C(exception=exception)
 
-    def D(self):
+    def D(self, exception=True):
         if self.abcd[3]:
             return self
-        raise StateException('Want D but ~D')
+        if exception:
+            raise StateException('Want D but ~D')
 
-    def d(self):
+    def d(self, exception=True):
         try:
             self.D()
         except StateException:
             return self
         else:
-            raise StateException('Want ~D but D')
+            if exception:
+                raise StateException('Want ~D but D')
 
-    def _D(self):
-        return self.d()
+    def _D(self, exception=True):
+        return self.d(exception=exception)
 
-    def _d(self):
-        return self.D()
+    def _d(self, exception=True):
+        return self.D(exception=exception)
 
 
 class _StateMixIn(object):
