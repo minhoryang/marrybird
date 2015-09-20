@@ -9,7 +9,7 @@ def push(message="", channel="#progress"):
     payload = {
         "username": "Server.py",
         #"icon_emoji": ":heartbeat:",
-        #"channel": channel,
+        "channel": channel,
         "text": message
     }
     requests.post(WEB_HOOK_URL, data=json.dumps(payload))
