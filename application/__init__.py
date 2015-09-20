@@ -52,6 +52,7 @@ def create_app(isolated=False):
         #     ),
         # },
     }
+    app.config['CELERY_SEND_TASK_SENT_EVENT'] = True
 
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
