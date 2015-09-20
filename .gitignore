@@ -5,4 +5,5 @@ __pycache__
 .idea/
 .DS_Store
 images/
+db/flower
 db/flower.*

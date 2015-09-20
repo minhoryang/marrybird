@@ -1,5 +1,6 @@
 from os.path import abspath, dirname, join
 
+from celery.schedules import crontab
 from flask import Flask
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
@@ -24,10 +25,32 @@ def create_app(isolated=False):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['CELERY_BROKER_URL'] = 'amqp://marrybird:marrybird-localhost@localhost:5672/marrybird'
     app.config['CELERY_BACKEND_URL'] = app.config['CELERY_BROKER_URL']
-    app.config['CELERY_IMPORTS'] = ['application.tasks.user', 'application.tasks.phone']
+    app.config['CELERY_IMPORTS'] = [  # TODO : Don't Exposed.
+        'application.tasks.user',
+        'application.tasks.phone',
+        'application.tasks.dating2.event',
+    ]
     app.config['CELERY_ACCEPT_CONTENT'] = ['json',]
     app.config['CELERY_TASK_SERIALIZER'] = 'json'
     app.config['CELERY_RESULT_SERIALIZER'] = 'json'
+    app.config['CELERY_TIMEZONE'] = 'Asia/Seoul'
+    app.config['CELERYBEAT_SCHEDULE'] = {
+        'Every-Day-Im-Shuffling': {
+            'task': 'application.tasks.dating2.event.SuggestionAll',
+            'schedule': crontab(
+                minute='*/2',
+                # hour='0', minute='30',
+            ),
+            #'args': (2),
+        },
+        # 'Knock-Knock-Knock-Penny--Are-You-There' : {
+        #     'task': '',
+        #     'schedule': crontab(
+        #         minute='*/2+1',
+        #         # hour='0', minute='0',
+        #     ),
+        # },
+    }
 
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
