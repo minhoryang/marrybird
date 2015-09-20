@@ -83,6 +83,45 @@ def Suggestion(username, max=2):
 
 
 @Celery.task(ignore_result=True)
+def WelcomeSuggestion(username, max=3):
+    """Event_00_Server_Suggested."""
+    from ...externals.slack import push
+    from ...models import db
+    from ...models.user import User
+    from ...models.record import Record
+    from ...models.dating.met import (
+        Met,
+        Met_NotResponsed,
+    )
+    from ...models.dating2.event import Event_00_Server_Suggested
+
+    usr = User.query.filter(
+        User.username == username,
+    ).first()
+
+    # Find her/him!
+    result = {}
+    out = Record.query.filter(
+        Record.is_male != usr.isMale,
+    ).all()
+    for j in out:
+        result[j] = j.username
+
+    # TODO : Regular Member.
+
+    result3 = list(result.values())[:max]
+    if result3:
+        for target_name in result3:
+            db.session.add(Event_00_Server_Suggested(username, [target_name]))
+            db.session.add(Met_NotResponsed.create(0, username, target_name))
+        db.session.commit()
+        push("%s님에게 %d분 중에서 다음분들을 추천해 드렸습니다 : %s (초기멤버)" % (username, len(result), ' '.join(result3)), "#matching")
+        return 'suggested %s' % result3
+    else:
+        push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
+
+
+@Celery.task(ignore_result=True)
 def RestInPeace():
     from ...models.dating2.event import DeadEvent
     DeadEvent.RestInPeace()
