@@ -19,6 +19,7 @@ from .._external_types import (
     JSONType,  # TODO : Manual Migration Needed!
 )
 from .event import (
+    Event_00_Server_Suggested,
     Event_03_AskedOut,
     Event_04_Got_AskedOut,
     Event_05_Got_AskedOut_And_Accept,
@@ -156,16 +157,21 @@ def module_init(**kwargs):
 
             # XXX : Check that 'you' already asked out to 'i'
             found_asked_out = []
-            for e in Event_04_Got_AskedOut.query.filter(
+            for a in Event_04_Got_AskedOut.query.filter(
                 Event_04_Got_AskedOut.username == i,
             ).all():
-                found_asked_out.extend(e._results)
+                found_asked_out.extend(a._results)
             if you not in found_asked_out:
                 # XXX : Action 3. Asked out
-                return Action3(i_state, you_state)
+                for e in Event_00_Server_Suggested.query.filter(
+                    Event_00_Server_Suggested.username == i,
+                ).all():
+                    if you in e._results:
+                        return Action3(i_state, you_state, e)
             else:
                 # XXX : Action 5. Accept
                 return Action5(i_state, you_state, found_asked_out)
+            return {'status': 404, 'message': 'not found'}, 404
 
     @namespace.route('/<string:i>/hate/<string:you>')
     class Hate(Resource):
@@ -259,7 +265,7 @@ for cls in ActionType.__members__.keys():
     })
 
 
-def Action3(i, you):
+def Action3(i, you, e):
     new_i_state = None
     old_i_state = None
     new_you_state = None
@@ -292,6 +298,10 @@ def Action3(i, you):
             db.session.add(new_i_state)
             db.session.add(old_i_state)
             db.session.delete(i)
+            old = OldEvent()
+            old.CopyAndPaste(e)
+            db.session.add(old)
+            db.session.delete(e)
         if new_you_state:
             db.session.add(new_you_state)
             db.session.add(old_you_state)

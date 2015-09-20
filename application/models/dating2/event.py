@@ -167,47 +167,33 @@ def module_init(**kwargs):
             ).all():
                 _Failed[e] = e._results
 
+            EXPIRED_AT = lambda e: 6 - (now - e.at).days
+
             result_json = {}
             for e, names in _result_json.items():
                 for name in names:
                     result_json[name] = Record._get(name)
-                    result_json[name]['expired_at'] = 7 - (now - e.at).days
+                    result_json[name]['expired_at'] = EXPIRED_AT(e)
 
             Feedbacked = {}
-            for e, names in _Feedbacked.items():
-                for name in names:
-                    Feedbacked[name] = Record._get(name)
-                    Feedbacked[name]['expired_at'] = 7 - (now - e.at).days
-
             FeedbackNeeded = {}
-            for e, names in _FeedbackNeeded.items():
-                for name in names:
-                    FeedbackNeeded[name] = Record._get(name)
-                    FeedbackNeeded[name]['expired_at'] = 7 - (now - e.at).days
-
             Success = {}
-            for e, names in _Success.items():
-                for name in names:
-                    Success[name] = Record._get(name)
-                    Success[name]['expired_at'] = 7 - (now - e.at).days
-
             SomeoneLovesMe = {}
-            for e, names in _SomeoneLovesMe.items():
-                for name in names:
-                    SomeoneLovesMe[name] = Record._get(name)
-                    SomeoneLovesMe[name]['expired_at'] = 7 - (now - e.at).days
-
             NotYet = {}
-            for e, names in _NotYet.items():
-                for name in names:
-                    NotYet[name] = Record._get(name)
-                    NotYet[name]['expired_at'] = 7 - (now - e.at).days
-
             Failed = {}
-            for e, names in _Failed.items():
-                for name in names:
-                    Failed[name] = Record._get(name)
-                    Failed[name]['expired_at'] = 7 - (now - e.at).days
+
+            for SOURCE, DESTINATION in (
+                (_Feedbacked, Feedbacked),
+                (_FeedbackNeeded, FeedbackNeeded),
+                (_Success, Success),
+                (_SomeoneLovesMe, SomeoneLovesMe),
+                (_NotYet, NotYet),
+                (_Failed, Failed),
+            ):
+                for e, names in SOURCE.items():
+                    name = names[0]
+                    DESTINATION[name] = Record._get(name)
+                    DESTINATION[name]['expired_at'] = EXPIRED_AT(e)
 
             return {'status': 200, 'message': {
                 'success': Success,
