@@ -39,7 +39,7 @@ def create_app(isolated=False):
             'task': 'application.tasks.dating2.event.SuggestionAll',
             'schedule': crontab(
                 # minute='*/2',
-                hour='*',
+                hour='*', minute='0'
                 # hour='0', minute='30',
             ),
             #'args': (2),
