@@ -185,13 +185,14 @@ def module_init(**kwargs):
                 'feedbacked': Feedbacked,
             }}
 
-    @namespace.route('/addfortest/<string:i>/<string:you>')
-    class AddFeedForTest(Resource):
+    if kwargs.get('DEBUG', None):
+        @namespace.route('/addfortest/<string:i>/<string:you>')
+        class AddFeedForTest(Resource):
 
-        @api.doc()
-        def get(self, i, you):
-            db.session.add(Event_00_Server_Suggested(i, [you]))
-            db.session.commit()
+            @api.doc()
+            def get(self, i, you):
+                db.session.add(Event_00_Server_Suggested(i, [you]))
+                db.session.commit()
 
 
 # XXX : Generated - Event Inherited DB per EventType.

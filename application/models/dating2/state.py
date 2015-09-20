@@ -249,20 +249,21 @@ def init(**kwargs):
 def module_init(**kwargs):
     namespace = kwargs['namespace']
 
-    @namespace.route('/statetransitiontest/<int:id>')
-    class StateTransitionTest(Resource):
-        def get(self, id):
-            current = State.query.get(id).link__()
-            old, next = current.TransitionTo(StateType.State_06_AbCd)
-            db.session.add(old)
-            db.session.add(next)
-            db.session.delete(current)
-            db.session.commit()
+    if kwargs.get('DEBUG', None):
+        @namespace.route('/statetransitiontest/<int:id>')
+        class StateTransitionTest(Resource):
+            def get(self, id):
+                current = State.query.get(id).link__()
+                old, next = current.TransitionTo(StateType.State_06_AbCd)
+                db.session.add(old)
+                db.session.add(next)
+                db.session.delete(current)
+                db.session.commit()
 
-    @namespace.route('/restinpeacetest')
-    class RestInPeaceTest(Resource):
-        def get(self):
-            DeadState.RestInPeace(timeout=timedelta(minutes=1))
+        @namespace.route('/restinpeacetest')
+        class RestInPeaceTest(Resource):
+            def get(self):
+                DeadState.RestInPeace(timeout=timedelta(minutes=1))
 
 
 # XXX : Generated - State Inherited DB per StateType.

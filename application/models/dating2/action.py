@@ -240,14 +240,15 @@ def module_init(**kwargs):
                     return Action9(i, you, goodbye, feedback)
             return {'status': 404, 'message': 'Not Found'}, 404
 
-    @namespace.route('/feedbacktest')
-    class FeedbackTest(Resource):
+    if kwargs.get('DEBUG', None):
+        @namespace.route('/feedbacktest', doc=False)
+        class FeedbackTest(Resource):
 
-        @api.doc()
-        def get(self):
-            feedback = Event_09_EndOfDating_And_Feedback.query.get(15)
-            for i in feedback._results:
-                print((i, type(i)))  # All Text
+            @api.doc()
+            def get(self):
+                feedback = Event_09_EndOfDating_And_Feedback.query.get(15)
+                for i in feedback._results:
+                    print((i, type(i)))  # All Text
 
 
 # XXX : Generated - Action Inherited DB per ActionType.
