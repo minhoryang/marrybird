@@ -87,18 +87,12 @@ class _ActionInheritedMixIn(object):
 
 
 class _ActionCopyMixIn(object):
-    old_at = db.Column(db.DateTime, default=datetime.now)
-
     def CopyAndPaste(self, action):
         for key in action.__dict__.keys():
             if key == '_sa_instance_state':
                 continue
             elif '__' not in key:
                 self.__setattr__(key, action.__dict__[key])
-
-
-class OldAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
-    __bind_key__ = __tablename__ = "oldaction"
 
 
 class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
@@ -109,16 +103,15 @@ class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     @staticmethod
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
-        for DB in (Action, OldAction):
-            for act in DB.query.filter(
-                DB.at >= target,
-            ).order_by(
-                DB.at.asc(),
-            ).all():
-                out = DeadAction()
-                out.CopyAndPaste(act)
-                db.session.add(out)
-                db.session.delete(act)
+        for act in Action.query.filter(
+            Action.at >= target,
+        ).order_by(
+            Action.at.asc(),
+        ).all():
+            out = DeadAction()
+            out.CopyAndPaste(act)
+            db.session.add(out)
+            db.session.delete(act)
         db.session.commit()
 
 
