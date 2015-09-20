@@ -19,7 +19,7 @@ def DeliveryToUser(event_id):
 def SuggestionAll(max=2):
     from ...externals.slack import push
     from ...models import db
-    from ...models.dating2.state import State
+    from ...models.dating2.state import State, StateException
 
     for user in State.query.all():
         try:
