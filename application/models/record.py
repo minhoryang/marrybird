@@ -187,6 +187,8 @@ def init(**kwargs):
                 db.session.close()
                 return {'status': 200, 'message': 'Updated!'}
             except IntegrityError:
+                db.session.rollback()
+                db.session.close()
                 return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400
 
     @namespace.route('/checknickname/<string:nickname>')
