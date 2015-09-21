@@ -24,5 +24,6 @@ def PhoneCheckRequest_post(self, phone, status):
     found.celery_id = str(self.request.id)
     db.session.add(found)
     db.session.commit()
+    db.session.close()
 
     return '%s - %s' % (found.phone, found.status)

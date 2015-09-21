@@ -184,6 +184,7 @@ def init(**kwargs):
             try:
                 db.session.add(existed_record)
                 db.session.commit()
+                db.session.close()
                 return {'status': 200, 'message': 'Updated!'}
             except IntegrityError:
                 return {'status': 400, 'message': 'Existed User&Nick&Phonenum\n'}, 400

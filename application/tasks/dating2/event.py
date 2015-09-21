@@ -76,6 +76,7 @@ def Suggestion(username, max=2):
             db.session.add(Event_00_Server_Suggested(username, [target_name]))
             db.session.add(Met_NotResponsed.create(0, username, target_name))
         db.session.commit()
+        db.session.close()
         push("%s님에게 %d분 중에서 다음분들을 추천해 드렸습니다 : %s" % (username, len(result2), ' '.join(result3)), "#matching")
         return 'suggested %s' % result3
     else:
@@ -115,6 +116,7 @@ def WelcomeSuggestion(username, max=3):
             db.session.add(Event_00_Server_Suggested(username, [target_name]))
             db.session.add(Met_NotResponsed.create(0, username, target_name))
         db.session.commit()
+        db.session.close()
         push("%s님에게 %d분 중에서 다음분들을 추천해 드렸습니다 : %s (초기멤버)" % (username, len(result), ' '.join(result3)), "#matching")
         return 'suggested %s' % result3
     else:

@@ -52,6 +52,7 @@ def init(**kwargs):
                 db.session.add(i)
             # TODO: Async-ed Timeout Feature NEEDED!
             db.session.commit()
+            db.session.close()
             # Register
             add = Phone()
             add.phone = args['phonenum']
@@ -59,6 +60,7 @@ def init(**kwargs):
             add.celery_status = 'requested'
             db.session.add(add)
             db.session.commit()
+            db.session.close()
             PhoneCheckRequest_post.delay(add.phone, add.status)
             return {'status': 200, 'message': 'requested'}
 
@@ -74,6 +76,7 @@ def init(**kwargs):
             got.status = 'Verified'
             db.session.add(got)
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': 'Verified'}
 
     def check_phone_number(phonenum):
