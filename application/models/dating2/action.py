@@ -327,6 +327,9 @@ def Action3(i, you, e):
                     db.session.add(old)
                     db.session.delete(e)
                     break
+            met = Met_NotResponsed.find(you.username, i.username)
+            if met:
+                db.session.delete(met)
         db.session.commit()
         db.session.close()
     return {'status': 200, 'message': 'asked out'}, 200
@@ -394,11 +397,11 @@ def Action4(i, you, found_asked_out):
                     db.session.add(old)
                     db.session.delete(e)
                     break
-            met = Met_NotResponsed.find(i.username, you.username)
-            if not met:
-                return {'status': 400, 'message': 'Did we met before?'}, 400
-            db.session.add(Met_Rejected.create(0, i.username, you.username))
-            db.session.delete(met)
+        met = Met_NotResponsed.find(i.username, you.username)
+        if not met:
+            return {'status': 400, 'message': 'Did we met before?'}, 400
+        db.session.add(Met_Rejected.create(0, i.username, you.username))
+        db.session.delete(met)
         db.session.commit()
         db.session.close()
     return {'status': 200, 'message': 'reject'}, 200
