@@ -22,3 +22,5 @@ greenlet
 
 celery
 flower
+
+pyscopg2
