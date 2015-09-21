@@ -58,7 +58,7 @@ class TimelineFormat(object):
     created_at = None
     created_at_humanize = None
 
-    def __init__(self, contents):
+    def __init__(self, contents, my_name):
         if isinstance(contents, (ReplyBook, OldReplyBook)):
             self.type = 'census'
             self.username = contents.username
@@ -73,9 +73,11 @@ class TimelineFormat(object):
             self.contents = {
                 'selfstory_id': contents.id,
                 'selfstory_photo_url': contents.photo_url,
-                # 'like_cnt': contents.like_cnt,
                 'title': contents.title if contents.title else contents.story,
             }
+            likes = [like.username for like in SelfStoryLike.query.filter(SelfStoryLike.story_id == contents.id).all()]
+            self.contents['like_cnt'] = str(len(likes))
+            self.contents['liked_already_by_you'] = True if my_name in likes else False
             self.created_at = contents.created_at
         else:
             raise TimelineException()
@@ -138,7 +140,7 @@ def module_init(**kwargs):
             for i in SelfStory.query.filter(
                 SelfStory.username.in_(people),
             ).all():
-                contents.append(TimelineFormat(i))
+                contents.append(TimelineFormat(i, username))
 
             question_book_id = []
             for i in ReplyBook.query.filter(
@@ -146,14 +148,14 @@ def module_init(**kwargs):
             ).all():
                 if i.question_book_id not in question_book_id:
                     if i.requested_at:
-                        contents.append(TimelineFormat(i))
+                        contents.append(TimelineFormat(i, username))
                         question_book_id.append(i.question_book_id)
 
             for i in OldReplyBook.query.filter(
                 OldReplyBook.username.in_(people),
             ).all():
                 if i.question_book_id not in question_book_id:
-                    contents.append(TimelineFormat(i))
+                    contents.append(TimelineFormat(i, username))
                     question_book_id.append(i.question_book_id)
             contents.sort(reverse=True)
 
