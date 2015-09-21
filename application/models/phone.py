@@ -14,7 +14,7 @@ class Phone(db.Model):
     __bind_key__ = "phone"
 
     id = db.Column(db.Integer, primary_key=True)
-    phone = db.Column(db.String(10))
+    phone = db.Column(db.String(12))
     status = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.now)
     modified_at = db.Column(db.DateTime, default=datetime.now)
