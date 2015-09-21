@@ -141,6 +141,7 @@ def module_init(**kwargs):
             new_one.content = insert["comment"]
             db.session.add(new_one)
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': 'putted'}, 200
 
         @jwt_required()
@@ -181,6 +182,7 @@ def module_init(**kwargs):
             found.modified_at = datetime.now()
             db.session.add(found)
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': 'modified'}, 200
 
         @jwt_required()
@@ -204,6 +206,7 @@ def module_init(**kwargs):
                 db.session.delete(foundComments)
 
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': 'deleted'}, 200
 
     if CommentLike.isEnabled(api.app):
@@ -247,6 +250,7 @@ def module_init(**kwargs):
                 like.comment_id = comment_id
                 db.session.add(like)
                 db.session.commit()
+                db.session.close()
                 return {'status': 200, 'message': 'Like it!'}, 200
 
             @jwt_required()
@@ -263,4 +267,5 @@ def module_init(**kwargs):
 
                 db.session.delete(found)
                 db.session.commit()
+                db.session.close()
                 return {'status': 200, 'message': 'Now You Hate it!'}, 200

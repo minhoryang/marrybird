@@ -66,6 +66,7 @@ def init(**kwargs):
             req.requester = username
             db.session.add(req)
             db.session.commit()
+            db.session.close()
             output = ComputeNow(req.id)
             return {'status': 200, 'message': 'Done.' + str(output)}
 
@@ -78,5 +79,6 @@ def init(**kwargs):
             req.requester = username
             db.session.add(req)
             db.session.commit()
+            db.session.close()
             output = ComputeNow(req.id)
             return {'status': 200, 'message': 'Done.' + str(output)}

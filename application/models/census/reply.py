@@ -254,6 +254,7 @@ def module_init(**kwargs):
             found.requested_at = datetime.now()
             db.session.add(found)
             db.session.commit()
+            db.session.close()
             output = ComputeNow(found.id)
             return {'status': 200, 'message': 'Done.' + str(output)}
 
@@ -285,6 +286,7 @@ def module_init(**kwargs):
                 db.session.add(target_r)
                 db.session.delete(origin_r)
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': 'reset done'}, 200
 
 
@@ -360,4 +362,5 @@ def module_init(**kwargs):
             found.replied_at = datetime.now()
             db.session.add(found)
             db.session.commit()
+            db.session.close()
             return {'status': 200, 'message': "added"}, 200

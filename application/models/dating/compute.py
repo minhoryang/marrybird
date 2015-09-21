@@ -65,5 +65,6 @@ def ComputeNow(request_id):
     r.result_json = str(result2).replace("'", '"')
     db.session.add(r)
     db.session.commit()
+    db.session.close()
 
     return tuple(result2)

@@ -87,9 +87,12 @@ def init(**kwargs):
                 state.username = args['register']['username']
                 db.session.add(state)
                 db.session.commit()
+                db.session.close()
                 from ..tasks.dating2.event import WelcomeSuggestion
                 WelcomeSuggestion.delay(args['register']['username'])
             except IntegrityError as e:
+                db.session.rollback()
+                db.session.close()
                 return {'status': 400, 'message': 'Existed Account\n'+str(e)}, 400
             return {'status': 200, 'message':'okay'}
 

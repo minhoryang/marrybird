@@ -141,6 +141,7 @@ def ComputeNow(reply_book_id):
     RB.compute_id = reply_book_id  # TODO : CELERY LIVES HERE!
     db.session.add(RB)
     db.session.commit()
+    db.session.close()
 
     result = "not found"
     QB = QuestionBook.query.get(RB.question_book_id)
@@ -156,5 +157,6 @@ def ComputeNow(reply_book_id):
     RB.computed_result = result
     db.session.add(RB)
     db.session.commit()
+    db.session.close()
 
     return RB.computed_result
