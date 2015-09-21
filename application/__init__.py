@@ -67,6 +67,7 @@ def create_app(isolated=False):
         # },
     }
     app.config['CELERY_SEND_TASK_SENT_EVENT'] = True
+    app.config['SQLALCHEMY_POOL_TIMEOUT'] = 10
 
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
@@ -87,6 +88,10 @@ def create_app(isolated=False):
 
     if not isolated:
         MyJWT.Bridger(plugins['jwt'])
+
+    @app.teardown_request
+    def teardown_request(exception):
+        db.session.close()
 
     return app
 
