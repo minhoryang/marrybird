@@ -70,6 +70,8 @@ class ReplyBookMixIn(object):
     computed_at = db.Column(db.DateTime, nullable=True)
     computed_result = db.Column(db.String(200), nullable=True)
 
+    #started_at = db.Column(db.DateTime, default=datetime.now)
+
 
 class ReplyBook(ReplyBookMixIn, db.Model):
     __bind_key__ = __tablename__ = "replybook"
