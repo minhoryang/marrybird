@@ -10,7 +10,7 @@ from . import (
 
 ENABLE_MODELS = [
     ("Dating V2 Action", action, (
-        # action.Action,
+        action.Action,
         action.Action_03_AskedOut,
         action.Action_05_Got_AskedOut_And_Accept,
         action.Action_06_Got_AskedOut_And_Reject,
@@ -19,7 +19,7 @@ ENABLE_MODELS = [
         action.DeadAction,
     )),
     ("Dating V2 State", state, (
-        # state.State,
+        state.State,
         state.State_02_A___,
         state.State_04_AB__,
         state.State_06_A_C_,
@@ -32,7 +32,7 @@ ENABLE_MODELS = [
         state.DeadState,
     )),
     ("Dating V2 Event", event, (
-        # event.Event,
+        event.Event,
         event.Event_00_Server_Suggested,  # -> result
         event.Event_03_AskedOut,  # -> notyet
         event.Event_04_Got_AskedOut,  # -> someonelovesme
