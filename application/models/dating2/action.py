@@ -318,6 +318,15 @@ def Action3(i, you, e):
             db.session.add(new_you_state)
             db.session.add(old_you_state)
             db.session.delete(you)
+            for e in Event_00_Server_Suggested.query.filter(
+                Event_00_Server_Suggested.username == you.username,
+            ).all():
+                if i.username in e._results:
+                    old = OldEvent()
+                    old.CopyAndPaste(e)
+                    db.session.add(old)
+                    db.session.delete(e)
+                    break
         db.session.commit()
         db.session.close()
     return {'status': 200, 'message': 'asked out'}, 200
