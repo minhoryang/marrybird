@@ -580,6 +580,9 @@ def Action8(i, you, found_accepted):
 
 def Action9(my_name, your_name, goodbye, feedback):
     db.session.add(Event_09_EndOfDating_And_Feedback(my_name, [your_name, str(feedback)]))
+    old = OldEvent()
+    old.CopyAndPaste(goodbye)
+    db.session.add(old)
     db.session.delete(goodbye)
     db.session.commit()
     return {'status': 200, 'message': 'feedback'}, 200
