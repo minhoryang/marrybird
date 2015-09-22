@@ -40,5 +40,4 @@ def init(**kwargs):
             rec.message = insert_message.parse_args()['message']
             db.session.add(rec)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'received'}, 200

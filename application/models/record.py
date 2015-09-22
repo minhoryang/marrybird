@@ -184,7 +184,6 @@ def init(**kwargs):
             try:
                 db.session.add(existed_record)
                 db.session.commit()
-                db.session.close()
                 return {'status': 200, 'message': 'Updated!'}
             except IntegrityError:
                 db.session.rollback()

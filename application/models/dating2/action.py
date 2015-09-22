@@ -118,7 +118,6 @@ class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
             db.session.add(out)
             db.session.delete(act)
         db.session.commit()
-        db.session.close()
 
 
 def init(**kwargs):
@@ -331,7 +330,6 @@ def Action3(i, you, e):
             if met:
                 db.session.delete(met)
         db.session.commit()
-        db.session.close()
     return {'status': 200, 'message': 'asked out'}, 200
 
 
@@ -403,7 +401,6 @@ def Action4(i, you, found_asked_out):
         db.session.add(Met_Rejected.create(0, i.username, you.username))
         db.session.delete(met)
         db.session.commit()
-        db.session.close()
     return {'status': 200, 'message': 'reject'}, 200
 
 
@@ -499,7 +496,6 @@ def Action5(i, you, found_asked_out):
             db.session.add(Met_Accepted.create(0, i.username, you.username))
             db.session.delete(met)
         db.session.commit()
-        db.session.close()
     return {'status': 200, 'message': 'accept'}, 200
 
 
@@ -591,7 +587,6 @@ def Action8(i, you, found_accepted):
             if not deleted:
                 return {'status': 400, 'message': 'Oops! Did We know each others?'}, 400
         db.session.commit()
-        db.session.close()
     return {'status': 200, 'message': 'goodbye'}, 200
 
 
@@ -602,7 +597,6 @@ def Action9(my_name, your_name, goodbye, feedback):
     db.session.add(old)
     db.session.delete(goodbye)
     db.session.commit()
-    db.session.close()
     return {'status': 200, 'message': 'feedback'}, 200
 
 

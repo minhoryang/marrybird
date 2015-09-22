@@ -53,7 +53,6 @@ def init(**kwargs):
                 db.session.add(i)
             # TODO: Async-ed Timeout Feature NEEDED!
             db.session.commit()
-            db.session.close()
             # Register
             add = Phone()
             add.phone = args['phonenum']
@@ -65,7 +64,6 @@ def init(**kwargs):
             else:
                 PhoneCheckRequest_post(add.phone, add.status)
             db.session.commit()
-            db.session.close()  # XXX : don't close if you want to use the variable from DB.
             return {'status': 200, 'message': 'requested'}
 
     @namespace.route('/validate/<string:phonenum>/<int:token>')
@@ -80,7 +78,6 @@ def init(**kwargs):
             got.status = 'Verified'
             db.session.add(got)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'Verified'}
 
     def check_phone_number(phonenum):

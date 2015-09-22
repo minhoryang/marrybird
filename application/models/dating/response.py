@@ -111,7 +111,6 @@ def init(**kwargs):
             db.session.add(Progress.Love(i, you, response_id))
             db.session.add(Met_Accepted.create(response_id, i, you))
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'meesage': 'done'}
 
     @namespace.route('/<string:i>/hate/<string:you>')
@@ -125,5 +124,4 @@ def init(**kwargs):
             #    return {'status': 400, 'message': 'Not You'}, 400  # TODO
             db.session.add(Met_Rejected.create(0, i, you))
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'done'}

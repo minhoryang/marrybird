@@ -64,5 +64,4 @@ def init(**kwargs):
             new_one.value = insert['value']
             db.session.add(new_one)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'added'}, 200

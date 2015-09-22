@@ -248,7 +248,6 @@ class DeadState(_StateMixIn, _StateCopyMixIn, db.Model):
             db.session.add(out)
             db.session.delete(act)
         db.session.commit()
-        db.session.close()
 
 
 def init(**kwargs):
@@ -268,7 +267,6 @@ def module_init(**kwargs):
                 db.session.add(next)
                 db.session.delete(current)
                 db.session.commit()
-                db.session.close()
 
         @namespace.route('/restinpeacetest')
         class RestInPeaceTest(Resource):

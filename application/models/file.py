@@ -86,6 +86,7 @@ def init(**kwargs):
                             )
                             db.session.add(f)
                             db.session.commit()  # XXX: is it okay to go here?
+                            handled.append(f)
                         else:
                             failed.append(args[arg_name].filename)
                     # Others such as authorization(included at parser), file2(not included (yet)) ignored automatically.

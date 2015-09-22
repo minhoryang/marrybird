@@ -109,7 +109,6 @@ def init(**kwargs):
             new_one.title = insert['title']
             db.session.add(new_one)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'putted'}, 200
 
     @namespace.route('/<string:username>/<int:idx>')
@@ -136,7 +135,6 @@ def init(**kwargs):
             found.modified_at = datetime.now()
             db.session.add(found)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'modified'}, 200
 
         @jwt_required()
@@ -154,7 +152,6 @@ def init(**kwargs):
 
             db.session.delete(found)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'deleted'}, 200
 
     @namespace.route('/<string:username>/<int:idx>/like')
@@ -197,7 +194,6 @@ def init(**kwargs):
             like.story_id = idx
             db.session.add(like)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'Like it!'}, 200
 
         @jwt_required()
@@ -217,5 +213,4 @@ def init(**kwargs):
 
             db.session.delete(found)
             db.session.commit()
-            db.session.close()
             return {'status': 200, 'message': 'Now You Hate it!'}, 200

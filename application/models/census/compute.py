@@ -141,7 +141,6 @@ def ComputeNow(reply_book_id):
     RB.compute_id = reply_book_id  # TODO : CELERY LIVES HERE!
     db.session.add(RB)
     db.session.commit()
-    db.session.close()
 
     result = "not found"
     QB = QuestionBook.query.get(RB.question_book_id)
@@ -157,6 +156,5 @@ def ComputeNow(reply_book_id):
     RB.computed_result = result
     db.session.add(RB)
     db.session.commit()
-    db.session.close()
 
     return result  # XXX : After db.session.close() you can't use the variables from DB.

@@ -88,7 +88,6 @@ def init(**kwargs):
                 state.username = args['register']['username']
                 db.session.add(state)
                 db.session.commit()
-                db.session.close()
                 from ..tasks.dating2.event import WelcomeSuggestion
                 if 'celery' in flags:
                     WelcomeSuggestion.delay(args['register']['username'])

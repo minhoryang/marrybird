@@ -113,7 +113,6 @@ def init(**kwargs):
             for question in MBTI_Question.loads():
                 db.session.add(question.convert(book_id=book_idx))
             db.session.commit()
-            db.session.close()
             return 'Done', 200
 
 

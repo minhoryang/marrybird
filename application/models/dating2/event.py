@@ -104,7 +104,6 @@ class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
                 db.session.add(out)
                 db.session.delete(evt)
         db.session.commit()
-        db.session.close()
 
 
 def init(**kwargs):
@@ -195,7 +194,6 @@ def module_init(**kwargs):
                 db.session.add(Event_00_Server_Suggested(i, [you]))
                 db.session.add(Met_NotResponsed.create(0, i, you))
                 db.session.commit()
-                db.session.close()
 
 
 # XXX : Generated - Event Inherited DB per EventType.
