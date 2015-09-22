@@ -1,6 +1,6 @@
 __author__ = 'minhoryang'
 
-from application.utils.constant import SQLALCHEMY_DATABASE_URI as sqlalchemy_database_uri  # XXX : Blocking to import as config.
+from ..utils.constant import SQLALCHEMY_DATABASE_URI as sqlalchemy_database_uri  # XXX : Blocking to import as config.
 
 
 MARRYBIRD_FLAGS = [

@@ -6,13 +6,26 @@ from .models import ENABLE_MODELS, db
 from .utils.my_api import MyApi
 from .utils.my_jwt import MyJWT
 from .utils.constant import SQLALCHEMY_BINDS_RULES
+from .configs import (
+    flask as flask_config,
+    # sqlite as sqlite_config,
+    postgresql as postgresql_config,
+    celery as celery_config,
+    jwt as jwt_config,
+)
 
 
 def create_app(isolated=False, configs=None):
     app = Flask(__name__)
 
     if not configs:
-        configs = []
+        configs = [
+            flask_config,
+            # sqlite_config,
+            postgresql_config,
+            celery_config,
+            jwt_config,
+        ]
 
     _MARRYBIRD_FLAGS = []
     for c in configs:
@@ -60,7 +73,13 @@ def create_celery(app=None, configs=None):
     from celery import Celery
 
     if not configs:
-        configs = []
+        configs = [
+            flask_config,
+            # sqlite_config,
+            postgresql_config,
+            celery_config,
+            jwt_config,
+        ]
 
     app = app or create_app(isolated=True, configs=configs)
 
