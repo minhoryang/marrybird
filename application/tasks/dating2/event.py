@@ -25,7 +25,7 @@ def SuggestionAll(max=2):
         except StateException:
             push("%s님은 지금 데이트 중이십니다 :)" % (user.username,), "#matching")
         else:
-            if 'celery' in Celery.conf.MARRYBIRD_FLAGS:
+            if 'celery' in current_app.conf.MARRYBIRD_FLAGS:
                 Suggestion.delay(user.username, max)
             else:
                 Suggestion(user.username, max)
