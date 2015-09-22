@@ -1,9 +1,11 @@
 __author__ = 'minhoryang'
 
-from celery import current_app
+from .. import create_celery
+
+Celery = create_celery()
 
 
-@current_app.task(bind=True, ignore_result=True)
+@Celery.task(bind=True, ignore_result=True)
 def PhoneCheckRequest_post(self, phone, status):
     from .. import db
     from ..externals.slack import push

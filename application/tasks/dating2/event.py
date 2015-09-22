@@ -1,9 +1,11 @@
 __author__ = 'minhoryang'
 
-from celery import current_app
+from .. import create_celery
+
+Celery = create_celery()
 
 
-@current_app.task(ignore_result=True)
+@Celery.task(ignore_result=True)
 def DeliveryToUser(event_id):
     from ... import db
     from ...externals.slack import push
@@ -13,7 +15,7 @@ def DeliveryToUser(event_id):
     return 'pushed'
 
 
-@current_app.task(ignore_result=True)
+@Celery.task(ignore_result=True)
 def SuggestionAll(max=2):
     from ...externals.slack import push
     from ...models import db
@@ -31,7 +33,7 @@ def SuggestionAll(max=2):
                 Suggestion(user.username, max)
 
 
-@current_app.task(ignore_result=True)
+@Celery.task(ignore_result=True)
 def Suggestion(username, max=2):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
@@ -83,7 +85,7 @@ def Suggestion(username, max=2):
         push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
 
 
-@current_app.task(ignore_result=True)
+@Celery.task(ignore_result=True)
 def WelcomeSuggestion(username, max=3):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
@@ -122,7 +124,7 @@ def WelcomeSuggestion(username, max=3):
         push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
 
 
-@current_app.task(ignore_result=True)
+@Celery.task(ignore_result=True)
 def RestInPeace():
     from ...models.dating2.event import DeadEvent
     DeadEvent.RestInPeace()
