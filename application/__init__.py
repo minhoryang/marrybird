@@ -15,16 +15,17 @@ from .configs import (
 )
 
 
-def create_app(isolated=False):
+def create_app(isolated=False, configs=None):
     app = Flask(__name__)
 
-    configs = [
-        flask_config,
-        # sqlite_config,
-        postgresql_config,
-        celery_config,
-        jwt_config,
-    ]
+    if not configs:
+        configs = [
+            flask_config,
+            # sqlite_config,
+            postgresql_config,
+            celery_config,
+            jwt_config,
+        ]
 
     _MARRYBIRD_FLAGS = []
     for c in configs:
@@ -32,8 +33,6 @@ def create_app(isolated=False):
             _MARRYBIRD_FLAGS.extend(c.MARRYBIRD_FLAGS)
         app.config.from_object(c)
     app.config['MARRYBIRD_FLAGS'] = _MARRYBIRD_FLAGS
-    from pprint import pprint
-    pprint(app.config)
 
     db.app = app  # XXX : FIXED DB Context Issue without launching the app.
     db.init_app(app)
@@ -70,10 +69,19 @@ def create_app(isolated=False):
     return app
 
 
-def create_celery(app=None):
+def create_celery(app=None, configs=None):
     from celery import Celery
 
-    app = app or create_app(isolated=True)
+    if not configs:
+        configs = [
+            flask_config,
+            # sqlite_config,
+            postgresql_config,
+            celery_config,
+            jwt_config,
+        ]
+
+    app = app or create_app(isolated=True, configs=configs)
 
     celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_BACKEND_URL'])
     celery.conf.update(app.config)
