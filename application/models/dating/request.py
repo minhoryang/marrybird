@@ -66,10 +66,9 @@ def init(**kwargs):
             req.requester = username
             db.session.add(req)
             db.session.commit()
-            db.session.close()
             output = ComputeNow(req.id)
+            db.session.close()  # XXX : After db.session.close() you can't use the variables from DB.
             return {'status': 200, 'message': 'Done.' + str(output)}
-
     @namespace.route('/<string:username>')
     class ComputeRequestBySystem(Resource):
         # TODO : LIMIT THIS CALL USED ONLY BY SYSTEM.
@@ -79,6 +78,6 @@ def init(**kwargs):
             req.requester = username
             db.session.add(req)
             db.session.commit()
-            db.session.close()
             output = ComputeNow(req.id)
+	    db.session.close()  # XXX : After db.session.close() you can't use the variables from DB.
             return {'status': 200, 'message': 'Done.' + str(output)}

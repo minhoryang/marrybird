@@ -1,12 +1,9 @@
 __author__ = 'minhoryang'
 
-from .. import create_celery
+from celery import current_app
 
 
-Celery = create_celery()
-
-
-@Celery.task(bind=True, ignore_result=True)
+@current_app.task(bind=True, ignore_result=True)
 def PhoneCheckRequest_post(self, phone, status):
     from .. import db
     from ..externals.slack import push
@@ -21,9 +18,11 @@ def PhoneCheckRequest_post(self, phone, status):
     push('휴대폰인증)' + found.phone + ' 로 ' + found.status + ' 를 보내주세요.')
 
     found.celery_status = 'sent'
-    found.celery_id = str(self.request.id)
+    if self.request.id:
+        found.celery_id = str(self.request.id)
     db.session.add(found)
     db.session.commit()
+    ret = '%s - %s' % (found.phone, found.status)
     db.session.close()
 
-    return '%s - %s' % (found.phone, found.status)
+    return ret

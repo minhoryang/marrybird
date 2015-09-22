@@ -159,4 +159,4 @@ def ComputeNow(reply_book_id):
     db.session.commit()
     db.session.close()
 
-    return RB.computed_result
+    return result  # XXX : After db.session.close() you can't use the variables from DB.

@@ -86,15 +86,16 @@ def init(**kwargs):
                             )
                             db.session.add(f)
                             db.session.commit()  # XXX: is it okay to go here?
-                            db.session.close()
-                            handled.append(f)
                         else:
                             failed.append(args[arg_name].filename)
                     # Others such as authorization(included at parser), file2(not included (yet)) ignored automatically.
+                ret = None
                 if not failed:
-                    return {'status': 200, 'message': [str(f.id) for f in handled]}
+                    ret = {'status': 200, 'message': [str(f.id) for f in handled]}
                 else:
-                    return {'status': 400, 'message': 'Not allowed file(s): ' + ', '.join(failed)}, 400
+                    ret = {'status': 400, 'message': 'Not allowed file(s): ' + ', '.join(failed)}, 400
+                db.session.close()  # XXX : After db.session.close() you can't use the variables from DB.
+                return ret
 
         # GET?!
         @namespace.route('/<int:idx>')

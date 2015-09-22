@@ -1,11 +1,9 @@
 __author__ = 'minhoryang'
 
-from ... import create_celery
-
-Celery = create_celery()
+from celery import current_app
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def DeliveryToUser(event_id):
     from ... import db
     from ...externals.slack import push
@@ -15,7 +13,7 @@ def DeliveryToUser(event_id):
     return 'pushed'
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def SuggestionAll(max=2):
     from ...externals.slack import push
     from ...models import db
@@ -27,10 +25,13 @@ def SuggestionAll(max=2):
         except StateException:
             push("%s님은 지금 데이트 중이십니다 :)" % (user.username,), "#matching")
         else:
-            Suggestion.delay(user.username, max)
+            if 'celery' in Celery.conf.MARRYBIRD_FLAGS:
+                Suggestion.delay(user.username, max)
+            else:
+                Suggestion(user.username, max)
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def Suggestion(username, max=2):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
@@ -83,7 +84,7 @@ def Suggestion(username, max=2):
         push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def WelcomeSuggestion(username, max=3):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
@@ -123,7 +124,7 @@ def WelcomeSuggestion(username, max=3):
         push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def RestInPeace():
     from ...models.dating2.event import DeadEvent
     DeadEvent.RestInPeace()

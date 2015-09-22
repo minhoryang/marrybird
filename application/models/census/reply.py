@@ -256,9 +256,10 @@ def module_init(**kwargs):
             found.requested_at = datetime.now()
             db.session.add(found)
             db.session.commit()
-            db.session.close()
             output = ComputeNow(found.id)
-            return {'status': 200, 'message': 'Done.' + str(output)}
+            ret = {'status': 200, 'message': 'Done.' + str(output)}
+            db.session.close()  # XXX : After db.session.close() you can't use the variables from DB.
+            return ret
 
         @jwt_required()
         @api.doc(parser=authorization)

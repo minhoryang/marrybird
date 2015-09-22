@@ -28,6 +28,7 @@ class Phone(db.Model):
 def init(**kwargs):
     api = kwargs['api']
     jwt = kwargs['jwt']
+    flags = kwargs['flags']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/request')
@@ -59,9 +60,12 @@ def init(**kwargs):
             add.status = str(randrange(1000, 9999))
             add.celery_status = 'requested'
             db.session.add(add)
+            if 'celery' in flags:
+                PhoneCheckRequest_post.delay(add.phone, add.status)
+            else:
+                PhoneCheckRequest_post(add.phone, add.status)
             db.session.commit()
-            db.session.close()
-            PhoneCheckRequest_post.delay(add.phone, add.status)
+            db.session.close()  # XXX : don't close if you want to use the variable from DB.
             return {'status': 200, 'message': 'requested'}
 
     @namespace.route('/validate/<string:phonenum>/<int:token>')

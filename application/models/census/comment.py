@@ -89,7 +89,12 @@ class CommentLike(db.Model):
 
     @staticmethod
     def isEnabled(_current_app):
-        return database_exists(SQLALCHEMY_DATABASE_URI(_current_app, __class__.__bind_key__))
+        return database_exists(SQLALCHEMY_DATABASE_URI(
+            name=__class__.__bind_key__,
+            project_path=_current_app.config['PROJECT_PATH'],
+            category='Census',
+            flags=_current_app.config['MARRYBIRD_FLAGS'],
+        ))
 
 
 def init(**kwargs):

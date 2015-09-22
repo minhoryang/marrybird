@@ -43,6 +43,7 @@ class FemaleUser(User):
 def init(**kwargs):
     api = kwargs['api']
     jwt = kwargs['jwt']
+    flags = kwargs['flags']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__)
 
     @namespace.route('/<string:username>')
@@ -89,7 +90,10 @@ def init(**kwargs):
                 db.session.commit()
                 db.session.close()
                 from ..tasks.dating2.event import WelcomeSuggestion
-                WelcomeSuggestion.delay(args['register']['username'])
+                if 'celery' in flags:
+                    WelcomeSuggestion.delay(args['register']['username'])
+                else:
+                    WelcomeSuggestion(args['register']['username'])
             except IntegrityError as e:
                 db.session.rollback()
                 db.session.close()
@@ -114,5 +118,9 @@ def init(**kwargs):
     class CeleryTest(Resource):
         def get(self, username):
             from ..tasks.user import test
-            t = test.delay(username)
-            return 'called %s ' % (t,)
+            if 'celery' in flags:
+                t = test.delay(username)
+                return 'called %s ' % (t,)
+            else:
+                t = test(username)
+                return 'called %s ' % (t,)

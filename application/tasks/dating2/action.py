@@ -1,11 +1,9 @@
 __author__ = 'minhoryang'
 
-from ... import create_celery
-
-Celery = create_celery()
+from celery import current_app
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def RestInPeace():
     from ...models.dating2.action import DeadAction
     DeadAction.RestInPeace()

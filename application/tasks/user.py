@@ -1,9 +1,7 @@
-from .. import create_celery
-
-Celery = create_celery()
+from celery import current_app
 
 
-@Celery.task(ignore_result=True)
+@current_app.task(ignore_result=True)
 def test(username):
     from ..models.user import User
     A = User.query.filter(User.username == username).first()
