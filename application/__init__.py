@@ -8,27 +8,24 @@ from .utils.my_jwt import MyJWT
 from .utils.constant import SQLALCHEMY_BINDS_RULES
 from .configs import (
     flask as flask_config,
-    # sqlite as sqlite_config,
+    sqlite as sqlite_config,
     postgresql as postgresql_config,
     celery as celery_config,
     jwt as jwt_config,
 )
 
 
-def create_app(isolated=False, configs=None):
+def create_app(isolated=False):
     app = Flask(__name__)
 
-    if not configs:
-        configs = [
-            flask_config,
-            # sqlite_config,
-            postgresql_config,
-            celery_config,
-            jwt_config,
-        ]
-
     _MARRYBIRD_FLAGS = []
-    for c in configs:
+    for c in [
+        flask_config,
+        # sqlite_config,
+        postgresql_config,
+        celery_config,
+        jwt_config,
+    ]:
         if 'MARRYBIRD_FLAGS' in c.__dict__:
             _MARRYBIRD_FLAGS.extend(c.MARRYBIRD_FLAGS)
         app.config.from_object(c)
@@ -69,19 +66,10 @@ def create_app(isolated=False, configs=None):
     return app
 
 
-def create_celery(app=None, configs=None):
+def create_celery(app=None):
     from celery import Celery
 
-    if not configs:
-        configs = [
-            flask_config,
-            # sqlite_config,
-            postgresql_config,
-            celery_config,
-            jwt_config,
-        ]
-
-    app = app or create_app(isolated=True, configs=configs)
+    app = app or create_app(isolated=True)
 
     celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_BACKEND_URL'])
     celery.conf.update(app.config)
