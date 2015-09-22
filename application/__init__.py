@@ -15,17 +15,16 @@ from .configs import (
 )
 
 
-def create_app(isolated=False, configs=None):
+def create_app(isolated=False):
     app = Flask(__name__)
 
-    if not configs:
-        configs = [
-            flask_config,
-            # sqlite_config,
-            postgresql_config,
-            celery_config,
-            jwt_config,
-        ]
+    configs = [
+        flask_config,
+        # sqlite_config,
+        postgresql_config,
+        celery_config,
+        jwt_config,
+    ]
 
     _MARRYBIRD_FLAGS = []
     for c in configs:
@@ -69,19 +68,10 @@ def create_app(isolated=False, configs=None):
     return app
 
 
-def create_celery(app=None, configs=None):
+def create_celery(app=None):
     from celery import Celery
 
-    if not configs:
-        configs = [
-            flask_config,
-            # sqlite_config,
-            postgresql_config,
-            celery_config,
-            jwt_config,
-        ]
-
-    app = app or create_app(isolated=True, configs=configs)
+    app = app or create_app(isolated=True)
 
     celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_BACKEND_URL'])
     celery.conf.update(app.config)
