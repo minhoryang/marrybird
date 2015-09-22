@@ -1,6 +1,6 @@
 __author__ = 'minhoryang'
 
-from .. import create_celery
+from ... import create_celery
 
 Celery = create_celery()
 
