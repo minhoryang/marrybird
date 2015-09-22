@@ -159,4 +159,4 @@ def module_init(**kwargs):
                     question_book_id.append(i.question_book_id)
             contents.sort(reverse=True)
 
-            return {i+1: j.jsonify() for i, j in enumerate(contents[:50])}
+            return {"status": 200, "message": {i+1: j.jsonify() for i, j in enumerate(contents[:50])}}
