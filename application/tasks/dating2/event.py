@@ -82,7 +82,7 @@ def Suggestion(username, max=2):
         push("%s님에게 %d분 중에서 다음분들을 추천해 드렸습니다 : %s" % (username, len(result2), ' '.join(result3)), "#matching")
         return 'suggested %s' % result3
     else:
-        push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
+        push("더이상 %s의 추천 상대를 추천할 수 없습니다. @matching" % (username,), "#matching")
 
 
 @Celery.task(ignore_result=True)
@@ -121,7 +121,7 @@ def WelcomeSuggestion(username, max=3):
         push("%s님에게 %d분 중에서 다음분들을 추천해 드렸습니다 : %s (초기멤버)" % (username, len(result), ' '.join(result3)), "#matching")
         return 'suggested %s' % result3
     else:
-        push("@matching : 더이상 %s의 추천 상대를 추천할 수 없습니다." % (username,), "#matching")
+        push("더이상 %s의 추천 상대를 추천할 수 없습니다. @matching" % (username,), "#matching")
 
 
 @Celery.task(ignore_result=True)
