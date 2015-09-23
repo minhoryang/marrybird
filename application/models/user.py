@@ -1,5 +1,6 @@
 """handles the log in / register."""
 from datetime import datetime
+from re import findall
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.restplus import Resource, fields
@@ -77,6 +78,10 @@ def init(**kwargs):
             """Register User by receiving JSON Post Message."""
             new_user = None
             args = self.wanted.parse_args()
+            username = args['register']['username']
+            ret = check_username_rule(username)
+            if ret:
+                return ret
             if args['register']['isMale']:
                 new_user = MaleUser(**args['register'])
             else:
@@ -85,14 +90,14 @@ def init(**kwargs):
                 db.session.add(new_user)
                 from .dating2.state import State_02_A___
                 state = State_02_A___()
-                state.username = args['register']['username']
+                state.username = username
                 db.session.add(state)
                 db.session.commit()
                 from ..tasks.dating2.event import WelcomeSuggestion
                 if 'celery' in flags:
-                    WelcomeSuggestion.delay(args['register']['username'])
+                    WelcomeSuggestion.delay(username)
                 else:
-                    WelcomeSuggestion(args['register']['username'])
+                    WelcomeSuggestion(username)
             except IntegrityError as e:
                 db.session.rollback()
                 db.session.close()
@@ -104,10 +109,19 @@ def init(**kwargs):
     class CheckID(Resource):
         def get(self, username):
             """Check If Wanted ID Was Already Existed."""
+            ret = check_username_rule(username)
+            if ret:
+                return ret
             user = User.query.filter(User.username == username).first()
             if user:
                 return {'status': 404, 'message': 'Exist ID! Failed to go!'}, 404
             return {'status': 200, 'message': 'Not Found! Okay to go!'}
+
+    def check_username_rule(username):
+        if not 5 <= len(username) <= 50:
+            return {'status': 400, 'message': 'too short or too long'}, 400
+        elif username not in findall("[A-Za-z0-9가-각]+", username):
+            return {'status': 400, 'message': 'Can`t Contain that character'}, 400
 
     @jwt.user_handler
     def load_user(payload):
