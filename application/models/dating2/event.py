@@ -93,9 +93,20 @@ class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
     @staticmethod
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
-        for DB in (Event, OldEvent):
+        for DB in (
+            Event_00_Server_Suggested,
+            Event_03_AskedOut,
+            Event_04_Got_AskedOut,
+            Event_05_Got_AskedOut_And_Accept,
+            Event_06_Got_AskedOut_And_Reject,
+            Event_07_AskedOut_Accepted,
+            Event_08_EndOfDating,
+            Event_09_EndOfDating_And_Feedback,
+            Event_99_AskedOut_Rejected,
+            OldEvent,
+        ):
             for evt in DB.query.filter(
-                DB.at >= target,
+                DB.at <= target,
             ).order_by(
                 DB.at.asc(),
             ).all():

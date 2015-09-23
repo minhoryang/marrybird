@@ -108,15 +108,22 @@ class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     @staticmethod
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
-        for act in Action.query.filter(
-            Action.at >= target,
-        ).order_by(
-            Action.at.asc(),
-        ).all():
-            out = DeadAction()
-            out.CopyAndPaste(act)
-            db.session.add(out)
-            db.session.delete(act)
+        for DB in (
+            Action_03_AskedOut,
+            Action_05_Got_AskedOut_And_Accept,
+            Action_06_Got_AskedOut_And_Reject,
+            Action_08_EndOfDating,
+            Action_09_EndOfDating_And_Feedback,
+        ):
+            for act in DB.query.filter(
+                DB.at <= target,
+            ).order_by(
+                DB.at.asc(),
+            ).all():
+                out = DeadAction()
+                out.CopyAndPaste(act)
+                db.session.add(out)
+                db.session.delete(act)
         db.session.commit()
 
 

@@ -239,7 +239,7 @@ class DeadState(_StateMixIn, _StateCopyMixIn, db.Model):
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
         for act in OldState.query.filter(
-            OldState.at >= target,
+            OldState.at <= target,
         ).order_by(
             OldState.at.asc(),
         ).all():
