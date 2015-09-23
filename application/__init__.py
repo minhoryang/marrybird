@@ -71,7 +71,7 @@ def create_celery(app=None):
 
     app = app or create_app(isolated=True)
 
-    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_BACKEND_URL'])
+    celery = Celery(__name__, broker=app.config.get('CELERY_BROKER_URL', None), backend=app.config.get('CELERY_BACKEND_URL', None))
     celery.conf.update(app.config)
 
     TaskBase = celery.Task

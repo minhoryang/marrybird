@@ -116,6 +116,7 @@ def init(**kwargs):
     @namespace.route('/test/<string:username>')
     class CeleryTest(Resource):
         def get(self, username):
+            """is Celery can worked with SQLAlchemy through Flask?"""
             from ..tasks.user import test
             if 'celery' in flags:
                 t = test.delay(username)
