@@ -135,6 +135,8 @@ def module_init(**kwargs):
                 ).all():
                     people.extend(e._results)
             people = list(set(people))
+            if not people:
+                return {'status': 200, "message": None}, 200
 
             contents = []  # TODO : FUCK YOU MINHO, DO IT WITH NOSQL!
             for i in SelfStory.query.filter(
