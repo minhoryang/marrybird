@@ -11,6 +11,8 @@ from . import (
 ENABLE_MODELS = [
     ("Dating V2 Action", action, (
         action.Action,
+        action.Action_01_NotResponsed_By_Me,
+        action.Action_02_NotResponsed_By_You,
         action.Action_03_AskedOut,
         action.Action_05_Got_AskedOut_And_Accept,
         action.Action_06_Got_AskedOut_And_Reject,

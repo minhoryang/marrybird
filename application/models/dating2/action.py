@@ -44,6 +44,8 @@ from .state import (
 
 
 class ActionType(Enum):
+    Action_01_NotResponsed_By_Me = "Action_01_NotResponsed_By_Me"
+    Action_02_NotResponsed_By_You = "Action_02_NotResponsed_By_You"
     Action_03_AskedOut = "Action_03_AskedOut"
     Action_05_Got_AskedOut_And_Accept = "Action_05_Got_AskedOut_And_Accept"
     Action_06_Got_AskedOut_And_Reject = "Action_06_Got_AskedOut_And_Reject"
@@ -109,6 +111,8 @@ class DeadAction(_ActionMixIn, _ActionCopyMixIn, db.Model):
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
         for DB in (
+            Action_01_NotResponsed_By_Me,
+            Action_02_NotResponsed_By_You,
             Action_03_AskedOut,
             Action_05_Got_AskedOut_And_Accept,
             Action_06_Got_AskedOut_And_Reject,

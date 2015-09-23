@@ -38,13 +38,13 @@ CELERYBEAT_SCHEDULE = {
         'task': 'application.tasks.dating2.state.RestInPeace',
         'schedule': crontab(hour='3', minute='30'),
     },
-    # 'Knock-Knock-Knock-Penny--Are-You-There' : {
-    #     'task': '',
-    #     'schedule': crontab(
-    #         minute='*/2+1',
-    #         # hour='0', minute='0',
-    #     ),
-    # },
+    'Knock-Knock-Knock-Penny--Are-You-There' : {
+        'task': 'application.tasks.dating2.action.NotResponsedAll',
+        'schedule': crontab(
+            minute='*/15',
+            # hour='0', minute='0',
+        ),
+    },
 }
 CELERY_SEND_TASK_SENT_EVENT = True
 
