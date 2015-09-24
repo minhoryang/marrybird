@@ -23,7 +23,7 @@ def create_app(isolated=False):
         flask_config,
         # sqlite_config,
         postgresql_config,
-        celery_config,
+        #celery_config,
         jwt_config,
     ]:
         if 'MARRYBIRD_FLAGS' in c.__dict__:

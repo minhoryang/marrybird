@@ -11,7 +11,7 @@ def SQLALCHEMY_DATABASE_URI(name, project_path=None, category=None, flags=None):
     if not flags:
         flags = []
     if 'postgresql' in flags:
-        return 'postgresql://marrybird:marrybird-localhost@127.0.0.1/%s' % (name, )
+        return 'postgresql://marrybird:marrybird-localhost@marrybird.crhhlrdtvvdm.ap-northeast-1.rds.amazonaws.com/%s' % (name, )
     elif 'sqlite' in flags:
         path = mkdir(join(project_path, 'db'))
         path = mkdir(join(path, category))

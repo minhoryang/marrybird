@@ -22,5 +22,4 @@ greenlet
 
 celery
 flower
-
 psycopg2
