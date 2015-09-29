@@ -50,7 +50,7 @@ def init(**kwargs):
     """
 
     def _allowed_file(filename):
-        return '.' in filename and filename.rsplit('.', 1)[1] in ['jpg', 'png', 'jpeg']
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'png', 'jpeg']
 
     @namespace.route('/<string:username>')  # TODO: REGEX .jpg, .png
     @api.doc(responses={200:'Successfully Uploaded', 400:'Bad Request', 401:'Auth Failed', 404:'Not Found'})
