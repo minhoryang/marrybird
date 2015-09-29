@@ -158,7 +158,7 @@ def module_init(**kwargs):
                 ).all():
                     DESTINATION[e] = e._results
 
-            EXPIRED_AT = lambda e: (e.at - expired_at).days
+            EXPIRED_AT = lambda e: (e.at - expired_at).days  # TODO : str()
 
             result_json = {}  # XXX : WARN (Need to show off what if result comes together.):w
 

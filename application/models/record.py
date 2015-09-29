@@ -114,7 +114,7 @@ class Record(db.Model):
     def _get(username):
         existed_record = __class__.query.filter(Record.username == username).first()
         if existed_record:
-            return {key : existed_record.__dict__[key] for key in __class__._available_keywords()}
+            return {key : existed_record.__dict__[key] for key in __class__._available_keywords()}  # TODO : str()
         return {}
 
 def init(**kwargs):
