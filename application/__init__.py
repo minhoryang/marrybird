@@ -45,6 +45,7 @@ def create_app(isolated=False):
         plugins['configs'] = app.config
         plugins['flags'] = plugins['configs']['MARRYBIRD_FLAGS']
         plugins['jwt'] = MyJWT(app)
+        # plugins['DEBUG'] = True
 
     for category, cls, models in ENABLE_MODELS:
         if not isolated:

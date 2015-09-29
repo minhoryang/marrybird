@@ -132,8 +132,9 @@ def module_init(**kwargs):
 
         @jwt_required()
         @api.doc(parser=authorization)
-        def get(self, now=datetime.now()):
+        def get(self):
             username = current_user.username
+            expired_at = datetime.now() - timedelta(days=7)
 
             _result_json = {}
             _Feedbacked = {}
@@ -157,7 +158,7 @@ def module_init(**kwargs):
                 ).all():
                     DESTINATION[e] = e._results
 
-            EXPIRED_AT = lambda e: 6 - (now - e.at).days
+            EXPIRED_AT = lambda e: (e.at - expired_at).days
 
             result_json = {}  # XXX : WARN (Need to show off what if result comes together.):w
 
