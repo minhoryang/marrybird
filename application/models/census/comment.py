@@ -88,12 +88,12 @@ class CommentLike(db.Model):
         super(__class__, self).__setattr__(key, value)
 
     @staticmethod
-    def isEnabled(_current_app):
+    def isEnabled(configs):
         return database_exists(SQLALCHEMY_DATABASE_URI(
             name=__class__.__bind_key__,
-            project_path=_current_app.config['PROJECT_PATH'],
+            project_path=configs['PROJECT_PATH'],
             category='Census',
-            flags=_current_app.config['MARRYBIRD_FLAGS'],
+            flags=configs['MARRYBIRD_FLAGS'],
         ))
 
 
@@ -105,6 +105,7 @@ def module_init(**kwargs):
     api = kwargs['api']
     jwt = kwargs['jwt']
     namespace = kwargs['namespace']
+    configs = kwargs['configs']
 
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
@@ -211,7 +212,7 @@ def module_init(**kwargs):
             db.session.commit()
             return {'status': 200, 'message': 'deleted'}, 200
 
-    if CommentLike.isEnabled(api.app):
+    if CommentLike.isEnabled(configs):
 
         @namespace.route('/<int:question_book_id>/comment/<int:comment_id>/like')
         class CommentLikes(Resource):

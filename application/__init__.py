@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint, redirect
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 
@@ -15,8 +15,12 @@ from .configs import (
 )
 
 
+VERSION = "v1.0"
+
+
 def create_app(isolated=False):
     app = Flask(__name__)
+    versioning = Blueprint('marrybird', __name__)
 
     _MARRYBIRD_FLAGS = []
     for c in [
@@ -37,9 +41,10 @@ def create_app(isolated=False):
     plugins = {}
     if not isolated:
         plugins['admin'] = Admin(app, name="admin")
-        plugins['api'] = MyApi(app, version='1.1', title='MarryBird API', description='Hi There!')
+        plugins['api'] = MyApi(versioning, version=VERSION, title='MarryBird API', description='Hi There!')
+        plugins['configs'] = app.config
+        plugins['flags'] = plugins['configs']['MARRYBIRD_FLAGS']
         plugins['jwt'] = MyJWT(app)
-        plugins['flags'] = app.config['MARRYBIRD_FLAGS']
 
     for category, cls, models in ENABLE_MODELS:
         if not isolated:
@@ -57,7 +62,18 @@ def create_app(isolated=False):
                 plugins['admin'].add_view(ModelView(model, db.session, category=category))
 
     if not isolated:
+        app.register_blueprint(
+            versioning,
+            url_prefix='/%s' % (VERSION,)
+        )
         MyJWT.Bridger(plugins['jwt'])
+
+    @app.route('/')
+    def index():
+        if not isolated:
+            return redirect(VERSION)
+        else:
+            return '%s isolated' % (VERSION,)  # XXX : Will not show.
 
     @app.teardown_request
     def teardown_request(exception):
