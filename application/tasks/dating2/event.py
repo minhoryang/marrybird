@@ -34,7 +34,7 @@ def SuggestionAll(max=2):
 
 
 @Celery.task(ignore_result=True)
-def Suggestion(username, max=2):
+def Suggestion(username, max=1):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
     from ...models import db
@@ -86,7 +86,7 @@ def Suggestion(username, max=2):
 
 
 @Celery.task(ignore_result=True)
-def WelcomeSuggestion(username, max=3):
+def WelcomeSuggestion(username, max=2):
     """Event_00_Server_Suggested."""
     from ...externals.slack import push
     from ...models import db
