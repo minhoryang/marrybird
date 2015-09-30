@@ -8,6 +8,7 @@ from . import (
     selfstory,
     notice,
     tomarrybird,
+    apns,
 )
 
 from .dating import ENABLE_MODELS as DATING_ENABLE_MODELS
@@ -38,6 +39,9 @@ ENABLE_MODELS = [
     )),
     ("User", tomarrybird, (
             tomarrybird.ToMarrybird,
+    )),
+    ("User", apns, (
+            apns.APNS,
     )),
 ] \
     + DATING_ENABLE_MODELS \
