@@ -16,6 +16,7 @@ from .. import db
 from .compute import ComputeNow
 from .question import QuestionBook, Question
 from .result import ResultBook
+from ._hexaco import *
 
 
 class ReplyMixIn(object):
@@ -226,6 +227,28 @@ def module_init(**kwargs):
             ).first()
             if not found or not found.isDone or not found.isResultReady:
                 return {'status': 404, 'message': 'Not Ready'}, 404
+
+            # XXX : THE FIRST Technical Debt lives here!!!!!!!!
+            HEXACO_DESC = QuestionBook.query.get(question_book_id).description
+            isHEXACO = 'HEXACO_' in HEXACO_DESC
+            if isHEXACO:
+                from json import loads
+                datas = loads(found.computed_result.replace("'",'"'))
+                if HEXACO_DESC == 'HEXACO_H':
+                    result = RESULT_FORM % (HEXACO_H['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_H['description'],
+                        HEXACO_H['detail_description']['H:Sinc'] % (datas['H:Sinc'],),
+                        HEXACO_H['detail_description']['H:Fair'] % (datas['H:Fair'],),
+                        HEXACO_H['detail_description']['H:Gree'] % (datas['H:Gree'],),
+                        HEXACO_H['detail_description']['H:Mode'] % (datas['H:Mode'],),
+                    ))
+                elif HEXACO_DESC == 'HEXACO_E':
+                    pass
+
+                return {'status': 200, 'message': {'result': result, 'description': description}}, 200
+            # XXX : THE FIRST Technical Debt lives here!!!!!!!!
+
             result = found.computed_result
 
             description = None
