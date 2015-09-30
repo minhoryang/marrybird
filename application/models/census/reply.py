@@ -18,6 +18,7 @@ from .question import QuestionBook, Question
 from .result import ResultBook
 from ._hexaco import *
 from ._o_h import O_H
+from ._narc import NARC
 
 
 class ReplyMixIn(object):
@@ -309,6 +310,14 @@ def module_init(**kwargs):
                 description = O_H['description']
                 return {'status': 200, 'message': {'result': result, 'description': description}}, 200
             # XXX : THE SECOND Technical Debt lives here!!!!!!!!
+            # XXX : THE THIRD Technical Debt lives here!!!!!!!!
+            isNARC = 'NARC' == HEXACO_DESC
+            if isNARC:
+                score = int(found.computed_result)
+                result = NARC['name'] % (score,)
+                description = NARC['description']
+                return {'status': 200, 'message': {'result': result, 'description': description}}, 200
+            # XXX : THE THIRD Technical Debt lives here!!!!!!!!
 
             result = found.computed_result
 
