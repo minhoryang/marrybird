@@ -1,2 +1,12 @@
 __pycache__
 *.db
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+.idea/
+.DS_Store
+images/
+db/flower
+db/flower.*
+db/celerybeat*
+supervisord.*
+celerybeat.pid

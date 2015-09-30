@@ -1,5 +1,26 @@
-SQLAlchemy
 flask
 flask-admin
-flask-restful
+-e git+https://github.com/marrybird/flask-restful.git@MARRYBIRD#egg=flask-restful
+flask-restplus
+alembic
+flask-migrate
+flask-sqlalchemy
+-e git+https://github.com/mattupstate/flask-jwt.git#egg=flask-jwt
+
 newrelic
+
+requests
+
+sqlalchemy-utils
+
+gunicorn
+#aiohttp
+eventlet
+greenlet
+
+-e git+https://github.com/jelmer/dulwich.git#egg=dulwich
+
+celery
+flower
+
+psycopg2
