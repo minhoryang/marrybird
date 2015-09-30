@@ -17,8 +17,7 @@ class HEXACO_Question:
         if not self.idx:
             raise HEXACO_Exception("No IDX")
         elif not self.question:
-            #raise HEXACO_Exception("No Question")
-            self.question = ""  # Only Question Can Ignorable.
+            raise HEXACO_Exception("No Question")
         elif len(self.expected_answer_list.keys()) == 0:
             raise HEXACO_Exception("No AnswerList")
         elif not self.expected_answer_count_max:
@@ -97,7 +96,7 @@ def ncdf(x):
 
 
 def PERCENT(usr, mean, sd):
-    return "%.2f" % ((1-ncdf((usr-mean)/sd))*100,)
+    return "%.0f" % ((1-ncdf((usr-mean)/sd))*100,)
 
 
 if __name__ == "__main__":
