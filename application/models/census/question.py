@@ -17,6 +17,7 @@ from ...externals.HEXACO_A import HEXACO_Question as HEXACO_A
 from ...externals.HEXACO_C import HEXACO_Question as HEXACO_C
 from ...externals.HEXACO_O import HEXACO_Question as HEXACO_O
 from ...externals.OpenHemispheric import OH_Question
+from ...externals.Narcissistic import NARC_Question
 
 
 class Question(db.Model):
@@ -175,6 +176,15 @@ def init(**kwargs):
     class O_H_Import(Resource):
         def get(self, book_idx):
             for question in OH_Question.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+
+    @namespace.route('/narcissistic_import/<int:book_idx>')
+    class NARC_Import(Resource):
+        def get(self, book_idx):
+            for question in NARC_Question.loads():
                 db.session.add(question.convert(book_id=book_idx))
             db.session.commit()
             return 'Done', 200
