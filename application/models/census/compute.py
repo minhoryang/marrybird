@@ -3,9 +3,9 @@ __author__ = 'minhoryang'
 from datetime import datetime
 from hashlib import md5
 
+from ._hexaco import *
 from .. import db
 from ...externals.HEXACO import PERCENT as HEXACO_PERCENT
-
 
 
 class Compute:
@@ -162,224 +162,56 @@ class Compute_HEXACO(Compute):
 
 class Compute_HEXACO_H(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'H:Sinc': [],
-            'H:Fair': [],
-            'H:Gree': [],
-            'H:Mode': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.91,
-                'sd': 0.46,
-                'cnt': 40,
-            },
-            'H:Sinc': {
-                'avg': 3.79,
-                'sd': 0.57,
-                'cnt': 10,
-            },
-            'H:Fair': {
-                'avg': 4.26,
-                'sd': 0.58,
-                'cnt': 10,
-            },
-            'H:Gree': {
-                'avg': 3.71,
-                'sd': 0.64,
-                'cnt': 10,
-            },
-            'H:Mode': {
-                'avg': 3.88,
-                'sd': 0.61,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_H['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_H['result_rules']
 
 
 class Compute_HEXACO_E(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'E:Fear': [],
-            'E:Anxi': [],
-            'E:Depe': [],
-            'E:Sent': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.19,
-                'sd': 0.47,
-                'cnt': 40,
-            },
-            'E:Fear': {
-                'avg': 3.05,
-                'sd': 0.69,
-                'cnt': 10,
-            },
-            'E:Anxi': {
-                'avg': 3.12,
-                'sd': 0.72,
-                'cnt': 10,
-            },
-            'E:Depe': {
-                'avg': 2.93,
-                'sd': 0.62,
-                'cnt': 10,
-            },
-            'E:Sent': {
-                'avg': 3.65,
-                'sd': 0.61,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_E['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_E['result_rules']
 
 
 class Compute_HEXACO_X(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'X:Expr': [],
-            'X:SocB': [],
-            'X:Soci': [],
-            'X:Live': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.19,
-                'sd': 0.53,
-                'cnt': 40,
-            },
-            'X:Expr': {
-                'avg': 2.89,
-                'sd': 0.71,
-                'cnt': 10,
-            },
-            'X:SocB': {
-                'avg': 3.16,
-                'sd': 0.76,
-                'cnt': 10,
-            },
-            'X:Soci': {
-                'avg': 3.12,
-                'sd': 0.67,
-                'cnt': 10,
-            },
-            'X:Live': {
-                'avg': 3.6,
-                'sd': 0.62,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_X['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_X['result_rules']
 
 
 class Compute_HEXACO_A(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'A:Forg': [],
-            'A:Gent': [],
-            'A:Flex': [],
-            'A:Pati': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.13,
-                'sd': 0.47,
-                'cnt': 40,
-            },
-            'A:Forg': {
-                'avg': 2.87,
-                'sd': 0.65,
-                'cnt': 10,
-            },
-            'A:Gent': {
-                'avg': 3.19,
-                'sd': 0.6,
-                'cnt': 10,
-            },
-            'A:Flex': {
-                'avg': 3.07,
-                'sd': 0.54,
-                'cnt': 10,
-            },
-            'A:Pati': {
-                'avg': 3.38,
-                'sd': 0.62,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_A['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_A['result_rules']
 
 
 class Compute_HEXACO_C(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'C:Orga': [],
-            'C:Dili': [],
-            'C:Perf': [],
-            'C:Prud': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.58,
-                'sd': 0.45,
-                'cnt': 40,
-            },
-            'C:Orga': {
-                'avg': 3.6,
-                'sd': 0.79,
-                'cnt': 10,
-            },
-            'C:Dili': {
-                'avg': 3.55,
-                'sd': 0.6,
-                'cnt': 10,
-            },
-            'C:Perf': {
-                'avg': 3.57,
-                'sd': 0.55,
-                'cnt': 10,
-            },
-            'C:Prud': {
-                'avg': 3.6,
-                'sd': 0.54,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_C['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_C['result_rules']
 
 
 class Compute_HEXACO_O(Compute_HEXACO):
     def init(self):
-        self.scores = {
-            'O:AesA': [],
-            'O:Inqu': [],
-            'O:Crea': [],
-            'O:Unco': [],
-        }
-        self.result_rules = {
-            'Total': {
-                'avg': 3.39,
-                'sd': 0.53,
-                'cnt': 40,
-            },
-            'O:AesA': {
-                'avg': 3.64,
-                'sd': 0.69,
-                'cnt': 10,
-            },
-            'O:Inqu': {
-                'avg': 3.64,
-                'sd': 0.68,
-                'cnt': 10,
-            },
-            'O:Crea': {
-                'avg': 3.17,
-                'sd': 0.72,
-                'cnt': 10,
-            },
-            'O:Unco': {
-                'avg': 3.11,
-                'sd': 0.66,
-                'cnt': 10,
-            },
-        }
+        self.scores = {}
+        for i in HEXACO_O['result_rules']:
+            if not i == 'Total':
+                self.scores[i] = []
+        self.result_rules = HEXACO_O['result_rules']
 
 
 def ComputeNow(reply_book_id):
