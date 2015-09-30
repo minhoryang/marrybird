@@ -20,8 +20,11 @@ CELERYBEAT_SCHEDULE = {
     'Every-Day-Im-Shuffling': {
         'task': 'application.tasks.dating2.event.SuggestionAll',
         'schedule': crontab(
-            hour='0', minute='30',
+            # minute='*/2',
+            hour='*', minute='*/10'
+            # hour='0', minute='30',
         ),
+        #'args': (2),
     },
     'Rest-In-Peace--Event':{
         'task': 'application.tasks.dating2.action.RestInPeace',
@@ -38,7 +41,8 @@ CELERYBEAT_SCHEDULE = {
     'Knock-Knock-Knock-Penny--Are-You-There' : {
         'task': 'application.tasks.dating2.action.NotResponsedAll',
         'schedule': crontab(
-            hour='0', minute='0',
+            minute='*/15',
+            # hour='0', minute='0',
         ),
     },
 }
