@@ -10,6 +10,12 @@ from sqlalchemy_utils import ScalarListType, JSONType
 
 from .. import db
 from ...externals.mbti import MBTI_Question
+from ...externals.HEXACO_H import HEXACO_Question as HEXACO_H
+from ...externals.HEXACO_E import HEXACO_Question as HEXACO_E
+from ...externals.HEXACO_X import HEXACO_Question as HEXACO_X
+from ...externals.HEXACO_A import HEXACO_Question as HEXACO_A
+from ...externals.HEXACO_C import HEXACO_Question as HEXACO_C
+from ...externals.HEXACO_O import HEXACO_Question as HEXACO_O
 
 
 class Question(db.Model):
@@ -111,6 +117,54 @@ def init(**kwargs):
     class MBTI_Import(Resource):
         def get(self, book_idx):
             for question in MBTI_Question.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_h_import/<int:book_idx>')
+    class HEXACO_H_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_H.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_e_import/<int:book_idx>')
+    class HEXACO_E_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_E.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_x_import/<int:book_idx>')
+    class HEXACO_X_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_X.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_a_import/<int:book_idx>')
+    class HEXACO_A_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_A.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_c_import/<int:book_idx>')
+    class HEXACO_C_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_C.loads():
+                db.session.add(question.convert(book_id=book_idx))
+            db.session.commit()
+            return 'Done', 200
+
+    @namespace.route('/hexaco_o_import/<int:book_idx>')
+    class HEXACO_O_Import(Resource):
+        def get(self, book_idx):
+            for question in HEXACO_O.loads():
                 db.session.add(question.convert(book_id=book_idx))
             db.session.commit()
             return 'Done', 200
