@@ -214,6 +214,31 @@ class Compute_HEXACO_O(Compute_HEXACO):
         self.result_rules = HEXACO_O['result_rules']
 
 
+class Compute_O_H(Compute):
+    def run(self):
+        for reply in self.reply_book.iter():
+            self._apply_score(reply)
+
+        return str(sum(self.scores['C']))
+
+    def init(self):
+        self.scores = {'C': []}
+
+    def _apply_score(self, reply):
+        CR = reply.getQuestion()._compute_rules
+        for r in reply._answers:
+            Selected_R = Compute.rule_reducer(
+                (
+                    r,
+                ),
+                CR.keys(),
+                chain_and_or='or'
+            )
+            if Selected_R:
+                for key, scores in CR[Selected_R].items():
+                    self.scores[key].append(scores)
+
+
 def ComputeNow(reply_book_id):
     from ..record import Record
     from .reply import ReplyBook

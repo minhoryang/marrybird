@@ -17,6 +17,7 @@ from .compute import ComputeNow
 from .question import QuestionBook, Question
 from .result import ResultBook
 from ._hexaco import *
+from ._o_h import O_H
 
 
 class ReplyMixIn(object):
@@ -291,6 +292,23 @@ def module_init(**kwargs):
 
                 return {'status': 200, 'message': {'result': result, 'description': description}}, 200
             # XXX : THE FIRST Technical Debt lives here!!!!!!!!
+            # XXX : THE SECOND Technical Debt lives here!!!!!!!!
+            isOH = 'O_H' == HEXACO_DESC
+            if isOH:
+                score = int(found.computed_result)
+                value = None
+                if score <= 55:
+                    value = O_H['values']['20']
+                elif score <= 60:
+                    value = O_H['values']['56']
+                elif score <= 64:
+                    value = O_H['values']['61']
+                else:
+                    value = O_H['values']['65']
+                result = O_H['name'] % (value, score)
+                description = O_H['description']
+                return {'status': 200, 'message': {'result': result, 'description': description}}, 200
+            # XXX : THE SECOND Technical Debt lives here!!!!!!!!
 
             result = found.computed_result
 
