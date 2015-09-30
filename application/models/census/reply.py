@@ -244,7 +244,50 @@ def module_init(**kwargs):
                         HEXACO_H['detail_description']['H:Mode'] % (datas['H:Mode'],),
                     ))
                 elif HEXACO_DESC == 'HEXACO_E':
-                    pass
+                    result = RESULT_FORM % (HEXACO_E['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_E['description'],
+                        HEXACO_E['detail_description']['E:Fear'] % (datas['E:Fear'],),
+                        HEXACO_E['detail_description']['E:Anxi'] % (datas['E:Anxi'],),
+                        HEXACO_E['detail_description']['E:Depe'] % (datas['E:Depe'],),
+                        HEXACO_E['detail_description']['E:Sent'] % (datas['E:Sent'],),
+                    ))
+                elif HEXACO_DESC == 'HEXACO_X':
+                    result = RESULT_FORM % (HEXACO_X['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_X['description'],
+                        HEXACO_X['detail_description']['X:Expr'] % (datas['X:Expr'],),
+                        HEXACO_X['detail_description']['X:SocB'] % (datas['X:SocB'],),
+                        HEXACO_X['detail_description']['X:Soci'] % (datas['X:Soci'],),
+                        HEXACO_X['detail_description']['X:Live'] % (datas['X:Live'],),
+                    ))
+                elif HEXACO_DESC == 'HEXACO_A':
+                    result = RESULT_FORM % (HEXACO_A['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_A['description'],
+                        HEXACO_A['detail_description']['A:Forg'] % (datas['A:Forg'],),
+                        HEXACO_A['detail_description']['A:Gent'] % (datas['A:Gent'],),
+                        HEXACO_A['detail_description']['A:Flex'] % (datas['A:Flex'],),
+                        HEXACO_A['detail_description']['A:Pati'] % (datas['A:Pati'],),
+                    ))
+                elif HEXACO_DESC == 'HEXACO_C':
+                    result = RESULT_FORM % (HEXACO_C['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_C['description'],
+                        HEXACO_C['detail_description']['C:Orga'] % (datas['C:Orga'],),
+                        HEXACO_C['detail_description']['C:Dili'] % (datas['C:Dili'],),
+                        HEXACO_C['detail_description']['C:Perf'] % (datas['C:Perf'],),
+                        HEXACO_C['detail_description']['C:Prud'] % (datas['C:Prud'],),
+                    ))
+                elif HEXACO_DESC == 'HEXACO_O':
+                    result = RESULT_FORM % (HEXACO_O['name'], datas['Total'])
+                    description = '\n\n'.join((
+                        HEXACO_O['description'],
+                        HEXACO_O['detail_description']['O:AesA'] % (datas['O:AesA'],),
+                        HEXACO_O['detail_description']['O:Inqu'] % (datas['O:Inqu'],),
+                        HEXACO_O['detail_description']['O:Crea'] % (datas['O:Crea'],),
+                        HEXACO_O['detail_description']['O:Unco'] % (datas['O:Unco'],),
+                    ))
 
                 return {'status': 200, 'message': {'result': result, 'description': description}}, 200
             # XXX : THE FIRST Technical Debt lives here!!!!!!!!
