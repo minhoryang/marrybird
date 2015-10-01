@@ -23,4 +23,6 @@ greenlet
 celery
 flower
 
+humanize
+
 psycopg2
