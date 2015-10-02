@@ -19,7 +19,7 @@ def PhoneCheckRequest_post(self, phone, status, retries=0, max_retries=10):
         if retries > max_retries:
             return 'failed - no record'
         if 'celery' in Celery.conf.MARRYBIRD_FLAGS:
-            return 'retry - %s' % (PhoneCheckRequest_post.delay(phone, status, retires+1),)
+            return 'retry - %s' % (PhoneCheckRequest_post.delay(phone, status, retries+1),)
         return PhoneCheckRequest_post(self, phone, status, retries+1)
 
     # TODO: Need to connect externals/phonenum-check-by-company
