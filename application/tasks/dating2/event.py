@@ -16,7 +16,7 @@ def DeliveryToUser(event_id):
 
 
 @Celery.task(ignore_result=True)
-def SuggestionAll(max=2):
+def SuggestionAll(max=1):
     from ...externals.slack import push
     from ...models import db
     from ...models.dating2.state import State, StateException
