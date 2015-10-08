@@ -20,25 +20,36 @@ CELERYBEAT_SCHEDULE = {
     'Every-Day-Im-Shuffling': {
         'task': 'application.tasks.dating2.event.SuggestionAll',
         'schedule': crontab(
-            hour='0', minute='30',
+            hour='0',
+            minute='30',
+        ),
+    },
+    'Rest-In-Peace--Action':{
+        'task': 'application.tasks.dating2.action.RestInPeace',
+        'schedule': crontab(
+            hour='2',
+            minute='30'
         ),
     },
     'Rest-In-Peace--Event':{
-        'task': 'application.tasks.dating2.action.RestInPeace',
-        'schedule': crontab(hour='2', minute='30'),
-    },
-    'Rest-In-Peace--Event':{
         'task': 'application.tasks.dating2.event.RestInPeace',
-        'schedule': crontab(hour='3', minute='0'),
+        'schedule': crontab(
+            hour='0',
+            minute='0'
+        ),
     },
-    'Rest-In-Peace--Event':{
+    'Rest-In-Peace--State':{
         'task': 'application.tasks.dating2.state.RestInPeace',
-        'schedule': crontab(hour='3', minute='30'),
+        'schedule': crontab(
+            hour='3',
+            minute='30'
+        ),
     },
     'Knock-Knock-Knock-Penny--Are-You-There' : {
         'task': 'application.tasks.dating2.action.NotResponsedAll',
         'schedule': crontab(
-            hour='0', minute='0',
+            hour='0',
+            minute='15',
         ),
     },
 }
