@@ -127,4 +127,4 @@ def WelcomeSuggestion(username, max=2):
 @Celery.task(ignore_result=True)
 def RestInPeace():
     from ...models.dating2.event import DeadEvent
-    DeadEvent.RestInPeace()
+    return DeadEvent.RestInPeace()
