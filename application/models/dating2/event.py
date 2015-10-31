@@ -93,6 +93,7 @@ class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
     @staticmethod
     def RestInPeace(now=datetime.now(), timeout=timedelta(days=7)):
         target = now - timeout
+        output = []
         for DB in (
             Event_00_Server_Suggested,
             Event_03_AskedOut,
@@ -114,7 +115,9 @@ class DeadEvent(_EventMixIn, _EventCopyMixIn, db.Model):
                 out.CopyAndPaste(evt)
                 db.session.add(out)
                 db.session.delete(evt)
+                output.append((evt.username, out._results))
         db.session.commit()
+        return output
 
 
 def init(**kwargs):
