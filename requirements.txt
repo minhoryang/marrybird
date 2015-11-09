@@ -26,3 +26,5 @@ flower
 humanize
 
 psycopg2
+
+coolsms
