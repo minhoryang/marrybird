@@ -27,4 +27,5 @@ humanize
 
 psycopg2
 
-coolsms
+-e git+https://github.com/marrybird/coolsms-python.git@python3#egg=coolsms
+
