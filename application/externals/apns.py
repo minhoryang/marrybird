@@ -36,4 +36,4 @@ def push(message, token=None, badge=1, sound='default'):
                 sound=sound,
             ).token_errors}
     else:
-        raise APNSException()
+        return {"errors": "no device_id for target"}

@@ -49,6 +49,7 @@ class SelfStoryLike(db.Model):
 def init(**kwargs):
     api = kwargs['api']
     jwt = kwargs['jwt']
+    flags = kwargs['flags']
     namespace = api.namespace(__name__.split('.')[-1], description=__doc__.split('.')[0])
     authorization = api.parser()
     authorization.add_argument('authorization', type=str, required=True, help='"Bearer $JsonWebToken"', location='headers')
@@ -178,6 +179,8 @@ def init(**kwargs):
         @api.doc(parser=authorization)
         def put(self, username, idx):
             """Like it."""
+            from ..tasks.selfstory import ILikeYourSelfStory_put
+
             story = SelfStory.query.get(idx)
             if not story or story.username != username:
                 return {'status': 404, 'message': 'Not Found'}, 404
@@ -194,6 +197,16 @@ def init(**kwargs):
             like.story_id = idx
             db.session.add(like)
             db.session.commit()
+            if 'celery' in flags:
+                ILikeYourSelfStory_put.delay(
+                    target_username=username,
+                    like_nickname=current_user.nickname,
+                )
+            else:
+                ILikeYourSelfStory_put(
+                    target_username=username,
+                    like_nickname=current_user.nickname,
+                )
             return {'status': 200, 'message': 'Like it!'}, 200
 
         @jwt_required()
