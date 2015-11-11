@@ -10,3 +10,6 @@ db/flower.*
 db/celerybeat*
 supervisord.*
 celerybeat.pid
+*.pem
+*.p12
+

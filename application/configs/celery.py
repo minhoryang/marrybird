@@ -11,6 +11,7 @@ CELERY_IMPORTS = [
     'application.tasks.dating2.action',
     'application.tasks.dating2.event',
     'application.tasks.dating2.state',
+    'application.tasks.selfstory',
 ]
 CELERY_ACCEPT_CONTENT = ['json',]
 CELERY_TASK_SERIALIZER = 'json'
