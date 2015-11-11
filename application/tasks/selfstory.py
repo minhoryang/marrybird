@@ -21,6 +21,6 @@ def ILikeYourSelfStory_put(self, target_username, like_nickname):
         device_id = found.token
         device_id = ''.join(device_id.split())
         # send it
-        msg = like_nickname + "님이 회원님의 셀프스토리를 좋대요!"
+        msg = like_nickname + "님이 회원님의 셀프스토리를 좋아해요!"
         return push(msg, device_id)
     return {'error': 'device_id notfound for ' + target_username}
